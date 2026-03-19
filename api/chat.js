@@ -1,43 +1,52 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+export const config = { runtime: 'edge' };
 
-  const { message } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: "Missing message" });
-  }
-
+export default async function handler(req) {
   try {
-    const groqResponse = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-70b-versatile",
-          messages: [
-            { role: "user", content: message }
-          ]
-        })
-      }
-    );
+    const { message } = await req.json();
 
-    const data = await groqResponse.json();
+    // 1. Map all 4 keys from Vercel Environment Variables
+    const keys = {
+      groq: process.env.GROQ_API_KEY,
+      or: process.env.OPENROUTER_API_KEY,
+      gemini: process.env.GEMINI_API_KEY,
+      openai: process.env.OPENAI_API_KEY
+    };
 
-    const reply =
-      data?.choices?.[0]?.message?.content ||
-      "No response from Groq.";
+    // 2. Launch all 4 AI requests simultaneously (The Council)
+    const results = await Promise.all([
+      // GROQ
+      fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST", headers: { "Authorization": `Bearer ${keys.groq}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "user", content: message }] })
+      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "Groq Offline"),
 
-    return res.status(200).json({ text: reply });
+      // OPENROUTER
+      fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST", headers: { "Authorization": `Bearer ${keys.or}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "openrouter/auto", messages: [{ role: "user", content: message }] })
+      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "OpenRouter Offline"),
 
-  } catch (err) {
-    return res.status(500).json({
-      error: "Groq Router Error: " + err.message
-    });
+      // GEMINI
+      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: message }] }] })
+      }).then(r => r.json()).then(d => d.candidates[0].content.parts[0].text).catch(() => "Gemini Offline"),
+
+      // GPT (OpenAI)
+      fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST", headers: { "Authorization": `Bearer ${keys.openai}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: message }] })
+      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "GPT Offline")
+    ]);
+
+    // 3. Construct the combined response
+    const finalDisplay = `🤖 GROQ: ${results[0]}\n\n🌐 OPENROUTER: ${results[1]}\n\n✨ GEMINI: ${results[2]}\n\n🧠 GPT: ${results[3]}`;
+
+    return new Response(JSON.stringify({
+      candidates: [{ content: { parts: [{ text: finalDisplay }] } }]
+    }), { status: 200 });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: "One or more API keys are missing or invalid in Vercel settings." }), { status: 500 });
   }
 }
