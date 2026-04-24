@@ -27,6 +27,7 @@
             width: 253px; 
             border-right: 4.45px solid var(--line); 
             height: 100%;
+            transition: width 0.3s ease;
         }
 
         main { 
@@ -34,6 +35,7 @@
             display: flex; 
             flex-direction: column; 
             height: 100%;
+            min-width: 0; /* Prevents flex items from overflowing */
         }
 
         header {
@@ -51,7 +53,7 @@
         }
 
         .msg { 
-            max-width: 65%; 
+            max-width: 85%; /* Wider on mobile for better readability */
             padding: 15px 20px; 
             border: 1px solid var(--line); 
             font-size: 14px;
@@ -63,6 +65,11 @@
             overflow-wrap: anywhere;
         }
 
+        /* Larger devices use a narrower message box */
+        @media (min-width: 768px) {
+            .msg { max-width: 65%; }
+        }
+
         .user { 
             align-self: flex-end; 
             border-color: rgba(255, 255, 255, 0.4); 
@@ -71,18 +78,27 @@
         .ai { align-self: flex-start; }
 
         .input-area { 
-            padding: 46px;
+            padding: 20px; /* Reduced padding for mobile */
             display: flex;
             justify-content: center;
-            padding-right: 100px; 
             align-items: flex-end; 
-            gap: 15px; 
+            gap: 10px; 
             position: relative; 
+            width: 100%;
+        }
+
+        /* Responsive shift to the left for desktop only */
+        @media (min-width: 1024px) {
+            .input-area {
+                padding: 46px;
+                padding-right: 100px; 
+                gap: 15px;
+            }
         }
 
         .circle-btn {
-            width: 58px;
-            height: 58px;
+            width: 50px; /* Slightly smaller for mobile */
+            height: 50px;
             background: var(--input-bg);
             border-radius: 50%;
             display: flex;
@@ -90,19 +106,22 @@
             justify-content: center;
             cursor: pointer;
             color: #ffffff;
-            font-size: 20px;
+            font-size: 18px;
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.32s;
             flex-shrink: 0;
             margin-bottom: 2px;
         }
 
-        .circle-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+        @media (min-width: 1024px) {
+            .circle-btn {
+                width: 58px;
+                height: 58px;
+                font-size: 20px;
+            }
         }
 
-        .circle-btn.clicked {
-            transform: scale(0.85);
-        }
+        .circle-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .circle-btn.clicked { transform: scale(0.85); }
 
         .input-wrap {
             position: relative;
@@ -117,7 +136,7 @@
             background: var(--input-bg);
             border: none; 
             border-radius: 25px; 
-            padding: 20px 60px 20px 30px; 
+            padding: 15px 50px 15px 20px; /* Adjusted for smaller screens */
             color: var(--text);
             outline: none;
             font-size: 16px;
@@ -132,29 +151,31 @@
             -ms-overflow-style: none; 
         }
 
-        .input-box::-webkit-scrollbar {
-            display: none;
-            width: 0 !important;
-            height: 0 !important;
+        @media (min-width: 1024px) {
+            .input-box { padding: 20px 60px 20px 30px; }
         }
 
-        .input-box:focus {
-            background: rgba(255, 255, 255, 0.14);
-        }
+        .input-box::-webkit-scrollbar { display: none; }
 
         .send-btn {
             position: absolute;
-            right: 24.5px;
-            bottom: 18px; 
+            right: 15px;
+            bottom: 15px; 
             color: #ffffff;
-            font-size: 21.5px;
+            font-size: 20px;
             cursor: pointer;
             opacity: 1;
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.34s;
         }
 
-        .send-btn.clicked {
-            transform: scale(0.8);
+        @media (min-width: 1024px) {
+            .send-btn { right: 24.5px; bottom: 18px; font-size: 21.5px; }
+        }
+
+        /* Mobile specific: Hide sidebar to save space */
+        @media (max-width: 768px) {
+            aside { width: 0; border: none; overflow: hidden; }
+            #chat-container { padding: 20px; }
         }
 
         #chat-container::-webkit-scrollbar { display: none; }
@@ -192,11 +213,9 @@
     <script>
         const memory = [];
 
-        // Device Detection: Runs on load to hide Camera button on desktops
         window.addEventListener('DOMContentLoaded', () => {
             const cameraBtn = document.getElementById('btn2');
             const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
             if (!isMobile) {
                 cameraBtn.style.display = 'none';
             }
