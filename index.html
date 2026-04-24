@@ -95,15 +95,14 @@
             }
         }
 
-        /* --- EMPTY BLANK BOX --- */
         .action-box {
             position: absolute;
-            bottom: 120%; /* Sits above the buttons */
+            bottom: 120%; 
             background: #111111;
             border: 1px solid var(--line);
             border-radius: 12px;
             width: 220px;
-            height: 150px; /* Empty blank box */
+            height: 150px; 
             display: none;
             z-index: 100;
             box-shadow: 0 8px 25px rgba(0,0,0,0.7);
@@ -120,7 +119,7 @@
         }
 
         .circle-btn {
-            width: 44px; /* Tiny bit smaller for mobile */
+            width: 44px; 
             height: 44px;
             background: var(--input-bg);
             border-radius: 50%;
@@ -136,9 +135,21 @@
             position: relative;
         }
 
+        /* Feedback for active recording */
+        .circle-btn.recording {
+            background: rgba(255, 0, 0, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
         @media (min-width: 1024px) {
             .circle-btn {
-                width: 48px; /* Tiny bit smaller for desktop */
+                width: 48px; 
                 height: 48px;
                 font-size: 18px;
             }
@@ -224,10 +235,9 @@
                 <div id="box2" class="action-box"></div>
             </div>
 
-            <div id="btn3" class="circle-btn" onclick="toggleBox('box3', 'btn3')">
+            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')">
                 <i class="fas fa-microphone"></i>
-                <div id="box3" class="action-box"></div>
-            </div>
+                </div>
 
             <div class="input-wrap">
                 <textarea id="userInput" class="input-box" rows="1" placeholder="" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
@@ -239,6 +249,56 @@
     <script>
         const memory = [];
         let activeBoxId = null;
+
+        // Voice Recognition Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+
+            recognition.onresult = (event) => {
+                const input = document.getElementById('userInput');
+                let transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('');
+                
+                input.value = transcript;
+                autoExpand(input);
+            };
+
+            recognition.onend = () => {
+                document.getElementById('btn3').classList.remove('recording');
+            };
+        }
+
+        function startVoiceRecognition(btnId) {
+            const btn = document.getElementById(btnId);
+            
+            // Close other boxes if open
+            if (activeBoxId) {
+                document.getElementById(activeBoxId).classList.remove('active');
+                activeBoxId = null;
+            }
+
+            if (!recognition) {
+                alert("Voice Recognition not supported in this browser.");
+                return;
+            }
+
+            btn.classList.add('clicked');
+            setTimeout(() => btn.classList.remove('clicked'), 100);
+
+            btn.classList.toggle('recording');
+            
+            if (btn.classList.contains('recording')) {
+                recognition.start();
+            } else {
+                recognition.stop();
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const cameraBtn = document.getElementById('btn2');
@@ -304,6 +364,9 @@
                 document.getElementById(activeBoxId).classList.remove('active');
                 activeBoxId = null;
             }
+
+            // Stop voice if sending
+            if (recognition) recognition.stop();
 
             memory.push({ role: "user", text: val });
             renderChat();
