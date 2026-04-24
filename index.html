@@ -11,6 +11,7 @@
             --line: rgba(255, 255, 255, 0.12); 
             --input-bg: rgba(255, 255, 255, 0.14); 
             --text: #ffffff;
+            --accent: rgba(255, 255, 255, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
@@ -35,7 +36,7 @@
             display: flex; 
             flex-direction: column; 
             height: 100%;
-            min-width: 0; /* Prevents flex items from overflowing */
+            min-width: 0; 
         }
 
         header {
@@ -53,7 +54,7 @@
         }
 
         .msg { 
-            max-width: 85%; /* Wider on mobile for better readability */
+            max-width: 85%; 
             padding: 15px 20px; 
             border: 1px solid var(--line); 
             font-size: 14px;
@@ -65,7 +66,6 @@
             overflow-wrap: anywhere;
         }
 
-        /* Larger devices use a narrower message box */
         @media (min-width: 768px) {
             .msg { max-width: 65%; }
         }
@@ -78,7 +78,7 @@
         .ai { align-self: flex-start; }
 
         .input-area { 
-            padding: 20px; /* Reduced padding for mobile */
+            padding: 20px; 
             display: flex;
             justify-content: center;
             align-items: flex-end; 
@@ -87,7 +87,6 @@
             width: 100%;
         }
 
-        /* Responsive shift to the left for desktop only */
         @media (min-width: 1024px) {
             .input-area {
                 padding: 46px;
@@ -96,8 +95,34 @@
             }
         }
 
+        /* --- THE NEW FLOATING BOX --- */
+        .action-box {
+            position: absolute;
+            bottom: 110%; /* Sits above the buttons */
+            background: #1a1a1a;
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            width: 200px;
+            padding: 15px;
+            display: none; /* Hidden by default */
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: white;
+            text-align: center;
+        }
+
+        .action-box.active {
+            display: block;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .circle-btn {
-            width: 50px; /* Slightly smaller for mobile */
+            width: 50px; 
             height: 50px;
             background: var(--input-bg);
             border-radius: 50%;
@@ -110,6 +135,7 @@
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.32s;
             flex-shrink: 0;
             margin-bottom: 2px;
+            position: relative;
         }
 
         @media (min-width: 1024px) {
@@ -120,7 +146,7 @@
             }
         }
 
-        .circle-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .circle-btn:hover { background: var(--accent); }
         .circle-btn.clicked { transform: scale(0.85); }
 
         .input-wrap {
@@ -136,7 +162,7 @@
             background: var(--input-bg);
             border: none; 
             border-radius: 25px; 
-            padding: 15px 50px 15px 20px; /* Adjusted for smaller screens */
+            padding: 15px 50px 15px 20px; 
             color: var(--text);
             outline: none;
             font-size: 16px;
@@ -172,7 +198,6 @@
             .send-btn { right: 24.5px; bottom: 18px; font-size: 21.5px; }
         }
 
-        /* Mobile specific: Hide sidebar to save space */
         @media (max-width: 768px) {
             aside { width: 0; border: none; overflow: hidden; }
             #chat-container { padding: 20px; }
@@ -191,16 +216,19 @@
         <div id="chat-container"></div>
 
         <div class="input-area">
-            <div id="btn1" class="circle-btn" onclick="triggerAction('btn1')">
+            <div id="btn1" class="circle-btn" onclick="toggleBox('box1', 'btn1')">
                 <i class="fas fa-plus"></i>
+                <div id="box1" class="action-box">Options for Plus</div>
             </div>
 
-            <div id="btn2" class="circle-btn" onclick="triggerAction('btn2')">
+            <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')">
                 <i class="fas fa-camera"></i>
+                <div id="box2" class="action-box">Camera Settings</div>
             </div>
 
-            <div id="btn3" class="circle-btn" onclick="triggerAction('btn3')">
+            <div id="btn3" class="circle-btn" onclick="toggleBox('box3', 'btn3')">
                 <i class="fas fa-microphone"></i>
+                <div id="box3" class="action-box">Voice Input</div>
             </div>
 
             <div class="input-wrap">
@@ -212,6 +240,7 @@
 
     <script>
         const memory = [];
+        let activeBoxId = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const cameraBtn = document.getElementById('btn2');
@@ -220,6 +249,30 @@
                 cameraBtn.style.display = 'none';
             }
         });
+
+        // Toggle logic for the boxes
+        function toggleBox(boxId, btnId) {
+            const box = document.getElementById(boxId);
+            const btn = document.getElementById(btnId);
+
+            // Click effect
+            btn.classList.add('clicked');
+            setTimeout(() => btn.classList.remove('clicked'), 100);
+
+            // If clicking the same box, close it
+            if (activeBoxId === boxId) {
+                box.classList.remove('active');
+                activeBoxId = null;
+            } else {
+                // Close any other open box
+                if (activeBoxId) {
+                    document.getElementById(activeBoxId).classList.remove('active');
+                }
+                // Open new box
+                box.classList.add('active');
+                activeBoxId = boxId;
+            }
+        }
 
         function autoExpand(textarea) {
             textarea.style.height = 'auto';
@@ -231,12 +284,6 @@
                 e.preventDefault();
                 send();
             }
-        }
-
-        function triggerAction(id) {
-            const btn = document.getElementById(id);
-            btn.classList.add('clicked');
-            setTimeout(() => btn.classList.remove('clicked'), 100);
         }
 
         function renderChat() {
@@ -259,6 +306,12 @@
 
             icon.classList.add('clicked');
             setTimeout(() => icon.classList.remove('clicked'), 100);
+
+            // Close boxes on send
+            if (activeBoxId) {
+                document.getElementById(activeBoxId).classList.remove('active');
+                activeBoxId = null;
+            }
 
             memory.push({ role: "user", text: val });
             renderChat();
