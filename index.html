@@ -91,39 +91,37 @@
             .input-area {
                 padding: 46px;
                 padding-right: 100px; 
-                gap: 15px;
+                gap: 12px;
             }
         }
 
-        /* --- THE NEW FLOATING BOX --- */
+        /* --- EMPTY BLANK BOX --- */
         .action-box {
             position: absolute;
-            bottom: 110%; /* Sits above the buttons */
-            background: #1a1a1a;
+            bottom: 120%; /* Sits above the buttons */
+            background: #111111;
             border: 1px solid var(--line);
-            border-radius: 15px;
-            width: 200px;
-            padding: 15px;
-            display: none; /* Hidden by default */
+            border-radius: 12px;
+            width: 220px;
+            height: 150px; /* Empty blank box */
+            display: none;
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            color: white;
-            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
         }
 
         .action-box.active {
             display: block;
-            animation: fadeIn 0.2s ease-out;
+            animation: fadeIn 0.15s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .circle-btn {
-            width: 50px; 
-            height: 50px;
+            width: 44px; /* Tiny bit smaller for mobile */
+            height: 44px;
             background: var(--input-bg);
             border-radius: 50%;
             display: flex;
@@ -131,7 +129,7 @@
             justify-content: center;
             cursor: pointer;
             color: #ffffff;
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.32s;
             flex-shrink: 0;
             margin-bottom: 2px;
@@ -140,9 +138,9 @@
 
         @media (min-width: 1024px) {
             .circle-btn {
-                width: 58px;
-                height: 58px;
-                font-size: 20px;
+                width: 48px; /* Tiny bit smaller for desktop */
+                height: 48px;
+                font-size: 18px;
             }
         }
 
@@ -178,7 +176,7 @@
         }
 
         @media (min-width: 1024px) {
-            .input-box { padding: 20px 60px 20px 30px; }
+            .input-box { padding: 18px 60px 18px 25px; }
         }
 
         .input-box::-webkit-scrollbar { display: none; }
@@ -186,16 +184,16 @@
         .send-btn {
             position: absolute;
             right: 15px;
-            bottom: 15px; 
+            bottom: 14px; 
             color: #ffffff;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             opacity: 1;
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.34s;
         }
 
         @media (min-width: 1024px) {
-            .send-btn { right: 24.5px; bottom: 18px; font-size: 21.5px; }
+            .send-btn { right: 22px; bottom: 16px; font-size: 20px; }
         }
 
         @media (max-width: 768px) {
@@ -218,17 +216,17 @@
         <div class="input-area">
             <div id="btn1" class="circle-btn" onclick="toggleBox('box1', 'btn1')">
                 <i class="fas fa-plus"></i>
-                <div id="box1" class="action-box">Options for Plus</div>
+                <div id="box1" class="action-box"></div>
             </div>
 
             <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')">
                 <i class="fas fa-camera"></i>
-                <div id="box2" class="action-box">Camera Settings</div>
+                <div id="box2" class="action-box"></div>
             </div>
 
             <div id="btn3" class="circle-btn" onclick="toggleBox('box3', 'btn3')">
                 <i class="fas fa-microphone"></i>
-                <div id="box3" class="action-box">Voice Input</div>
+                <div id="box3" class="action-box"></div>
             </div>
 
             <div class="input-wrap">
@@ -250,25 +248,20 @@
             }
         });
 
-        // Toggle logic for the boxes
         function toggleBox(boxId, btnId) {
             const box = document.getElementById(boxId);
             const btn = document.getElementById(btnId);
 
-            // Click effect
             btn.classList.add('clicked');
             setTimeout(() => btn.classList.remove('clicked'), 100);
 
-            // If clicking the same box, close it
             if (activeBoxId === boxId) {
                 box.classList.remove('active');
                 activeBoxId = null;
             } else {
-                // Close any other open box
                 if (activeBoxId) {
                     document.getElementById(activeBoxId).classList.remove('active');
                 }
-                // Open new box
                 box.classList.add('active');
                 activeBoxId = boxId;
             }
@@ -307,7 +300,6 @@
             icon.classList.add('clicked');
             setTimeout(() => icon.classList.remove('clicked'), 100);
 
-            // Close boxes on send
             if (activeBoxId) {
                 document.getElementById(activeBoxId).classList.remove('active');
                 activeBoxId = null;
