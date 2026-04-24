@@ -13,6 +13,7 @@
             --text: #ffffff;
             --accent: rgba(255, 255, 255, 0.2);
             --box-bg: #111111;
+            --modal-bg: #161616;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
@@ -38,6 +39,7 @@
             flex-direction: column; 
             height: 100%;
             min-width: 0; 
+            position: relative;
         }
 
         header {
@@ -78,6 +80,47 @@
 
         .ai { align-self: flex-start; }
 
+        /* --- CENTRAL MODAL STYLE --- */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .central-poll {
+            background: var(--modal-bg);
+            width: 90%;
+            max-width: 500px;
+            height: 350px;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show { display: flex; }
+        .modal-overlay.show .central-poll { transform: scale(1); opacity: 1; }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            color: #777;
+            font-size: 20px;
+        }
+        .close-modal:hover { color: #fff; }
+
+        /* --- INPUT AREA & BUTTONS --- */
         .input-area { 
             padding: 20px; 
             display: flex;
@@ -89,14 +132,9 @@
         }
 
         @media (min-width: 1024px) {
-            .input-area {
-                padding: 46px;
-                padding-right: 100px; 
-                gap: 12px;
-            }
+            .input-area { padding: 46px; padding-right: 100px; gap: 12px; }
         }
 
-        /* --- UPDATED POLL BOX --- */
         .action-box {
             position: absolute;
             bottom: 120%; 
@@ -111,15 +149,10 @@
             padding: 8px 0;
         }
 
-        /* Specific height for empty boxes to match your previous request */
         #box2, #box3 { height: 150px; }
 
-        .action-box.active {
-            display: block;
-            animation: fadeIn 0.15s ease-out;
-        }
+        .action-box.active { display: block; animation: fadeIn 0.15s ease-out; }
 
-        /* List items inside Plus Poll */
         .poll-item {
             display: flex;
             align-items: center;
@@ -129,28 +162,12 @@
             cursor: pointer;
             transition: background 0.2s, color 0.2s;
             gap: 12px;
-            text-align: left;
         }
 
-        .poll-item:hover {
-            background: var(--line);
-            color: #fff;
-        }
-
-        .poll-item i {
-            width: 18px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .poll-item:hover { background: var(--line); color: #fff; }
 
         .circle-btn {
-            width: 44px; 
-            height: 44px;
+            width: 44px; height: 44px;
             background: var(--input-bg);
             border-radius: 50%;
             display: flex;
@@ -177,11 +194,7 @@
         }
 
         @media (min-width: 1024px) {
-            .circle-btn {
-                width: 48px; 
-                height: 48px;
-                font-size: 18px;
-            }
+            .circle-btn { width: 48px; height: 48px; font-size: 18px; }
         }
 
         .circle-btn:hover { background: var(--accent); }
@@ -223,12 +236,9 @@
 
         .send-btn {
             position: absolute;
-            right: 15px;
-            bottom: 14px; 
-            color: #ffffff;
-            font-size: 18px;
-            cursor: pointer;
-            opacity: 1;
+            right: 15px; bottom: 14px; 
+            color: #ffffff; font-size: 18px;
+            cursor: pointer; opacity: 1;
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.34s;
         }
 
@@ -241,6 +251,11 @@
             #chat-container { padding: 20px; }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         #chat-container::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -249,6 +264,16 @@
     <aside></aside>
 
     <main>
+        <div id="modalOverlay" class="modal-overlay">
+            <div class="central-poll">
+                <i class="fas fa-times close-modal" onclick="closeModal()"></i>
+                <h2 id="modalTitle" style="margin-bottom: 20px;"></h2>
+                <div id="modalBody" style="color: #aaa; font-size: 15px;">
+                    This is the central poll for the selected feature.
+                </div>
+            </div>
+        </div>
+
         <header></header>
         
         <div id="chat-container"></div>
@@ -257,11 +282,11 @@
             <div id="btn1" class="circle-btn" onclick="toggleBox('box1', 'btn1')">
                 <i class="fas fa-plus"></i>
                 <div id="box1" class="action-box">
-                    <div class="poll-item"><i class="fas fa-paperclip"></i> Attach File</div>
-                    <div class="poll-item"><i class="fas fa-link"></i> Search Link</div>
-                    <div class="poll-item"><i class="fas fa-cog"></i> Settings</div>
-                    <div class="poll-item"><i class="fas fa-layer-group"></i> Mode</div>
-                    <div class="poll-item"><i class="fas fa-tools"></i> Tools</div>
+                    <div class="poll-item" onclick="openModal('Attach File')"><i class="fas fa-paperclip"></i> Attach File</div>
+                    <div class="poll-item" onclick="openModal('Search Link')"><i class="fas fa-link"></i> Search Link</div>
+                    <div class="poll-item" onclick="openModal('Settings')"><i class="fas fa-cog"></i> Settings</div>
+                    <div class="poll-item" onclick="openModal('Mode')"><i class="fas fa-layer-group"></i> Mode</div>
+                    <div class="poll-item" onclick="openModal('Tools')"><i class="fas fa-tools"></i> Tools</div>
                 </div>
             </div>
 
@@ -286,46 +311,44 @@
         const memory = [];
         let activeBoxId = null;
 
+        // Modal Functions
+        function openModal(title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalOverlay').classList.add('show');
+            // Hide the small poll box
+            if (activeBoxId) {
+                document.getElementById(activeBoxId).classList.remove('active');
+                activeBoxId = null;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
-
             recognition.onresult = (event) => {
                 const input = document.getElementById('userInput');
-                let transcript = Array.from(event.results)
-                    .map(result => result[0])
-                    .map(result => result.transcript)
-                    .join('');
-                
-                input.value = transcript;
+                input.value = Array.from(event.results).map(r => r[0].transcript).join('');
                 autoExpand(input);
             };
-
-            recognition.onend = () => {
-                document.getElementById('btn3').classList.remove('recording');
-            };
+            recognition.onend = () => document.getElementById('btn3').classList.remove('recording');
         }
 
         function startVoiceRecognition(btnId) {
             const btn = document.getElementById(btnId);
             const box = document.getElementById('box3');
+            if (activeBoxId && activeBoxId !== 'box3') document.getElementById(activeBoxId).classList.remove('active');
+            if (!recognition) return alert("Not supported.");
             
-            if (activeBoxId && activeBoxId !== 'box3') {
-                document.getElementById(activeBoxId).classList.remove('active');
-            }
-
-            if (!recognition) {
-                alert("Voice Recognition not supported in this browser.");
-                return;
-            }
-
             btn.classList.add('clicked');
             setTimeout(() => btn.classList.remove('clicked'), 100);
 
-            // Toggle logic for empty box while recording
             if (activeBoxId === 'box3') {
                 box.classList.remove('active');
                 activeBoxId = null;
@@ -340,17 +363,13 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const cameraBtn = document.getElementById('btn2');
             const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) {
-                cameraBtn.style.display = 'none';
-            }
+            if (!isMobile) document.getElementById('btn2').style.display = 'none';
         });
 
         function toggleBox(boxId, btnId) {
             const box = document.getElementById(boxId);
             const btn = document.getElementById(btnId);
-
             btn.classList.add('clicked');
             setTimeout(() => btn.classList.remove('clicked'), 100);
 
@@ -358,9 +377,7 @@
                 box.classList.remove('active');
                 activeBoxId = null;
             } else {
-                if (activeBoxId) {
-                    document.getElementById(activeBoxId).classList.remove('active');
-                }
+                if (activeBoxId) document.getElementById(activeBoxId).classList.remove('active');
                 box.classList.add('active');
                 activeBoxId = boxId;
             }
@@ -372,10 +389,7 @@
         }
 
         function checkEnter(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                send();
-            }
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
         }
 
         function renderChat() {
@@ -395,7 +409,6 @@
             const icon = document.getElementById('sendIcon');
             const val = input.value.trim();
             if (!val) return;
-
             icon.classList.add('clicked');
             setTimeout(() => icon.classList.remove('clicked'), 100);
 
@@ -404,12 +417,10 @@
                 activeBoxId = null;
                 document.getElementById('btn3').classList.remove('recording');
             }
-
             if (recognition) recognition.stop();
 
             memory.push({ role: "user", text: val });
             renderChat();
-            
             input.value = "";
             input.style.height = 'auto';
 
@@ -423,13 +434,9 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ message: val })
                 });
-
                 const data = await res.json();
-                const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
-                memory[loadingIdx].text = responseText;
-            } catch (err) {
-                memory[loadingIdx].text = "?";
-            }
+                memory[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
+            } catch (err) { memory[loadingIdx].text = "?"; }
             renderChat();
         }
     </script>
