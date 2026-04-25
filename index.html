@@ -27,7 +27,7 @@
             overflow: hidden; 
         }
 
-        /* --- SIDEBAR HISTORY --- */
+        /* --- SIDEBAR --- */
         aside { 
             width: 280px; 
             background: var(--sidebar-bg);
@@ -65,7 +65,6 @@
             transition: background 0.3s;
         }
 
-        /* Icon-only circular/square buttons */
         .icon-btn {
             flex: 1;
             justify-content: center;
@@ -75,7 +74,6 @@
 
         .nav-btn:hover { background: var(--accent); }
 
-        /* Hanging Sign */
         .hanging-label {
             padding: 15px 25px 5px 25px;
             font-size: 11px;
@@ -112,6 +110,7 @@
         .history-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .history-item.active { background: var(--line); color: #fff; }
 
+        /* --- MAIN AREA --- */
         main { 
             flex: 1; 
             display: flex; 
@@ -128,7 +127,12 @@
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
+
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.15); border-radius: 10px; }
 
         .msg { 
             max-width: 85%; 
@@ -314,7 +318,7 @@
         <div id="chat-container"></div>
 
         <div class="input-area">
-            <div id="btn1" class="circle-btn" onclick="toggleBox('box1', 'btn1')">
+            <div id="btn1" class="circle-btn" onclick="toggleBox('box1')">
                 <i class="fas fa-plus"></i>
                 <div id="box1" class="action-box">
                     <div class="poll-item" onclick="openModal('Attach File')"><i class="fas fa-paperclip"></i> Attach File</div>
@@ -324,8 +328,17 @@
                     <div class="poll-item" onclick="openModal('Tools')"><i class="fas fa-tools"></i> Tools</div>
                 </div>
             </div>
-            <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')"><i class="fas fa-camera"></i><div id="box2" class="action-box" style="height:150px"></div></div>
-            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')"><i class="fas fa-microphone"></i><div id="box3" class="action-box" style="height:150px"></div></div>
+            
+            <div id="btn2" class="circle-btn" onclick="toggleBox('box2')" style="display: none;">
+                <i class="fas fa-camera"></i>
+                <div id="box2" class="action-box" style="height:150px"></div>
+            </div>
+
+            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')">
+                <i class="fas fa-microphone"></i>
+                <div id="box3" class="action-box" style="height:150px"></div>
+            </div>
+
             <div class="input-wrap">
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
@@ -335,7 +348,23 @@
 
     <script>
         let chats = []; let currentChatId = null; let activeBoxId = null;
+
+        // FIXED DEVICE DETECTION
+        function checkDevice() {
+            const cameraBtn = document.getElementById('btn2');
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                cameraBtn.style.display = 'flex';
+            } else {
+                cameraBtn.style.display = 'none';
+            }
+        }
+
+        window.onload = checkDevice;
+
         function showNamingModal() { document.getElementById('namingOverlay').classList.add('show'); document.getElementById('chatNameInput').focus(); }
+        
         function createNewChat() {
             const input = document.getElementById('chatNameInput');
             const name = input.value.trim() || "Untitled Chat";
@@ -344,6 +373,7 @@
             document.getElementById('namingOverlay').classList.remove('show');
             renderHistory(); renderChat();
         }
+
         function renderHistory() {
             const list = document.getElementById('history-list'); list.innerHTML = "";
             chats.forEach(c => {
@@ -354,6 +384,7 @@
                 list.appendChild(item);
             });
         }
+
         function renderChat() {
             const container = document.getElementById('chat-container'); container.innerHTML = "";
             const current = chats.find(c => c.id === currentChatId); if (!current) return;
@@ -363,19 +394,38 @@
             });
             container.scrollTop = container.scrollHeight;
         }
+
         function openModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalOverlay').classList.add('show'); }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         if (SpeechRecognition) {
             recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = true;
-            recognition.onresult = (e) => { document.getElementById('userInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); autoExpand(document.getElementById('userInput')); };
+            recognition.onresult = (e) => { 
+                document.getElementById('userInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); 
+                autoExpand(document.getElementById('userInput')); 
+            };
             recognition.onend = () => document.getElementById('btn3').classList.remove('recording');
         }
-        function startVoiceRecognition(btnId) { const btn = document.getElementById(btnId); if (!recognition) return; btn.classList.toggle('recording'); if (btn.classList.contains('recording')) recognition.start(); else recognition.stop(); }
-        function toggleBox(boxId) { const box = document.getElementById(boxId); if (activeBoxId && activeBoxId !== boxId) document.getElementById(activeBoxId).classList.remove('active'); box.classList.toggle('active'); activeBoxId = box.classList.contains('active') ? boxId : null; }
+
+        function startVoiceRecognition(btnId) { 
+            const btn = document.getElementById(btnId); 
+            if (!recognition) return; 
+            btn.classList.toggle('recording'); 
+            if (btn.classList.contains('recording')) recognition.start(); else recognition.stop(); 
+        }
+
+        function toggleBox(boxId) { 
+            const box = document.getElementById(boxId); 
+            if (activeBoxId && activeBoxId !== boxId) document.getElementById(activeBoxId).classList.remove('active'); 
+            box.classList.toggle('active'); 
+            activeBoxId = box.classList.contains('active') ? boxId : null; 
+        }
+
         function autoExpand(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight) + 'px'; }
         function checkEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+
         async function send() {
             const input = document.getElementById('userInput'); const val = input.value.trim(); if (!val) return;
             if (!currentChatId) { const chat = { id: Date.now(), name: val.substring(0, 20), messages: [] }; chats.unshift(chat); currentChatId = chat.id; }
@@ -383,6 +433,7 @@
             current.messages.push({ role: "user", text: val }); renderChat(); renderHistory();
             input.value = ""; input.style.height = 'auto';
             const loadingIdx = current.messages.length; current.messages.push({ role: "ai", text: "..." }); renderChat();
+            
             try {
                 const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: val }) });
                 const data = await res.json(); current.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
