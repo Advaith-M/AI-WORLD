@@ -29,21 +29,25 @@
 
         /* --- SIDEBAR HISTORY --- */
         aside { 
-            width: 260px; 
+            width: 280px; 
             background: var(--sidebar-bg);
             border-right: 1px solid var(--line); 
             height: 100%;
             display: flex;
             flex-direction: column;
-            transition: width 0.3s ease;
+        }
+
+        .top-nav {
+            padding: 15px 20px 5px 20px;
+            display: flex;
+            gap: 10px;
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 10px 20px 20px 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Spacing between top buttons */
-            border-bottom: 1px solid var(--line);
+            gap: 10px;
         }
 
         .nav-btn {
@@ -61,13 +65,30 @@
             transition: background 0.3s;
         }
 
+        /* Icon-only circular/square buttons */
+        .icon-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 10px;
+            font-size: 16px;
+        }
+
         .nav-btn:hover { background: var(--accent); }
 
-        /* SCROLLABLE LIST AREA */
+        /* Hanging Sign */
+        .hanging-label {
+            padding: 15px 25px 5px 25px;
+            font-size: 11px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
         #history-list {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 10px; /* Spacing between button group and list */
+            padding: 5px 10px 20px 10px;
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
         }
@@ -107,12 +128,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
-
-        #chat-container::-webkit-scrollbar { width: 6px; }
-        #chat-container::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.15); border-radius: 10px; }
 
         .msg { 
             max-width: 85%; 
@@ -126,7 +142,6 @@
             word-break: break-all;
         }
 
-        @media (min-width: 768px) { .msg { max-width: 65%; } }
         .user { align-self: flex-end; border-color: rgba(255, 255, 255, 0.4); }
         .ai { align-self: flex-start; }
 
@@ -151,7 +166,6 @@
             border-radius: 20px;
             border: 1px solid var(--line);
             padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             text-align: center;
         }
 
@@ -186,8 +200,6 @@
             position: relative; 
         }
 
-        @media (min-width: 1024px) { .input-area { padding: 46px; padding-right: 100px; gap: 12px; } }
-
         .action-box {
             position: absolute;
             bottom: 120%; 
@@ -215,7 +227,7 @@
         .poll-item:hover { background: var(--line); color: #fff; }
 
         .circle-btn {
-            width: 44px; height: 44px;
+            width: 48px; height: 48px;
             background: var(--input-bg);
             border-radius: 50%;
             display: flex;
@@ -223,7 +235,6 @@
             justify-content: center;
             cursor: pointer;
             color: #ffffff;
-            font-size: 16px;
             flex-shrink: 0;
             margin-bottom: 2px;
             position: relative;
@@ -255,17 +266,16 @@
             cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-            aside { display: none; }
-            #chat-container { padding: 20px; }
-        }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <aside>
+        <div class="top-nav">
+            <div class="nav-btn icon-btn" onclick="openModal('Search')"><i class="fas fa-search"></i></div>
+            <div class="nav-btn icon-btn" onclick="openModal('More Options')"><i class="fas fa-bars"></i></div>
+        </div>
         <div class="sidebar-header">
             <div class="nav-btn" onclick="showNamingModal()">
                 <i class="fas fa-plus-circle"></i>
@@ -280,6 +290,7 @@
                 <span>...</span>
             </div>
         </div>
+        <div class="hanging-label">Chats</div>
         <div id="history-list"></div>
     </aside>
 
@@ -313,17 +324,8 @@
                     <div class="poll-item" onclick="openModal('Tools')"><i class="fas fa-tools"></i> Tools</div>
                 </div>
             </div>
-
-            <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')">
-                <i class="fas fa-camera"></i>
-                <div id="box2" class="action-box" style="height:150px"></div>
-            </div>
-
-            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')">
-                <i class="fas fa-microphone"></i>
-                <div id="box3" class="action-box" style="height:150px"></div>
-            </div>
-
+            <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')"><i class="fas fa-camera"></i><div id="box2" class="action-box" style="height:150px"></div></div>
+            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')"><i class="fas fa-microphone"></i><div id="box3" class="action-box" style="height:150px"></div></div>
             <div class="input-wrap">
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
@@ -332,143 +334,61 @@
     </main>
 
     <script>
-        let chats = []; 
-        let currentChatId = null;
-        let activeBoxId = null;
-
-        // --- CHAT HISTORY LOGIC ---
-        function showNamingModal() {
-            document.getElementById('namingOverlay').classList.add('show');
-            document.getElementById('chatNameInput').focus();
-        }
-
+        let chats = []; let currentChatId = null; let activeBoxId = null;
+        function showNamingModal() { document.getElementById('namingOverlay').classList.add('show'); document.getElementById('chatNameInput').focus(); }
         function createNewChat() {
-            const nameInput = document.getElementById('chatNameInput');
-            const name = nameInput.value.trim() || "Untitled Chat";
-            const newChat = { id: Date.now(), name: name, messages: [] };
-            
-            chats.unshift(newChat);
-            currentChatId = newChat.id;
-            
-            nameInput.value = "";
+            const input = document.getElementById('chatNameInput');
+            const name = input.value.trim() || "Untitled Chat";
+            const chat = { id: Date.now(), name, messages: [] };
+            chats.unshift(chat); currentChatId = chat.id; input.value = "";
             document.getElementById('namingOverlay').classList.remove('show');
-            renderHistory();
-            renderChat();
+            renderHistory(); renderChat();
         }
-
         function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = "";
-            chats.forEach(chat => {
+            const list = document.getElementById('history-list'); list.innerHTML = "";
+            chats.forEach(c => {
                 const item = document.createElement('div');
-                item.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
-                item.innerText = chat.name;
-                item.onclick = () => { currentChatId = chat.id; renderHistory(); renderChat(); };
+                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
+                item.innerText = c.name;
+                item.onclick = () => { currentChatId = c.id; renderHistory(); renderChat(); };
                 list.appendChild(item);
             });
         }
-
         function renderChat() {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = "";
-            const currentChat = chats.find(c => c.id === currentChatId);
-            if (!currentChat) return;
-            
-            currentChat.messages.forEach(m => {
-                const d = document.createElement('div');
-                d.className = `msg ${m.role}`;
-                d.innerText = m.text;
+            const container = document.getElementById('chat-container'); container.innerHTML = "";
+            const current = chats.find(c => c.id === currentChatId); if (!current) return;
+            current.messages.forEach(m => {
+                const d = document.createElement('div'); d.className = `msg ${m.role}`; d.innerText = m.text;
                 container.appendChild(d);
             });
             container.scrollTop = container.scrollHeight;
         }
-
-        // --- UTILITY MODALS ---
-        function openModal(title) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalOverlay').classList.add('show');
-            if (activeBoxId) toggleBox(activeBoxId, ''); 
-        }
-
+        function openModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalOverlay').classList.add('show'); }
         function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
-
-        // --- INPUT & VOICE ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = true;
-            recognition.onresult = (e) => {
-                const input = document.getElementById('userInput');
-                input.value = Array.from(e.results).map(r => r[0].transcript).join('');
-                autoExpand(input);
-            };
+            recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = true;
+            recognition.onresult = (e) => { document.getElementById('userInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); autoExpand(document.getElementById('userInput')); };
             recognition.onend = () => document.getElementById('btn3').classList.remove('recording');
         }
-
-        function startVoiceRecognition(btnId) {
-            const btn = document.getElementById(btnId);
-            if (!recognition) return alert("Not supported.");
-            btn.classList.toggle('recording');
-            if (btn.classList.contains('recording')) recognition.start();
-            else recognition.stop();
-        }
-
-        function toggleBox(boxId, btnId) {
-            const box = document.getElementById(boxId);
-            if (activeBoxId && activeBoxId !== boxId) document.getElementById(activeBoxId).classList.remove('active');
-            box.classList.toggle('active');
-            activeBoxId = box.classList.contains('active') ? boxId : null;
-        }
-
-        function autoExpand(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
-
+        function startVoiceRecognition(btnId) { const btn = document.getElementById(btnId); if (!recognition) return; btn.classList.toggle('recording'); if (btn.classList.contains('recording')) recognition.start(); else recognition.stop(); }
+        function toggleBox(boxId) { const box = document.getElementById(boxId); if (activeBoxId && activeBoxId !== boxId) document.getElementById(activeBoxId).classList.remove('active'); box.classList.toggle('active'); activeBoxId = box.classList.contains('active') ? boxId : null; }
+        function autoExpand(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight) + 'px'; }
         function checkEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
-
         async function send() {
-            const input = document.getElementById('userInput');
-            const val = input.value.trim();
-            if (!val) return;
-
-            // Auto-create first chat if none exists
-            if (!currentChatId) {
-                const newChat = { id: Date.now(), name: val.substring(0, 20), messages: [] };
-                chats.unshift(newChat);
-                currentChatId = newChat.id;
-            }
-
-            const currentChat = chats.find(c => c.id === currentChatId);
-            currentChat.messages.push({ role: "user", text: val });
-            renderChat();
-            renderHistory();
-            
-            input.value = "";
-            input.style.height = 'auto';
-            
-            const loadingIdx = currentChat.messages.length;
-            currentChat.messages.push({ role: "ai", text: "..." });
-            renderChat();
-
+            const input = document.getElementById('userInput'); const val = input.value.trim(); if (!val) return;
+            if (!currentChatId) { const chat = { id: Date.now(), name: val.substring(0, 20), messages: [] }; chats.unshift(chat); currentChatId = chat.id; }
+            const current = chats.find(c => c.id === currentChatId);
+            current.messages.push({ role: "user", text: val }); renderChat(); renderHistory();
+            input.value = ""; input.style.height = 'auto';
+            const loadingIdx = current.messages.length; current.messages.push({ role: "ai", text: "..." }); renderChat();
             try {
-                const res = await fetch("/api/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message: val })
-                });
-                const data = await res.json();
-                currentChat.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
-            } catch (err) { currentChat.messages[loadingIdx].text = "?"; }
+                const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: val }) });
+                const data = await res.json(); current.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
+            } catch (err) { current.messages[loadingIdx].text = "?"; }
             renderChat();
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) document.getElementById('btn2').style.display = 'none';
-        });
     </script>
 </body>
 </html>
