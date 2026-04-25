@@ -8,6 +8,7 @@
     <style>
         :root {
             --bg: #000000;
+            --sidebar-bg: #0a0a0a;
             --line: rgba(255, 255, 255, 0.12); 
             --input-bg: rgba(255, 255, 255, 0.14); 
             --text: #ffffff;
@@ -26,12 +27,59 @@
             overflow: hidden; 
         }
 
+        /* --- SIDEBAR HISTORY --- */
         aside { 
-            width: 253px; 
-            border-right: 4.45px solid var(--line); 
+            width: 260px; 
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--line); 
             height: 100%;
+            display: flex;
+            flex-direction: column;
             transition: width 0.3s ease;
         }
+
+        .sidebar-header {
+            padding: 20px;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .new-chat-btn:hover { background: var(--accent); }
+
+        #history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .history-item {
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .history-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .history-item.active { background: var(--line); color: #fff; }
 
         main { 
             flex: 1; 
@@ -42,11 +90,6 @@
             position: relative;
         }
 
-        header {
-            height: 0px;
-            border-bottom: 1px solid var(--line);
-        }
-
         #chat-container { 
             flex: 1; 
             overflow-y: auto; 
@@ -54,28 +97,12 @@
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
-            /* Scrollbar styling for Firefox */
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
 
-        /* Scrollbar styling for Chrome, Safari, and Edge */
-        #chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chat-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #chat-container::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-        }
-
-        #chat-container::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.15); border-radius: 10px; }
 
         .msg { 
             max-width: 85%; 
@@ -87,59 +114,59 @@
             border-radius: 10px; 
             white-space: pre-wrap;
             word-break: break-all;
-            overflow-wrap: anywhere;
         }
 
-        @media (min-width: 768px) {
-            .msg { max-width: 65%; }
-        }
-
-        .user { 
-            align-self: flex-end; 
-            border-color: rgba(255, 255, 255, 0.4); 
-        }
-
+        @media (min-width: 768px) { .msg { max-width: 65%; } }
+        .user { align-self: flex-end; border-color: rgba(255, 255, 255, 0.4); }
         .ai { align-self: flex-start; }
 
+        /* --- MODALS --- */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
         }
+
+        .modal-overlay.show { display: flex; }
 
         .central-poll {
             background: var(--modal-bg);
             width: 90%;
-            max-width: 500px;
-            height: 350px;
+            max-width: 400px;
             border-radius: 20px;
             border: 1px solid var(--line);
             padding: 30px;
-            position: relative;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
         }
 
-        .modal-overlay.show { display: flex; }
-        .modal-overlay.show .central-poll { transform: scale(1); opacity: 1; }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0;
+            background: #000;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
 
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .modal-btn {
+            padding: 10px 25px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            color: #777;
-            font-size: 20px;
+            font-weight: bold;
         }
-        .close-modal:hover { color: #fff; }
 
+        /* --- INPUT AREA --- */
         .input-area { 
             padding: 20px; 
             display: flex;
@@ -147,12 +174,9 @@
             align-items: flex-end; 
             gap: 10px; 
             position: relative; 
-            width: 100%;
         }
 
-        @media (min-width: 1024px) {
-            .input-area { padding: 46px; padding-right: 100px; gap: 12px; }
-        }
+        @media (min-width: 1024px) { .input-area { padding: 46px; padding-right: 100px; gap: 12px; } }
 
         .action-box {
             position: absolute;
@@ -163,12 +187,8 @@
             width: 220px;
             display: none;
             z-index: 100;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-            overflow: hidden;
             padding: 8px 0;
         }
-
-        #box2, #box3 { height: 150px; }
 
         .action-box.active { display: block; animation: fadeIn 0.15s ease-out; }
 
@@ -179,7 +199,6 @@
             color: #ccc;
             font-size: 14px;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s;
             gap: 12px;
         }
 
@@ -195,37 +214,15 @@
             cursor: pointer;
             color: #ffffff;
             font-size: 16px;
-            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.32s;
             flex-shrink: 0;
             margin-bottom: 2px;
             position: relative;
         }
 
-        .circle-btn.recording {
-            background: rgba(255, 0, 0, 0.3);
-            animation: pulse 1.5s infinite;
-        }
+        .circle-btn.recording { background: rgba(255, 0, 0, 0.3); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        @media (min-width: 1024px) {
-            .circle-btn { width: 48px; height: 48px; font-size: 18px; }
-        }
-
-        .circle-btn:hover { background: var(--accent); }
-        .circle-btn.clicked { transform: scale(0.85); }
-
-        .input-wrap {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            align-items: flex-end;
-        }
+        .input-wrap { position: relative; width: 100%; max-width: 800px; display: flex; align-items: flex-end; }
 
         .input-box {
             width: 100%;
@@ -236,63 +233,55 @@
             color: var(--text);
             outline: none;
             font-size: 16px;
-            transition: background 0.32s ease;
-            word-break: break-all;
             resize: none;
-            line-height: 1.5; 
             max-height: 160px; 
             overflow-y: auto;
-            display: block;
-            scrollbar-width: none; 
-            -ms-overflow-style: none; 
         }
-
-        @media (min-width: 1024px) {
-            .input-box { padding: 18px 60px 18px 25px; }
-        }
-
-        .input-box::-webkit-scrollbar { display: none; }
 
         .send-btn {
             position: absolute;
             right: 15px; bottom: 14px; 
             color: #ffffff; font-size: 18px;
-            cursor: pointer; opacity: 1;
-            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.34s;
-        }
-
-        @media (min-width: 1024px) {
-            .send-btn { right: 22px; bottom: 16px; font-size: 20px; }
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
-            aside { width: 0; border: none; overflow: hidden; }
+            aside { display: none; }
             #chat-container { padding: 20px; }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <aside></aside>
+    <aside>
+        <div class="sidebar-header">
+            <div class="new-chat-btn" onclick="showNamingModal()">
+                <i class="fas fa-plus-circle"></i>
+                <span>New Chat</span>
+            </div>
+        </div>
+        <div id="history-list"></div>
+    </aside>
 
     <main>
-        <div id="modalOverlay" class="modal-overlay">
+        <div id="namingOverlay" class="modal-overlay">
             <div class="central-poll">
-                <i class="fas fa-times close-modal" onclick="closeModal()"></i>
-                <h2 id="modalTitle" style="margin-bottom: 20px;"></h2>
-                <div id="modalBody" style="color: #aaa; font-size: 15px;">
-                    This is the central poll for the selected feature.
-                </div>
+                <h2 style="font-size: 18px;">Name your Chat</h2>
+                <input type="text" id="chatNameInput" class="modal-input" placeholder="e.g. My Project" autofocus>
+                <button class="modal-btn" onclick="createNewChat()">Create Chat</button>
             </div>
         </div>
 
-        <header></header>
-        
+        <div id="modalOverlay" class="modal-overlay">
+            <div class="central-poll">
+                <i class="fas fa-times" style="float:right; cursor:pointer" onclick="closeModal()"></i>
+                <h2 id="modalTitle" style="margin-bottom: 20px; font-size: 18px;"></h2>
+                <div id="modalBody" style="color: #aaa;"></div>
+            </div>
+        </div>
+
         <div id="chat-container"></div>
 
         <div class="input-area">
@@ -309,108 +298,65 @@
 
             <div id="btn2" class="circle-btn" onclick="toggleBox('box2', 'btn2')">
                 <i class="fas fa-camera"></i>
-                <div id="box2" class="action-box"></div>
+                <div id="box2" class="action-box" style="height:150px"></div>
             </div>
 
             <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')">
                 <i class="fas fa-microphone"></i>
-                <div id="box3" class="action-box"></div>
+                <div id="box3" class="action-box" style="height:150px"></div>
             </div>
 
             <div class="input-wrap">
-                <textarea id="userInput" class="input-box" rows="1" placeholder="" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
+                <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
         </div>
     </main>
 
     <script>
-        const memory = [];
+        let chats = []; 
+        let currentChatId = null;
         let activeBoxId = null;
 
-        function openModal(title) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalOverlay').classList.add('show');
-            if (activeBoxId) {
-                document.getElementById(activeBoxId).classList.remove('active');
-                activeBoxId = null;
-            }
+        // --- CHAT HISTORY LOGIC ---
+        function showNamingModal() {
+            document.getElementById('namingOverlay').classList.add('show');
+            document.getElementById('chatNameInput').focus();
         }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.remove('show');
-        }
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition;
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = true;
-            recognition.onresult = (event) => {
-                const input = document.getElementById('userInput');
-                input.value = Array.from(event.results).map(r => r[0].transcript).join('');
-                autoExpand(input);
-            };
-            recognition.onend = () => document.getElementById('btn3').classList.remove('recording');
-        }
-
-        function startVoiceRecognition(btnId) {
-            const btn = document.getElementById(btnId);
-            const box = document.getElementById('box3');
-            if (activeBoxId && activeBoxId !== 'box3') document.getElementById(activeBoxId).classList.remove('active');
-            if (!recognition) return alert("Not supported.");
+        function createNewChat() {
+            const nameInput = document.getElementById('chatNameInput');
+            const name = nameInput.value.trim() || "Untitled Chat";
+            const newChat = { id: Date.now(), name: name, messages: [] };
             
-            btn.classList.add('clicked');
-            setTimeout(() => btn.classList.remove('clicked'), 100);
-
-            if (activeBoxId === 'box3') {
-                box.classList.remove('active');
-                activeBoxId = null;
-                btn.classList.remove('recording');
-                recognition.stop();
-            } else {
-                box.classList.add('active');
-                activeBoxId = 'box3';
-                btn.classList.add('recording');
-                recognition.start();
-            }
+            chats.unshift(newChat);
+            currentChatId = newChat.id;
+            
+            nameInput.value = "";
+            document.getElementById('namingOverlay').classList.remove('show');
+            renderHistory();
+            renderChat();
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) document.getElementById('btn2').style.display = 'none';
-        });
-
-        function toggleBox(boxId, btnId) {
-            const box = document.getElementById(boxId);
-            const btn = document.getElementById(btnId);
-            btn.classList.add('clicked');
-            setTimeout(() => btn.classList.remove('clicked'), 100);
-
-            if (activeBoxId === boxId) {
-                box.classList.remove('active');
-                activeBoxId = null;
-            } else {
-                if (activeBoxId) document.getElementById(activeBoxId).classList.remove('active');
-                box.classList.add('active');
-                activeBoxId = boxId;
-            }
-        }
-
-        function autoExpand(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
-
-        function checkEnter(e) {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = "";
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+                item.innerText = chat.name;
+                item.onclick = () => { currentChatId = chat.id; renderHistory(); renderChat(); };
+                list.appendChild(item);
+            });
         }
 
         function renderChat() {
             const container = document.getElementById('chat-container');
             container.innerHTML = "";
-            memory.forEach(m => {
+            const currentChat = chats.find(c => c.id === currentChatId);
+            if (!currentChat) return;
+            
+            currentChat.messages.forEach(m => {
                 const d = document.createElement('div');
                 d.className = `msg ${m.role}`;
                 d.innerText = m.text;
@@ -419,28 +365,74 @@
             container.scrollTop = container.scrollHeight;
         }
 
+        // --- UTILITY MODALS ---
+        function openModal(title) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalOverlay').classList.add('show');
+            if (activeBoxId) toggleBox(activeBoxId, ''); 
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+
+        // --- INPUT & VOICE ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.onresult = (e) => {
+                const input = document.getElementById('userInput');
+                input.value = Array.from(e.results).map(r => r[0].transcript).join('');
+                autoExpand(input);
+            };
+            recognition.onend = () => document.getElementById('btn3').classList.remove('recording');
+        }
+
+        function startVoiceRecognition(btnId) {
+            const btn = document.getElementById(btnId);
+            if (!recognition) return alert("Not supported.");
+            btn.classList.toggle('recording');
+            if (btn.classList.contains('recording')) recognition.start();
+            else recognition.stop();
+        }
+
+        function toggleBox(boxId, btnId) {
+            const box = document.getElementById(boxId);
+            if (activeBoxId && activeBoxId !== boxId) document.getElementById(activeBoxId).classList.remove('active');
+            box.classList.toggle('active');
+            activeBoxId = box.classList.contains('active') ? boxId : null;
+        }
+
+        function autoExpand(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        function checkEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+
         async function send() {
             const input = document.getElementById('userInput');
-            const icon = document.getElementById('sendIcon');
             const val = input.value.trim();
             if (!val) return;
-            icon.classList.add('clicked');
-            setTimeout(() => icon.classList.remove('clicked'), 100);
 
-            if (activeBoxId) {
-                document.getElementById(activeBoxId).classList.remove('active');
-                activeBoxId = null;
-                document.getElementById('btn3').classList.remove('recording');
+            // Auto-create first chat if none exists
+            if (!currentChatId) {
+                const newChat = { id: Date.now(), name: val.substring(0, 20), messages: [] };
+                chats.unshift(newChat);
+                currentChatId = newChat.id;
             }
-            if (recognition) recognition.stop();
 
-            memory.push({ role: "user", text: val });
+            const currentChat = chats.find(c => c.id === currentChatId);
+            currentChat.messages.push({ role: "user", text: val });
             renderChat();
+            renderHistory();
+            
             input.value = "";
             input.style.height = 'auto';
-
-            const loadingIdx = memory.length;
-            memory.push({ role: "ai", text: "..." });
+            
+            const loadingIdx = currentChat.messages.length;
+            currentChat.messages.push({ role: "ai", text: "..." });
             renderChat();
 
             try {
@@ -450,10 +442,15 @@
                     body: JSON.stringify({ message: val })
                 });
                 const data = await res.json();
-                memory[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
-            } catch (err) { memory[loadingIdx].text = "?"; }
+                currentChat.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
+            } catch (err) { currentChat.messages[loadingIdx].text = "?"; }
             renderChat();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const isMobile = /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) document.getElementById('btn2').style.display = 'none';
+        });
     </script>
 </body>
 </html>
