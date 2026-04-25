@@ -54,6 +54,27 @@
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
+            /* Scrollbar styling for Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        /* Scrollbar styling for Chrome, Safari, and Edge */
+        #chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        #chat-container::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
         .msg { 
@@ -80,7 +101,6 @@
 
         .ai { align-self: flex-start; }
 
-        /* --- CENTRAL MODAL STYLE --- */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -120,7 +140,6 @@
         }
         .close-modal:hover { color: #fff; }
 
-        /* --- INPUT AREA & BUTTONS --- */
         .input-area { 
             padding: 20px; 
             display: flex;
@@ -255,8 +274,6 @@
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        #chat-container::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -311,11 +328,9 @@
         const memory = [];
         let activeBoxId = null;
 
-        // Modal Functions
         function openModal(title) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalOverlay').classList.add('show');
-            // Hide the small poll box
             if (activeBoxId) {
                 document.getElementById(activeBoxId).classList.remove('active');
                 activeBoxId = null;
