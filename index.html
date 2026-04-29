@@ -15,9 +15,11 @@
             --accent: rgba(255, 255, 255, 0.2);
             --box-bg: #111111;
             --modal-bg: #161616;
+            --user-outline: rgba(255, 255, 255, 0.3);
+            --ai-outline: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { 
             background: var(--bg); 
@@ -29,26 +31,17 @@
 
         /* --- SIDEBAR --- */
         aside { 
-            width: 295px; 
+            width: 280px; 
             background: var(--sidebar-bg);
-            border-right: 3.7895px solid var(--line); 
+            border-right: 1px solid var(--line); 
             height: 100%;
             display: flex;
             flex-direction: column;
+            transition: width 0.3s ease;
         }
 
-        .top-nav {
-            padding: 15px 20px 5px 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .sidebar-header {
-            padding: 10px 20px 10px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .top-nav { padding: 15px 20px 5px 20px; display: flex; gap: 10px; }
+        .sidebar-header { padding: 10px 20px 10px 20px; display: flex; flex-direction: column; gap: 10px; }
 
         .nav-btn {
             width: 100%;
@@ -62,266 +55,203 @@
             gap: 12px;
             cursor: pointer;
             font-size: 14px;
-            transition: background 0.3s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .icon-btn {
-            flex: 1;
-            justify-content: center;
-            padding: 10px;
-            font-size: 16px;
-        }
-
+        .nav-btn:active, .circle-btn:active { transform: scale(0.95); }
         .nav-btn:hover { background: var(--accent); }
+
+        .icon-btn { flex: 1; justify-content: center; padding: 10px; font-size: 16px; }
 
         .hanging-label {
             padding: 15px 25px 5px 25px;
             font-size: 11px;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 2px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         #history-list {
             flex: 1;
             overflow-y: auto;
-            padding: 5px 10px 10px 10px;
+            padding: 5px 10px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+            scrollbar-color: transparent transparent;
         }
 
-        #history-list::-webkit-scrollbar { width: 4px; }
-        #history-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        #history-list:hover { scrollbar-color: rgba(255, 255, 255, 0.1) transparent; }
 
         .history-item {
             padding: 12px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            color: #aaa;
+            color: #888;
+            transition: all 0.2s ease;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            transition: background 0.2s, color 0.2s;
         }
 
         .history-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .history-item.active { background: var(--line); color: #fff; }
 
-        .sidebar-footer {
-            padding: 15px 20px;
-            border-top: 3.457px solid var(--line);
-            margin-top: auto;
-        }
+        .sidebar-footer { padding: 15px 20px; border-top: 1px solid var(--line); }
 
         /* --- MAIN AREA --- */
-        main { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%;
-            min-width: 0; 
-            position: relative;
-        }
-
-        /* Top Bar Container for Title and Profile */
-        .main-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            display: flex;
-            justify-content: center; /* Center the curved box */
-            align-items: center;
-            z-index: 50;
-            pointer-events: none; /* Allows scrolling chat underneath */
-        }
-
-        /* Curved Header Box */
-        .chat-title-box {
-            background: var(--input-bg);
-            border: 1.374px solid var(--line);
-            padding: 10px 23px;
-            border-radius: 7.3481px;
-            max-width: 300px; /* Limits length */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 13px;
-            font-weight: 500;
-            color: #fff;
-            backdrop-filter: blur(10px);
-            pointer-events: auto;
-        }
+        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; }
 
         .profile-trigger {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
+            position: absolute; right: 20px; top: 20px;
+            width: 42px; height: 42px;
             background: var(--input-bg);
             border: 1px solid var(--line);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #fff;
-            transition: background 0.3s;
-            pointer-events: auto;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #fff; z-index: 60;
+            transition: all 0.3s ease;
         }
-
-        .profile-trigger:hover { background: var(--accent); }
+        .profile-trigger:hover { background: var(--accent); transform: rotate(5deg); }
 
         #chat-container { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 100px 40px 40px 40px; /* More top padding for header */
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
+            padding: 80px 15% 40px 15%; 
+            display: flex; flex-direction: column; gap: 24px; 
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
         }
 
+        #chat-container:hover { scrollbar-color: rgba(255, 255, 255, 0.1) transparent; }
+
+        /* Professional Message Outlines */
         .msg { 
-            max-width: 85%; 
-            padding: 15px 20px; 
-            border: 1px solid var(--line); 
-            font-size: 14px;
+            max-width: 80%; 
+            padding: 16px 20px; 
+            font-size: 15px;
             line-height: 1.6;
-            color: #fff;
-            border-radius: 10px; 
+            color: #eee;
+            position: relative;
+            animation: msgFade 0.4s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .user { align-self: flex-end; border-color: rgba(255, 255, 255, 0.4); }
-        .ai { align-self: flex-start; }
+        @keyframes msgFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user { 
+            align-self: flex-end; 
+            background: #1a1a1a;
+            border: 1px solid var(--user-outline);
+            border-radius: 18px 18px 4px 18px; 
+        }
+
+        .ai { 
+            align-self: flex-start; 
+            background: #111;
+            border: 1px solid var(--ai-outline);
+            border-radius: 18px 18px 18px 4px; 
+        }
 
         /* --- MODALS --- */
         .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(12px);
         }
-
-        .modal-overlay.show { display: flex; }
+        .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
 
         .central-poll {
             background: var(--modal-bg);
-            width: 90%;
-            max-width: 420px;
-            border-radius: 24px;
-            border: 1px solid var(--line);
-            padding: 40px;
-            text-align: center;
+            width: 90%; max-width: 400px;
+            border-radius: 24px; border: 1px solid var(--line);
+            padding: 40px; text-align: center;
         }
 
         .modal-input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            background: #000;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            color: white;
-            outline: none;
+            width: 100%; padding: 14px; margin: 10px 0;
+            background: #000; border: 1px solid var(--line);
+            border-radius: 12px; color: white; outline: none;
         }
 
         .modal-btn {
-            width: 100%;
-            padding: 14px;
-            margin-top: 15px;
-            background: #fff;
-            color: #000;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
+            width: 100%; padding: 14px; margin-top: 15px;
+            background: #fff; color: #000; border: none;
+            border-radius: 12px; cursor: pointer; font-weight: 600;
+            transition: transform 0.2s;
         }
-
-        .toggle-auth { margin-top: 20px; font-size: 13px; color: #888; cursor: pointer; }
-        .toggle-auth span { color: #fff; text-decoration: underline; }
 
         /* --- INPUT AREA --- */
         .input-area { 
-            padding: 20px; 
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; 
-            gap: 10px; 
-            position: relative; 
+            padding: 20px 15%; 
+            display: flex; justify-content: center; align-items: flex-end; 
+            gap: 12px; position: relative; 
         }
 
         .action-box {
-            position: absolute;
-            bottom: 120%; 
-            background: var(--box-bg);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            width: 220px;
-            display: none;
-            z-index: 100;
-            padding: 8px 0;
+            position: absolute; bottom: 100%; 
+            background: var(--box-bg); border: 1px solid var(--line);
+            border-radius: 16px; width: 220px; display: none;
+            z-index: 100; padding: 10px 0; margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
+        .action-box.active { display: block; animation: slideUp 0.3s ease; }
 
-        .action-box.active { display: block; animation: fadeIn 0.15s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .poll-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 18px;
-            color: #ccc;
-            font-size: 14px;
-            cursor: pointer;
-            gap: 12px;
+            display: flex; align-items: center; padding: 12px 20px;
+            color: #bbb; font-size: 14px; cursor: pointer; gap: 12px;
+            transition: all 0.2s;
         }
-
         .poll-item:hover { background: var(--line); color: #fff; }
 
         .circle-btn {
-            width: 48px; height: 48px;
+            width: 52px; height: 52px;
             background: var(--input-bg);
+            border: 1px solid var(--line);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #ffffff;
-            flex-shrink: 0;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #ffffff; flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .input-wrap { position: relative; width: 100%; max-width: 800px; display: flex; align-items: flex-end; }
+        /* Mic Active State */
+        .circle-btn.mic-active { 
+            background: #ffffff !important; 
+            color: #000000 !important;
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
+            transform: scale(1.1);
+        }
+
+        .input-wrap { position: relative; width: 100%; display: flex; align-items: flex-end; }
 
         .input-box {
             width: 100%;
             background: var(--input-bg);
-            border: none; 
-            border-radius: 15px; 
-            padding: 15px 50px 15px 20px; 
+            border: 1px solid var(--line); 
+            border-radius: 26px; 
+            padding: 15px 55px 15px 22px; 
             color: var(--text);
             outline: none;
             font-size: 16px;
             resize: none;
-            max-height: 160px; 
-            overflow-y: auto;
+            max-height: 150px; /* Limits to roughly 5-6 lines */
+            overflow-y: hidden; /* Default hidden */
+            transition: border 0.3s;
         }
+        .input-box:focus { border-color: rgba(255,255,255,0.4); }
 
         .send-btn {
-            position: absolute;
-            right: 15px; bottom: 14px; 
-            color: #ffffff; font-size: 18px;
-            cursor: pointer;
+            position: absolute; right: 18px; bottom: 15px; 
+            color: rgba(255,255,255,0.5); font-size: 18px;
+            cursor: pointer; transition: color 0.3s;
         }
+        .send-btn:hover { color: #fff; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -332,38 +262,19 @@
             <div class="nav-btn icon-btn" onclick="openModal('More Options')"><i class="fas fa-bars"></i></div>
         </div>
         <div class="sidebar-header">
-            <div class="nav-btn" onclick="showNamingModal()">
-                <i class="fas fa-plus-circle"></i>
-                <span>New Chat</span>
-            </div>
-            <div class="nav-btn" onclick="openModal('World')">
-                <i class="fas fa-globe"></i>
-                <span>World</span>
-            </div>
-            <div class="nav-btn" onclick="openModal('More')">
-                <i class="fas fa-ellipsis-h"></i>
-                <span>...</span>
-            </div>
+            <div class="nav-btn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
+            <div class="nav-btn" onclick="openModal('World')"><i class="fas fa-globe"></i><span>World</span></div>
+            <div class="nav-btn" onclick="openModal('More')"><i class="fas fa-ellipsis-h"></i><span>...</span></div>
         </div>
-        
-        <div class="hanging-label">Chats</div>
+        <div class="hanging-label">History</div>
         <div id="history-list"></div>
-
         <div class="sidebar-footer">
-            <div class="nav-btn" onclick="openModal('Settings')">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </div>
+            <div class="nav-btn" onclick="openModal('Settings')"><i class="fas fa-cog"></i><span>Settings</span></div>
         </div>
     </aside>
 
     <main>
-        <header class="main-header">
-            <div id="activeChatTitle" class="chat-title-box">New Discussion</div>
-            <div class="profile-trigger" onclick="toggleAuthModal()">
-                <i class="fas fa-user"></i>
-            </div>
-        </header>
+        <div class="profile-trigger" onclick="toggleAuthModal()"><i class="fas fa-user"></i></div>
 
         <div id="authOverlay" class="modal-overlay">
             <div class="central-poll">
@@ -373,14 +284,13 @@
                 <input type="password" class="modal-input" placeholder="Password">
                 <div id="signUpFields" style="display: none;"><input type="text" class="modal-input" placeholder="Full Name"></div>
                 <button class="modal-btn" onclick="toggleAuthModal()">Continue</button>
-                <div class="toggle-auth" onclick="switchAuthMode()"><p id="authToggleText">New user? <span>Create an account</span></p></div>
             </div>
         </div>
 
         <div id="namingOverlay" class="modal-overlay">
             <div class="central-poll">
-                <h2 style="font-size: 18px;">Name your Chat</h2>
-                <input type="text" id="chatNameInput" class="modal-input" placeholder="e.g. My Project" autofocus>
+                <h2>Name your Chat</h2>
+                <input type="text" id="chatNameInput" class="modal-input" placeholder="e.g. Research Session" autofocus>
                 <button class="modal-btn" onclick="createNewChat()">Create Chat</button>
             </div>
         </div>
@@ -388,7 +298,7 @@
         <div id="modalOverlay" class="modal-overlay">
             <div class="central-poll">
                 <i class="fas fa-times" style="float:right; cursor:pointer" onclick="closeModal()"></i>
-                <h2 id="modalTitle" style="font-size: 18px;"></h2>
+                <h2 id="modalTitle"></h2>
             </div>
         </div>
 
@@ -400,24 +310,25 @@
                 <div id="box1" class="action-box">
                     <div class="poll-item" onclick="openModal('Attach File')"><i class="fas fa-paperclip"></i> Attach File</div>
                     <div class="poll-item" onclick="openModal('Search Link')"><i class="fas fa-link"></i> Search Link</div>
-                    <div class="poll-item" onclick="openModal('Settings')"><i class="fas fa-cog"></i> Settings</div>
-                    <div class="poll-item" onclick="openModal('Mode')"><i class="fas fa-layer-group"></i> Mode</div>
-                    <div class="poll-item" onclick="openModal('Tools')"><i class="fas fa-tools"></i> Tools</div>
                 </div>
             </div>
             
-            <div id="btn2" class="circle-btn" onclick="toggleBox('box2')" style="display: none;"><i class="fas fa-camera"></i><div id="box2" class="action-box" style="height:150px"></div></div>
-            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition('btn3')"><i class="fas fa-microphone"></i></div>
+            <div id="btn2" class="circle-btn" onclick="toggleBox('box2')" style="display: none;"><i class="fas fa-camera"></i><div id="box2" class="action-box"></div></div>
+            
+            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition()">
+                <i class="fas fa-microphone"></i>
+            </div>
 
             <div class="input-wrap">
-                <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="checkEnter(event)" autofocus></textarea>
+                <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="checkEnter(event)" placeholder="Ask me anything..." autofocus></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
         </div>
     </main>
 
     <script>
-        let chats = []; let currentChatId = null; let activeBoxId = null; let isSignUp = false;
+        let chats = []; let currentChatId = null; let activeBoxId = null; 
+        let micTimeout;
 
         function checkDevice() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -426,17 +337,11 @@
         window.onload = checkDevice;
 
         function toggleAuthModal() { document.getElementById('authOverlay').classList.toggle('show'); }
-        function switchAuthMode() {
-            isSignUp = !isSignUp;
-            document.getElementById('authTitle').innerText = isSignUp ? "Sign Up" : "Sign In";
-            document.getElementById('signUpFields').style.display = isSignUp ? "block" : "none";
-        }
-
         function showNamingModal() { document.getElementById('namingOverlay').classList.add('show'); document.getElementById('chatNameInput').focus(); }
-        
+
         function createNewChat() {
             const input = document.getElementById('chatNameInput');
-            const name = input.value.trim() || "Untitled Chat";
+            const name = input.value.trim() || "New Discussion";
             const chat = { id: Date.now(), name, messages: [] };
             chats.unshift(chat); currentChatId = chat.id; input.value = "";
             document.getElementById('namingOverlay').classList.remove('show');
@@ -456,12 +361,8 @@
 
         function renderChat() {
             const container = document.getElementById('chat-container'); container.innerHTML = "";
-            const titleEl = document.getElementById('activeChatTitle');
             const current = chats.find(c => c.id === currentChatId); 
-            
-            if (!current) { titleEl.innerText = "New Discussion"; return; }
-            
-            titleEl.innerText = current.name;
+            if (!current) return;
             current.messages.forEach(m => {
                 const d = document.createElement('div'); d.className = `msg ${m.role}`; d.innerText = m.text;
                 container.appendChild(d);
@@ -469,17 +370,40 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function openModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalOverlay').classList.add('show'); }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
-
+        /* --- VOICE RECOGNITION LOGIC --- */
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         if (SpeechRecognition) {
-            recognition = new SpeechRecognition(); recognition.onresult = (e) => { 
-                document.getElementById('userInput').value = Array.from(e.results).map(r => r[0].transcript).join(''); autoExpand(document.getElementById('userInput')); 
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+
+            recognition.onstart = () => {
+                const btn = document.getElementById('btn3');
+                btn.classList.add('mic-active');
+                clearTimeout(micTimeout);
+                // 5 second fallback if no noise is heard
+                micTimeout = setTimeout(() => { recognition.stop(); }, 5000);
+            };
+
+            recognition.onresult = (e) => {
+                clearTimeout(micTimeout);
+                const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+                document.getElementById('userInput').value = transcript;
+                autoExpand(document.getElementById('userInput'));
+                // Reset timeout on noise
+                micTimeout = setTimeout(() => { recognition.stop(); }, 5000);
+            };
+
+            recognition.onend = () => {
+                document.getElementById('btn3').classList.remove('mic-active');
             };
         }
-        function startVoiceRecognition(btnId) { if (!recognition) return; recognition.start(); }
+
+        function startVoiceRecognition() {
+            if (!recognition) return;
+            try { recognition.start(); } catch(e) { recognition.stop(); }
+        }
 
         function toggleBox(boxId) { 
             const box = document.getElementById(boxId); 
@@ -487,22 +411,36 @@
             box.classList.toggle('active'); activeBoxId = box.classList.contains('active') ? boxId : null; 
         }
 
-        function autoExpand(t) { t.style.height = 'auto'; t.style.height = (t.scrollHeight) + 'px'; }
+        function autoExpand(t) {
+            t.style.height = 'auto';
+            const newHeight = t.scrollHeight;
+            t.style.height = newHeight + 'px';
+            // Enable scrollbar only after ~5 lines (approx 120px)
+            t.style.overflowY = newHeight > 140 ? 'auto' : 'hidden';
+        }
+
         function checkEnter(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
 
         async function send() {
             const input = document.getElementById('userInput'); const val = input.value.trim(); if (!val) return;
-            if (!currentChatId) { const chat = { id: Date.now(), name: val.substring(0, 20), messages: [] }; chats.unshift(chat); currentChatId = chat.id; }
+            if (!currentChatId) { 
+                const chat = { id: Date.now(), name: val.substring(0, 25), messages: [] }; 
+                chats.unshift(chat); currentChatId = chat.id; 
+            }
             const current = chats.find(c => c.id === currentChatId);
             current.messages.push({ role: "user", text: val }); renderChat(); renderHistory();
             input.value = ""; input.style.height = 'auto';
             const loadingIdx = current.messages.length; current.messages.push({ role: "ai", text: "..." }); renderChat();
             try {
                 const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: val }) });
-                const data = await res.json(); current.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "!";
-            } catch (err) { current.messages[loadingIdx].text = "?"; }
+                const data = await res.json(); 
+                current.messages[loadingIdx].text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Response error.";
+            } catch (err) { current.messages[loadingIdx].text = "Connection failed."; }
             renderChat();
         }
+
+        function openModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalOverlay').classList.add('show'); }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
     </script>
 </body>
 </html>
