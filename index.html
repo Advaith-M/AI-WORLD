@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> | AI VILE</title>
+    <title>AI VILE | Professional Intelligence</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
@@ -13,7 +13,6 @@
             --input-bg: rgba(255, 255, 255, 0.14); 
             --text: #ffffff;
             --accent: rgba(255, 255, 255, 0.2);
-            --box-bg: #111111;
             --modal-bg: #161616;
             --user-outline: rgba(255, 255, 255, 0.3);
             --ai-outline: rgba(255, 255, 255, 0.1);
@@ -21,401 +20,276 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            height: 100vh; 
-            display: flex; 
-            overflow: hidden; 
-        }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
 
         /* --- SIDEBAR --- */
         aside { 
-            width: 280px; 
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--line); 
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--line); 
+            height: 100%; display: flex; flex-direction: column; 
         }
 
-        .top-nav { padding: 15px 20px 5px 20px; display: flex; gap: 10px; }
-        .sidebar-header { padding: 10px 20px 10px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .top-nav { padding: 15px 20px; display: flex; gap: 10px; }
+        .sidebar-header { padding: 10px 20px; display: flex; flex-direction: column; gap: 10px; }
 
         .nav-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--input-bg);
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--line);
+            border-radius: 10px; color: white; display: flex; align-items: center; gap: 12px;
+            cursor: pointer; font-size: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .nav-btn:active, .circle-btn:active { transform: scale(0.95); }
         .nav-btn:hover { background: var(--accent); }
 
         .hanging-label {
-            padding: 15px 25px 5px 25px;
-            font-size: 11px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+            padding: 15px 25px 5px 25px; font-size: 11px; font-weight: 700;
+            color: rgba(255, 255, 255, 0.3); letter-spacing: 1.5px; text-transform: uppercase;
         }
 
-        #history-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 5px 10px;
-            scrollbar-width: thin;
-            scrollbar-color: transparent transparent;
+        #history-list { flex: 1; overflow-y: auto; padding: 5px 10px; scrollbar-width: none; }
+
+        /* --- MAIN HEADER (LOGO AREA) --- */
+        .main-header {
+            position: absolute; top: 0; left: 0; right: 0; height: 70px;
+            padding: 0 30px; display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); border-bottom: 1px solid var(--line); z-index: 100;
         }
-
-        #history-list:hover { scrollbar-color: rgba(255, 255, 255, 0.1) transparent; }
-
-        .history-item {
-            padding: 12px;
-            margin-bottom: 4px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #888;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .history-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .history-item.active { background: var(--line); color: #fff; }
-
-        .sidebar-footer { padding: 15px 20px; border-top: 1px solid var(--line); }
-
-        /* --- MAIN AREA --- */
-        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; }
-
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .site-name { font-size: 18px; font-weight: 800; letter-spacing: 2px; color: #fff; }
         .profile-trigger {
-            position: absolute; right: 20px; top: 20px;
-            width: 42px; height: 42px;
-            background: var(--input-bg);
-            border: 1px solid var(--line);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #fff; z-index: 60;
+            width: 40px; height: 40px; background: var(--input-bg); border: 1px solid var(--line);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
+
+        /* --- MAIN CHAT AREA --- */
+        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; padding-top: 70px; }
 
         #chat-container { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 80px 15% 40px 15%; 
-            display: flex; flex-direction: column; gap: 24px; 
-            scrollbar-width: thin;
+            flex: 1; overflow-y: auto; padding: 40px 15%; display: flex; flex-direction: column; gap: 24px; 
+            scrollbar-width: thin; scrollbar-color: transparent transparent;
         }
 
         .msg { 
-            max-width: 80%; 
-            padding: 16px 20px; 
-            font-size: 15px;
-            line-height: 1.6;
-            color: #eee;
-            animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 80%; padding: 16px 20px; font-size: 15px; line-height: 1.6; color: #eee;
+            animation: msgEntry 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
-        @keyframes professionalEntry {
-            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
+        @keyframes msgEntry { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .user { align-self: flex-end; background: #1a1a1a; border: 1px solid var(--user-outline); border-radius: 18px 18px 4px 18px; }
         .ai { align-self: flex-start; background: #111; border: 1px solid var(--ai-outline); border-radius: 18px 18px 18px 4px; }
+
+        /* --- INPUT AREA & VOICE BTN --- */
+        .input-area { padding: 20px 15%; display: flex; gap: 12px; align-items: flex-end; }
+        .circle-btn {
+            width: 52px; height: 52px; background: var(--input-bg); border: 1px solid var(--line);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #fff; flex-shrink: 0; transition: all 0.3s;
+        }
+
+        /* High Quality Mic Pulse Animation */
+        .mic-active { 
+            background: #ffffff !important; color: #000 !important; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.6); 
+            animation: pulse 1.5s infinite; 
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .input-wrap { position: relative; width: 100%; display: flex; align-items: flex-end; }
+        .input-box {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--line); 
+            border-radius: 26px; padding: 15px 55px 15px 22px; color: var(--text);
+            outline: none; font-size: 16px; resize: none; max-height: 150px; overflow-y: hidden;
+        }
+
+        .send-btn { position: absolute; right: 18px; bottom: 15px; color: rgba(255,255,255,0.3); font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .send-btn.primed { color: #fff; transform: scale(1.2); text-shadow: 0 0 10px #fff; }
 
         /* --- MODALS --- */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: none; justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center;
             z-index: 1000; backdrop-filter: blur(12px);
         }
         .modal-overlay.show { display: flex; }
-
-        .central-poll {
-            background: var(--modal-bg);
-            width: 90%; max-width: 400px;
-            border-radius: 24px; border: 1px solid var(--line);
-            padding: 40px; text-align: center;
-        }
-
-        .modal-input {
-            width: 100%; padding: 14px; margin: 10px 0;
-            background: #000; border: 1px solid var(--line);
-            border-radius: 12px; color: white; outline: none;
-        }
-
-        .modal-btn {
-            width: 100%; padding: 14px; margin-top: 10px;
-            background: #fff; color: #000; border: none;
-            border-radius: 12px; cursor: pointer; font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .modal-btn.secondary {
-            background: transparent;
-            color: #888;
-            border: 1px solid var(--line);
-            margin-top: 8px;
-        }
-        .modal-btn.secondary:hover { color: #fff; background: rgba(255,255,255,0.05); }
-
-        /* --- INPUT AREA --- */
-        .input-area { 
-            padding: 20px 15%; 
-            display: flex; justify-content: center; align-items: flex-end; 
-            gap: 12px; position: relative; 
-        }
-
-        .circle-btn {
-            width: 52px; height: 52px;
-            background: var(--input-bg);
-            border: 1px solid var(--line);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #ffffff; flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .circle-btn.mic-active { 
-            background: #ffffff !important; 
-            color: #000 !important;
-            box-shadow: 0 0 20px rgba(255,255,255,0.4);
-        }
-
-        .input-wrap { position: relative; width: 100%; display: flex; align-items: flex-end; }
-
-        .input-box {
-            width: 100%;
-            background: var(--input-bg);
-            border: 1px solid var(--line); 
-            border-radius: 26px; 
-            padding: 15px 55px 15px 22px; 
-            color: var(--text);
-            outline: none; font-size: 16px;
-            resize: none; max-height: 150px;
-            overflow-y: hidden;
-            transition: border 0.3s;
-        }
-
-        .send-btn {
-            position: absolute; right: 18px; bottom: 15px; 
-            color: rgba(255,255,255,0.3); font-size: 18px;
-            cursor: pointer; transition: all 0.3s;
-        }
-        
-        /* Visual cue for first Enter press */
-        .send-btn.primed { color: #fff; transform: scale(1.1); text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .central-poll { background: var(--modal-bg); width: 90%; max-width: 400px; border-radius: 24px; border: 1px solid var(--line); padding: 40px; text-align: center; }
+        .modal-input { width: 100%; padding: 14px; margin: 10px 0; background: #000; border: 1px solid var(--line); border-radius: 12px; color: white; outline: none; }
+        .modal-btn { width: 100%; padding: 14px; margin-top: 15px; background: #fff; color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; }
+        .modal-btn.secondary { background: transparent; color: #888; border: 1px solid var(--line); margin-top: 8px; }
     </style>
 </head>
 <body>
 
     <aside>
         <div class="top-nav">
-            <div class="nav-btn icon-btn" onclick="openModal('Search')"><i class="fas fa-search"></i></div>
-            <div class="nav-btn icon-btn" onclick="openModal('More Options')"><i class="fas fa-bars"></i></div>
+            <div class="nav-btn" onclick="openModal('Search')"><i class="fas fa-search"></i></div>
+            <div class="nav-btn" onclick="openModal('Menu')"><i class="fas fa-bars"></i></div>
         </div>
         <div class="sidebar-header">
             <div class="nav-btn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
-            <div class="nav-btn" onclick="openModal('World')"><i class="fas fa-globe"></i><span>World</span></div>
         </div>
-        <div class="hanging-label">History</div>
+        <div class="hanging-label">Recent History</div>
         <div id="history-list"></div>
-        <div class="sidebar-footer">
-            <div class="nav-btn" onclick="openModal('Settings')"><i class="fas fa-cog"></i><span>Settings</span></div>
-        </div>
     </aside>
 
     <main>
-        <div class="profile-trigger" onclick="toggleAuthModal()"><i class="fas fa-user"></i></div>
+        <div class="main-header">
+            <div class="logo-area">
+                <i class="fas fa-bolt" style="font-size: 24px;"></i>
+                <span class="site-name">AI VILE</span>
+            </div>
+            <div class="profile-trigger" onclick="toggleAuthModal()"><i class="fas fa-user"></i></div>
+        </div>
 
-        <!-- NEW CHAT MODAL WITH EXIT -->
         <div id="namingOverlay" class="modal-overlay">
             <div class="central-poll">
-                <h2>New Discussion</h2>
-                <p style="color: #666; font-size: 13px; margin: 10px 0 20px;">Give your conversation a title</p>
-                <input type="text" id="chatNameInput" class="modal-input" placeholder="e.g. Project Alpha" autofocus>
-                <button class="modal-btn" onclick="createNewChat()">Create Chat</button>
+                <h2>New Conversation</h2>
+                <input type="text" id="chatNameInput" class="modal-input" placeholder="Enter chat title..." autofocus>
+                <button class="modal-btn" onclick="createNewChat()">Create</button>
                 <button class="modal-btn secondary" onclick="closeNamingModal()">Cancel</button>
-            </div>
-        </div>
-
-        <div id="authOverlay" class="modal-overlay">
-            <div class="central-poll">
-                <i class="fas fa-times" style="float:right; cursor:pointer" onclick="toggleAuthModal()"></i>
-                <h2>Sign In</h2>
-                <input type="email" class="modal-input" placeholder="Email">
-                <input type="password" class="modal-input" placeholder="Password">
-                <button class="modal-btn" onclick="toggleAuthModal()">Continue</button>
-            </div>
-        </div>
-
-        <div id="modalOverlay" class="modal-overlay">
-            <div class="central-poll">
-                <i class="fas fa-times" style="float:right; cursor:pointer" onclick="closeModal()"></i>
-                <h2 id="modalTitle"></h2>
             </div>
         </div>
 
         <div id="chat-container"></div>
 
         <div class="input-area">
-            <div id="btn1" class="circle-btn" onclick="toggleBox('box1')">
-                <i class="fas fa-plus"></i>
-            </div>
-            
-            <div id="btn2" class="circle-btn" style="display: none;"><i class="fas fa-camera"></i></div>
-            
-            <div id="btn3" class="circle-btn" onclick="startVoiceRecognition()">
+            <div class="circle-btn" onclick="openModal('Options')"><i class="fas fa-plus"></i></div>
+            <div id="voiceBtn" class="circle-btn" onclick="toggleVoice()">
                 <i class="fas fa-microphone"></i>
             </div>
-
             <div class="input-wrap">
-                <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="handleDoubleEnter(event)" placeholder="Double-tap Enter to send..." autofocus></textarea>
+                <textarea id="userInput" class="input-box" rows="1" oninput="autoExpand(this)" onkeydown="handleDoubleEnter(event)" placeholder="Double-tap Enter to send..."></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
         </div>
     </main>
 
     <script>
-        let chats = []; let currentChatId = null; 
+        let chats = []; 
+        let currentChatId = null; 
         let lastEnterTime = 0;
-        let micTimeout;
+        let isListening = false;
+        let recognition;
 
-        function checkDevice() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            document.getElementById('btn2').style.display = isMobile ? 'flex' : 'none';
+        /* --- VOICE RECOGNITION (BEST QUALITY) --- */
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechAPI();
+            recognition.continuous = true;
+            recognition.interimResults = true; // Real-time feedback
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const input = document.getElementById('userInput');
+                input.value = transcript;
+                autoExpand(input);
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('mic-active');
+            };
+
+            recognition.onerror = () => {
+                isListening = false;
+                document.getElementById('voiceBtn').classList.remove('mic-active');
+            };
         }
-        window.onload = checkDevice;
 
-        /* --- MODAL LOGIC --- */
-        function showNamingModal() { document.getElementById('namingOverlay').classList.add('show'); document.getElementById('chatNameInput').focus(); }
-        function closeNamingModal() { document.getElementById('namingOverlay').classList.remove('show'); }
-        function toggleAuthModal() { document.getElementById('authOverlay').classList.toggle('show'); }
-        function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
-
-        function createNewChat() {
-            const input = document.getElementById('chatNameInput');
-            const name = input.value.trim() || "Untitled Chat";
-            const chat = { id: Date.now(), name, messages: [] };
-            chats.unshift(chat); currentChatId = chat.id; input.value = "";
-            closeNamingModal();
-            renderHistory(); renderChat();
+        function toggleVoice() {
+            if (!recognition) return alert("Speech recognition not supported in this browser.");
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+                isListening = true;
+                document.getElementById('voiceBtn').classList.add('mic-active');
+            }
         }
 
         /* --- DOUBLE ENTER LOGIC --- */
         function handleDoubleEnter(e) {
             const sendIcon = document.getElementById('sendIcon');
-            
             if (e.key === 'Enter' && !e.shiftKey) {
-                const currentTime = new Date().getTime();
-                const timeDiff = currentTime - lastEnterTime;
-
-                if (timeDiff < 500 && timeDiff > 0) {
+                const now = Date.now();
+                if (now - lastEnterTime < 500) {
                     e.preventDefault();
                     send();
                     sendIcon.classList.remove('primed');
-                    lastEnterTime = 0;
                 } else {
-                    // First press: visual feedback only
-                    lastEnterTime = currentTime;
+                    lastEnterTime = now;
                     sendIcon.classList.add('primed');
-                    
-                    // Reset visual feedback if they don't press again within 500ms
-                    setTimeout(() => {
-                        if (new Date().getTime() - lastEnterTime >= 500) {
-                            sendIcon.classList.remove('primed');
-                        }
-                    }, 505);
+                    setTimeout(() => { if (Date.now() - lastEnterTime >= 500) sendIcon.classList.remove('primed'); }, 510);
                 }
             }
         }
 
         function autoExpand(t) {
             t.style.height = 'auto';
-            const h = t.scrollHeight;
-            t.style.height = h + 'px';
-            t.style.overflowY = h > 140 ? 'auto' : 'hidden';
+            t.style.height = t.scrollHeight + 'px';
+            t.style.overflowY = t.scrollHeight > 140 ? 'auto' : 'hidden';
         }
 
-        async function send() {
-            const input = document.getElementById('userInput'); const val = input.value.trim(); if (!val) return;
-            if (!currentChatId) { 
-                const chat = { id: Date.now(), name: val.substring(0, 25), messages: [] }; 
-                chats.unshift(chat); currentChatId = chat.id; 
+        function send() {
+            const input = document.getElementById('userInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            if (!currentChatId) {
+                const chat = { id: Date.now(), name: val.substring(0, 20), messages: [] };
+                chats.unshift(chat); currentChatId = chat.id;
             }
+
             const current = chats.find(c => c.id === currentChatId);
-            current.messages.push({ role: "user", text: val }); 
-            renderChat(); renderHistory();
-            input.value = ""; input.style.height = 'auto';
+            current.messages.push({ role: "user", text: val });
+            renderChat();
+            renderHistory();
             
-            const loadingIdx = current.messages.length; 
-            current.messages.push({ role: "ai", text: "..." }); renderChat();
-            
-            try {
-                // Placeholder for real API
-                setTimeout(() => {
-                    current.messages[loadingIdx].text = "This is a professional AI response.";
-                    renderChat();
-                }, 1000);
-            } catch (err) { current.messages[loadingIdx].text = "Error."; renderChat(); }
+            input.value = "";
+            input.style.height = 'auto';
+
+            // Simulate AI
+            setTimeout(() => {
+                current.messages.push({ role: "ai", text: "Professional high-speed response processed." });
+                renderChat();
+            }, 600);
         }
 
         function renderChat() {
-            const container = document.getElementById('chat-container'); container.innerHTML = "";
-            const current = chats.find(c => c.id === currentChatId); 
+            const container = document.getElementById('chat-container');
+            container.innerHTML = "";
+            const current = chats.find(c => c.id === currentChatId);
             if (!current) return;
             current.messages.forEach(m => {
-                const d = document.createElement('div'); d.className = `msg ${m.role}`; d.innerText = m.text;
+                const d = document.createElement('div');
+                d.className = `msg ${m.role}`;
+                d.innerText = m.text;
                 container.appendChild(d);
             });
             container.scrollTop = container.scrollHeight;
         }
 
         function renderHistory() {
-            const list = document.getElementById('history-list'); list.innerHTML = "";
+            const list = document.getElementById('history-list');
+            list.innerHTML = "";
             chats.forEach(c => {
                 const item = document.createElement('div');
-                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
+                item.className = `nav-btn ${c.id === currentChatId ? 'active' : ''}`;
+                item.style.marginBottom = "5px";
                 item.innerText = c.name;
-                item.onclick = () => { currentChatId = c.id; renderHistory(); renderChat(); };
+                item.onclick = () => { currentChatId = c.id; renderChat(); renderHistory(); };
                 list.appendChild(item);
             });
         }
 
-        /* --- VOICE RECOGNITION --- */
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition;
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.onstart = () => { 
-                document.getElementById('btn3').classList.add('mic-active');
-                micTimeout = setTimeout(() => { recognition.stop(); }, 5000);
-            };
-            recognition.onresult = (e) => {
-                clearTimeout(micTimeout);
-                document.getElementById('userInput').value = e.results[0][0].transcript;
-                autoExpand(document.getElementById('userInput'));
-                micTimeout = setTimeout(() => { recognition.stop(); }, 5000);
-            };
-            recognition.onend = () => document.getElementById('btn3').classList.remove('mic-active');
+        function showNamingModal() { document.getElementById('namingOverlay').classList.add('show'); }
+        function closeNamingModal() { document.getElementById('namingOverlay').classList.remove('show'); }
+        function createNewChat() {
+            const name = document.getElementById('chatNameInput').value || "New Chat";
+            const chat = { id: Date.now(), name, messages: [] };
+            chats.unshift(chat); currentChatId = chat.id;
+            closeNamingModal(); renderHistory(); renderChat();
         }
-        function startVoiceRecognition() { if (recognition) recognition.start(); }
-
-        function openModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('modalOverlay').classList.add('show'); }
+        function openModal(t) { console.log("Opening: " + t); }
     </script>
 </body>
 </html>
