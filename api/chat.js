@@ -1,52 +1,73 @@
-export const config = { runtime: 'edge' };
+export default async function handler(req, res) {
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-export default async function handler(req) {
-  try {
-    const { message } = await req.json();
+    const { prompt } = req.body;
 
-    // 1. Map all 4 keys from Vercel Environment Variables
-    const keys = {
-      groq: process.env.GROQ_API_KEY,
-      or: process.env.OPENROUTER_API_KEY,
-      gemini: process.env.GEMINI_API_KEY,
-      openai: process.env.OPENAI_API_KEY
+    if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+    }
+
+    // Helper to call OpenAI
+    const fetchOpenAI = async () => {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o",
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || "OpenAI was unable to respond.";
     };
 
-    // 2. Launch all 4 AI requests simultaneously (The Council)
-    const results = await Promise.all([
-      // GROQ
-      fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST", headers: { "Authorization": `Bearer ${keys.groq}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "user", content: message }] })
-      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "Groq Offline"),
+    // Helper to call Gemini
+    const fetchGemini = async () => {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "Gemini was unable to respond.";
+    };
 
-      // OPENROUTER
-      fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST", headers: { "Authorization": `Bearer ${keys.or}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "openrouter/auto", messages: [{ role: "user", content: message }] })
-      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "OpenRouter Offline"),
+    // Helper to call Groq
+    const fetchGroq = async () => {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "llama3-70b-8192",
+                messages: [{ role: "user", content: prompt }]
+            })
+        });
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || "Groq was unable to respond.";
+    };
 
-      // GEMINI
-      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${keys.gemini}`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: message }] }] })
-      }).then(r => r.json()).then(d => d.candidates[0].content.parts[0].text).catch(() => "Gemini Offline"),
+    try {
+        // Execute all 3 requests at the same time for maximum speed
+        const [gpt, gemini, groq] = await Promise.all([
+            fetchOpenAI().catch(e => `OpenAI Error: ${e.message}`),
+            fetchGemini().catch(e => `Gemini Error: ${e.message}`),
+            fetchGroq().catch(e => `Groq Error: ${e.message}`)
+        ]);
 
-      // GPT (OpenAI)
-      fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST", headers: { "Authorization": `Bearer ${keys.openai}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: message }] })
-      }).then(r => r.json()).then(d => d.choices[0].message.content).catch(() => "GPT Offline")
-    ]);
-
-    // 3. Construct the combined response
-    const finalDisplay = `🤖 GROQ: ${results[0]}\n\n🌐 OPENROUTER: ${results[1]}\n\n✨ GEMINI: ${results[2]}\n\n🧠 GPT: ${results[3]}`;
-
-    return new Response(JSON.stringify({
-      candidates: [{ content: { parts: [{ text: finalDisplay }] } }]
-    }), { status: 200 });
-
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "One or more API keys are missing or invalid in Vercel settings." }), { status: 500 });
-  }
+        // Return the combined object to the frontend
+        res.status(200).json({ gpt, gemini, groq });
+    } catch (error) {
+        res.status(500).json({ error: "The AI Council failed to deliberate." });
+    }
 }
