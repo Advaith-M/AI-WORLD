@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> | AI VILE</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Fixed FontAwesome Link with bypass attributes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
         :root {
             --bg: #000000;
@@ -307,13 +308,6 @@
     </main>
 
     <script>
-        // --- API CONFIGURATION ---
-        const KEYS = {
-            openai: "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",
-            gemini: "AIzaSyCVSDpSK7U0-eCEwfX0Zkz3aQKNA12Mxtc",
-            groq: "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"
-        };
-
         let chats = []; 
         let currentChatId = null; 
         let lastEnterTime = 0;
@@ -372,45 +366,10 @@
             t.style.overflowY = h > 140 ? 'auto' : 'hidden';
         }
 
-        // --- TRIPLE AI API LOGIC ---
-        async function fetchOpenAI(prompt) {
-            try {
-                const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${KEYS.openai}` },
-                    body: JSON.stringify({ model: "gpt-4o", messages: [{ role: "user", content: prompt }] })
-                });
-                const data = await resp.json();
-                return data.choices[0].message.content;
-            } catch(e) { return "OpenAI Error: " + e.message; }
-        }
-
-        async function fetchGemini(prompt) {
-            try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEYS.gemini}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-                const data = await resp.json();
-                return data.candidates[0].content.parts[0].text;
-            } catch(e) { return "Gemini Error: " + e.message; }
-        }
-
-        async function fetchGroq(prompt) {
-            try {
-                const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${KEYS.groq}` },
-                    body: JSON.stringify({ model: "llama3-70b-8192", messages: [{ role: "user", content: prompt }] })
-                });
-                const data = await resp.json();
-                return data.choices[0].message.content;
-            } catch(e) { return "Groq Error: " + e.message; }
-        }
-
+        /* FIXED SEND LOGIC - Talking to /api/chat */
         async function send() {
             const input = document.getElementById('userInput'); const val = input.value.trim(); if (!val) return;
+            
             if (!currentChatId) { 
                 const chat = { id: Date.now(), name: val.substring(0, 25), messages: [] }; 
                 chats.unshift(chat); currentChatId = chat.id; 
@@ -421,19 +380,28 @@
             input.value = ""; input.style.height = 'auto';
             
             const loadingIdx = current.messages.length; 
-            current.messages.push({ role: "ai", text: "Gathering intel from ChatGPT, Gemini, and Groq..." }); 
+            current.messages.push({ role: "ai", text: "Consulting the Council..." }); 
             renderChat();
             
-            // Run all 3 APIs in parallel for speed
-            const responses = await Promise.all([
-                fetchOpenAI(val),
-                fetchGemini(val),
-                fetchGroq(val)
-            ]);
+            try {
+                // Call your internal Vercel serverless function
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: val })
+                });
+                
+                if (!response.ok) throw new Error('API request failed.');
 
-            const combinedResponse = `**OpenAI Insight:**\n${responses[0]}\n\n---\n**Gemini Insight:**\n${responses[1]}\n\n---\n**Groq Insight:**\n${responses[2]}`;
-            
-            current.messages[loadingIdx].text = combinedResponse;
+                const data = await response.json();
+
+                // Format the aggregate response from all three AIs
+                const combinedResponse = `**OpenAI Insight:**\n${data.gpt}\n\n---\n**Gemini Insight:**\n${data.gemini}\n\n---\n**Groq Insight:**\n${data.groq}`;
+                
+                current.messages[loadingIdx].text = combinedResponse;
+            } catch (err) {
+                current.messages[loadingIdx].text = "Error: " + err.message;
+            }
             renderChat();
         }
 
@@ -442,9 +410,8 @@
             const current = chats.find(c => c.id === currentChatId); 
             if (!current) return;
             current.messages.forEach(m => {
-                const d = document.createElement('div'); 
-                d.className = `msg ${m.role}`; 
-                // Using innerHTML here to render the Markdown-style headers we added in send()
+                const d = document.createElement('div'); d.className = `msg ${m.role}`; 
+                // Render line breaks for combined responses
                 d.innerHTML = m.text.replace(/\n/g, '<br>');
                 container.appendChild(d);
             });
