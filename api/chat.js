@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   }, 'GPT');
 
   // 2. Gemini 3 Flash (The newest 2026 version)
-  const gemini = getAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+  const gemini = getAI(`https://generativelanguage.googleapis.com/v1beta/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
