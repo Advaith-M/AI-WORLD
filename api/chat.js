@@ -3,47 +3,45 @@ export default async function handler(req, res) {
 
   const getAI = async (url, options, type) => {
     try {
-      // Set a 10-second timeout so one slow AI doesn't break everything
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const response = await fetch(url, options);
       
-      const r = await fetch(url, { ...options, signal: controller.signal });
-      clearTimeout(timeoutId);
+      // Check if the response is actually OK before trying to read JSON
+      if (!response.ok) {
+        const errorText = await response.text();
+        return `Error from ${type}: ${response.status} - ${errorText}`;
+      }
+
+      const data = await response.json();
       
-      const d = await r.json();
-      if (d.error) return `Error: ${d.error.message || d.error}`;
-      
-      if (type === 'GPT') return d.choices[0].message.content;
-      if (type === 'GEMINI') return d.candidates[0].content.parts[0].text;
-      if (type === 'GROQ') return d.choices[0].message.content;
+      if (type === 'GPT') return data.choices[0].message.content;
+      if (type === 'GEMINI') return data.candidates[0].content.parts[0].text;
+      if (type === 'GROQ') return data.choices[0].message.content;
     } catch (e) {
-      return `${type} Failed: ${e.name === 'AbortError' ? 'Timeout' : e.message}`;
+      return `${type} Failed: ${e.message}`;
     }
   };
 
-  // 1. GPT-4o-mini (Reliable standard)
+  // 1. OpenAI (gpt-4o-mini is the 2026 cost-effective choice)
   const gpt = getAI('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: prompt }] })
   }, 'GPT');
 
-  // 2. Gemini 3 Flash (The newest 2026 version)
-  const gemini = getAI(`https://generativelanguage.googleapis.com/v1beta/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+  // 2. GEMINI - Updated to Gemini 3.1 Pro (The 2026 Stable Release)
+  const gemini = getAI(`https://generativelanguage.googleapis.com/v1/models/gemini-3.1-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
   }, 'GEMINI');
 
-  // 3. Groq - Llama 3.3 70B Versatile (The current high-performance model)
+  // 3. GROQ - Using Llama 3.3 70B (The current reliable model on Groq)
   const groq = getAI('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }] })
   }, 'GROQ');
 
-  // Use Promise.all to wait for all responses simultaneously
   const [gptRes, geminiRes, groqRes] = await Promise.all([gpt, gemini, groq]);
-
   res.status(200).json({ gpt: gptRes, gemini: geminiRes, groq: groqRes });
 }
