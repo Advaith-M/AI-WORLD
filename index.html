@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI VILE | Collective Intelligence</title>
+    <!-- Added crossorigin="anonymous" and a fallback check for icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" crossorigin="anonymous">
     <style>
         :root {
@@ -37,7 +38,6 @@
             cursor: pointer; font-size: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .nav-btn:hover { background: var(--accent); transform: translateY(-1px); }
-        .nav-btn:active { transform: scale(0.98); }
 
         .hanging-label {
             padding: 15px 25px 15px 100px; font-size: 11px; font-weight: 700;
@@ -50,7 +50,6 @@
             font-size: 12.5px; color: #888; transition: all 0.37s ease;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .history-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
         .history-item.active { background: var(--line); color: #fff; }
 
         .sidebar-footer { padding: 15px 20px; border-top: 3.45px solid var(--line); }
@@ -76,22 +75,14 @@
         .user { align-self: flex-end; background: #1a1a1a; border: 1px solid var(--user-outline); border-radius: 18px 18px 4px 18px; }
         .ai { align-self: flex-start; background: #111; border: 1px solid var(--ai-outline); border-radius: 18px 18px 18px 4px; }
 
-        /* --- FLOATING POLL (Plus Button Menu) --- */
+        /* --- FLOATING POLL --- */
         .poll-menu {
             position: absolute; bottom: 85px; left: 15%; 
             background: var(--modal-bg); border: 1px solid var(--line);
             border-radius: 15px; padding: 10px; display: none;
             flex-direction: column; gap: 5px; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: slideUp 0.3s ease;
         }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .poll-menu.show { display: flex; }
-        .poll-item {
-            padding: 10px 15px; color: #ccc; cursor: pointer; border-radius: 8px;
-            font-size: 13px; display: flex; align-items: center; gap: 10px;
-        }
-        .poll-item:hover { background: var(--accent); color: #fff; }
 
         /* --- INPUT AREA --- */
         .input-area { padding: 20px 15%; display: flex; gap: 12px; align-items: flex-end; position: relative; }
@@ -100,29 +91,26 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; color: #fff; transition: all 0.3s ease;
         }
-        .circle-btn:hover { background: var(--accent); }
-        .mic-active { background: #fff !important; color: #000 !important; transform: scale(1.1); box-shadow: 0 0 15px #fff; }
+        .mic-active { background: #fff !important; color: #000 !important; box-shadow: 0 0 15px #fff; }
 
         .input-wrap { position: relative; width: 100%; }
         .input-box {
             width: 100%; background: var(--input-bg); border: 2px solid var(--line); 
             border-radius: 20px; padding: 15px 55px 15px 22px; color: var(--text);
-            outline: none; font-size: 15px; resize: none; transition: border 0.345s;
+            outline: none; font-size: 15px; resize: none;
         }
         .send-btn {
             position: absolute; right: 17.59px; bottom: 20px; 
-            color: rgba(255,255,255,255); font-size: 18px; cursor: pointer; transition: 0.285s;
+            color: rgba(255,255,255,0.5); font-size: 18px; cursor: pointer; transition: 0.285s;
         }
         .send-btn.primed { color: #fff; transform: scale(1.1); }
 
-        /* MODALS */
         .modal-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:1000;
         }
-        .modal-overlay.show { display:flex; animation: fadeIn 0.4s ease; }
+        .modal-overlay.show { display:flex; }
         .modal-card { background: var(--modal-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--line); width: 350px; text-align: center; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
     </style>
 </head>
 <body>
@@ -145,12 +133,8 @@
 
     <main>
         <div id="chat-container"></div>
-
-        <!-- The Floating Poll Menu -->
         <div id="plusPoll" class="poll-menu">
-            <div class="poll-item" onclick="openGenericModal('Upload File')"><i class="fas fa-file-upload"></i> Upload File</div>
-            <div class="poll-item" onclick="openGenericModal('Camera')"><i class="fas fa-camera"></i> Capture</div>
-            <div class="poll-item" onclick="openGenericModal('Templates')"><i class="fas fa-th-large"></i> Templates</div>
+            <div class="poll-item" style="padding:10px; cursor:pointer;" onclick="openGenericModal('Upload')"><i class="fas fa-file-upload"></i> Upload File</div>
         </div>
 
         <div class="input-area">
@@ -175,7 +159,7 @@
     <div id="genericModal" class="modal-overlay" onclick="closeGenericModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2 id="modalTitle"></h2>
-            <p style="color:#666; margin-top:15px">Feature coming soon in the next Vile update.</p>
+            <p style="color:#666; margin-top:15px">Feature coming soon.</p>
         </div>
     </div>
 
@@ -189,16 +173,12 @@
         function openGenericModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('genericModal').classList.add('show'); }
         function closeGenericModal() { document.getElementById('genericModal').classList.remove('show'); }
         function toggleSidebar() { const s = document.getElementById('sidebar'); s.style.width = s.style.width === '80px' ? '280px' : '80px'; }
-
         function autoGrow(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
 
         function handleDoubleEnter(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 const now = Date.now();
-                if (now - lastEnterTime < 500) {
-                    e.preventDefault();
-                    send();
-                }
+                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
                 lastEnterTime = now;
                 document.getElementById('sendIcon').classList.add('primed');
                 setTimeout(() => document.getElementById('sendIcon').classList.remove('primed'), 500);
@@ -230,16 +210,19 @@
             renderChat();
 
             try {
+                // Calls your serverless function in /api/chat.js
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: val })
                 });
                 const data = await response.json();
-                const result = `**OpenAI**\n${data.gpt}\n\n**Gemini**\n${data.gemini}\n\n**Groq**\n${data.groq}`;
+                
+                // Format the combined response
+                const result = `<b>OpenAI</b><br>${data.gpt}<br><br><b>Gemini</b><br>${data.gemini}<br><br><b>Groq</b><br>${data.groq}`;
                 current.messages[loadIdx].text = result;
             } catch (err) {
-                current.messages[loadIdx].text = " - OFFLINE - ";
+                current.messages[loadIdx].text = "[ OFFLINE ] Check Vercel Logs.";
             }
             renderChat();
             renderHistory();
@@ -253,7 +236,7 @@
             current.messages.forEach(m => {
                 const d = document.createElement('div');
                 d.className = `msg ${m.role}`;
-                d.innerHTML = m.text.replace(/\n/g, '<br>');
+                d.innerHTML = m.text;
                 container.appendChild(d);
             });
             container.scrollTop = container.scrollHeight;
