@@ -4,14 +4,13 @@ export default async function handler(req, res) {
   const getAI = async (url, options, type) => {
     try {
       const response = await fetch(url, options);
-      
-      // Check if the response is actually OK before trying to read JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        return `Error from ${type}: ${response.status} - ${errorText}`;
-      }
-
       const data = await response.json();
+      
+      // Detailed error logging to help you troubleshoot
+      if (data.error) {
+        console.error(`${type} Error:`, data.error);
+        return `Error from ${type}: ${data.error.message || data.error}`;
+      }
       
       if (type === 'GPT') return data.choices[0].message.content;
       if (type === 'GEMINI') return data.candidates[0].content.parts[0].text;
@@ -21,21 +20,21 @@ export default async function handler(req, res) {
     }
   };
 
-  // 1. OpenAI (gpt-4o-mini is the 2026 cost-effective choice)
+  // 1. OpenAI (gpt-4o-mini - Ensure you have a >$0 balance)
   const gpt = getAI('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: prompt }] })
   }, 'GPT');
 
-  // 2. GEMINI - Updated to Gemini 3.1 Pro (The 2026 Stable Release)
-  const gemini = getAI(`https://generativelanguage.googleapis.com/v1/models/gemini-3.1-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+  // 2. GEMINI - Switched back to v1beta to support the 3.1-pro model
+  const gemini = getAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${process.env.GEMINI_API_KEY}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
   }, 'GEMINI');
 
-  // 3. GROQ - Using Llama 3.3 70B (The current reliable model on Groq)
+  // 3. GROQ - Using the stable Llama 3.3 70B model
   const groq = getAI('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
