@@ -640,6 +640,7 @@
         }
         
         function closeGenericModal() { 
+            document.getElementById('genericModal').classList.remove('remove'); 
             document.getElementById('genericModal').classList.remove('show'); 
         }
         
@@ -681,7 +682,6 @@
                 }
                 lastEnterTime = now;
             }
-            // SMARTPHONE & TABLET RULESET: Enter key acts as standard line breakout feed. Transmission requires dedicated button contact.
         }
 
         /* --- HARDWARE CAMERA MODULE CORE --- */
@@ -778,7 +778,79 @@
             }
         }
 
-        // Processing transmission execution engine routed cleanly through text API or Puter intercept frameworks
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = "";
+            chats.forEach(c => {
+                const item = document.createElement('div');
+                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
+                item.innerText = c.name;
+                item.onclick = () => {
+                    currentChatId = c.id;
+                    renderHistory();
+                    renderChat();
+                };
+                container.appendChild(item);
+            });
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = "";
+            if (!currentChatId) return;
+            const current = chats.find(c => c.id === currentChatId);
+            current.messages.forEach((m, idx) => {
+                const msgNode = document.createElement('div');
+                msgNode.className = `msg ${m.role}`;
+                
+                // If it contains a custom ID placeholder block, wrap it so updateAiChatBubble target works
+                if (m.text.includes('id="ai-node-') || m.text.includes('generated-image-container')) {
+                    msgNode.innerHTML = m.text;
+                } else {
+                    msgNode.innerText = m.text;
+                }
+                container.appendChild(msgNode);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function startVoice() {
+            if (recognitionInstance) {
+                recognitionInstance.stop();
+                return;
+            }
+            const SpeechContract = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechContract) return;
+            
+            recognitionInstance = new SpeechContract();
+            recognitionInstance.continuous = false;
+            recognitionInstance.interimResults = false;
+            recognitionInstance.lang = 'en-US';
+            
+            document.getElementById('micBtn').classList.add('mic-active');
+            
+            recognitionInstance.onresult = (e) => {
+                const txt = e.results[0][0].transcript;
+                const box = document.getElementById('userInput');
+                box.value = box.value ? box.value + " " + txt : txt;
+                autoGrow(box);
+                document.getElementById('sendIcon').classList.add('primed');
+            };
+            
+            recognitionInstance.onend = () => {
+                document.getElementById('micBtn').classList.remove('mic-active');
+                recognitionInstance = null;
+            };
+            
+            recognitionInstance.onerror = () => {
+                document.getElementById('micBtn').classList.remove('mic-active');
+                recognitionInstance = null;
+            };
+            
+            recognitionInstance.start();
+        }
+
+        // Processing transmission execution engine routed cleanly through backend /api/chat endpoints
         async function send() {
             const input = document.getElementById('userInput');
             let textVal = input.value.trim();
@@ -792,24 +864,26 @@
             }
             appendMessage("user", userDisplay);
 
-            // --- INTERCEPT SYSTEM - REGEX PROMPT ANALYSIS FOR CLIENT-SIDE GENERATION ---
+            // --- INTERCEPT SYSTEM - REGEX PROMPT ANALYSIS FOR ROUTING TO BACKEND PIPELINE ---
             const imageGenerationRegexPattern = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
+            const isImageIntent = imageGenerationRegexPattern.test(textVal) && !pendingImageData;
             
-            if (imageGenerationRegexPattern.test(textVal) && !pendingImageData) {
+            const uniqueAiTrackId = 'ai-node-' + Date.now();
+            const current = chats.find(c => c.id === currentChatId);
+            const loadIdx = current.messages.length;
+
+            if (isImageIntent) {
                 const matchOffsetResult = textVal.match(imageGenerationRegexPattern);
                 const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "digital art matrix asset";
                 
-                const uniqueAiTrackId = 'ai-node-' + Date.now();
-                
-                // Mount loading structure directly in chat layout array
-                const current = chats.find(c => c.id === currentChatId);
+                // Mount high-fidelity loading structure directly into chat layout array
                 current.messages.push({
                     role: "ai",
                     text: `
                         <div class="image-loading-state" id="${uniqueAiTrackId}">
                             <div class="spinner-line-wrap">
                                 <i class="fas fa-circle-notch fa-spin" style="color: var(--brand-primary)"></i>
-                                <span>Compiling client-side image space arrays for: <i>"${targetedVisualSubject}"</i>...</span>
+                                <span>Generating server-side infinite asset matrix for: <i>"${targetedVisualSubject}"</i>...</span>
                             </div>
                             <div class="progress-track-bar">
                                 <div class="progress-active-fill"></div>
@@ -818,158 +892,50 @@
                     `
                 });
                 renderChat();
-                
-                // Re-zero input elements immediately
-                input.value = ""; 
-                input.style.height = isPC ? '52px' : '44px'; 
-                document.getElementById('sendIcon').classList.remove('primed');
-
-                try {
-                    // Fire Puter's direct zero-cost serverless image pipeline matrix routine
-                    const generatedDomImageElement = await puter.ai.txt2img(targetedVisualSubject);
-                    const directEngineImageSourceUrl = generatedDomImageElement.src;
-
-                    const finalHtmlTemplate = `
-                        <div class="generated-image-container">
-                            <div class="image-header-metadata">
-                                <span><i class="far fa-image"></i> Asset Rendered via Puter Engine</span>
-                                <span>1024 × 1024</span>
-                            </div>
-                            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 12px; font-style: italic;">
-                                Prompt context: "${targetedVisualSubject}"
-                            </p>
-                            <img src="${directEngineImageSourceUrl}" class="chat-img-preview" alt="AI Generated Graphic Asset" onclick="window.open(this.src)" style="max-height: 512px; width: 100%;">
-                        </div>
-                    `;
-                    
-                    // Update current structural chat object array data values
-                    const targetMessageIndex = current.messages.length - 1;
-                    current.messages[targetMessageIndex].text = finalHtmlTemplate;
-                    updateAiChatBubble(uniqueAiTrackId, finalHtmlTemplate);
-                    renderChat();
-                } catch (canvasExecutionError) {
-                    const errorHtml = `
-                        <div style="color: var(--error); padding: 4px 0;">
-                            <i class="fas fa-exclamation-triangle"></i> Puter Engine Execution Failure: ${canvasExecutionError.message}
-                        </div>
-                    `;
-                    const targetMessageIndex = current.messages.length - 1;
-                    current.messages[targetMessageIndex].text = errorHtml;
-                    renderChat();
-                }
-                return; // Gracefully pop out early from runtime thread
+            } else {
+                appendMessage("ai", "..."); 
             }
-
-            // ROUTE B: TRADITIONAL API PIPELINE HANDOFF
-            const payload = {
-                prompt: textVal,
-                multimodal: pendingImageData ? true : false,
-                image_data: pendingImageData 
-            };
             
+            // Re-zero input elements immediately
+            const cachedPrompt = textVal;
             input.value = ""; 
             input.style.height = isPC ? '52px' : '44px'; 
+            const cachedImageData = pendingImageData;
             clearCameraData();
             document.getElementById('sendIcon').classList.remove('primed');
-
-            const current = chats.find(c => c.id === currentChatId);
-            const loadIdx = current.messages.length;
-            appendMessage("ai", "..."); 
 
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload) 
+                    body: JSON.stringify({
+                        prompt: cachedPrompt,
+                        multimodal: cachedImageData ? true : false,
+                        image_data: cachedImageData 
+                    })
                 });
+
                 const data = await response.json();
-                current.messages[loadIdx].text = data.groq;
-            } catch (err) {
-                current.messages[loadIdx].text = "[ System Interruption: Frame Analysis Offline ]";
-            }
-            renderChat();
-            renderHistory();
-        }
-
-        function renderChat() {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = "";
-            const current = chats.find(c => c.id === currentChatId);
-            if (!current) return;
-            current.messages.forEach(m => {
-                const d = document.createElement('div');
-                d.className = `msg ${m.role}`;
-                d.innerHTML = m.text;
-                container.appendChild(d);
-            });
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = "";
-            chats.forEach(c => {
-                const d = document.createElement('div');
-                d.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
-                d.innerText = c.name;
-                d.onclick = () => { currentChatId = c.id; renderChat(); renderHistory(); };
-                list.appendChild(d);
-            });
-        }
-
-        /* --- PRESTINE SPEECH SYNCHRONIZATION ENGINE --- */
-        function startVoice() {
-            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!Speech) { 
-                alert("Speech recognition engine unvetted or disabled on this specific client application.");
-                return; 
-            }
-
-            const micBtn = document.getElementById('micBtn');
-            const userInput = document.getElementById('userInput');
-
-            if (recognitionInstance) { 
-                recognitionInstance.stop(); 
-                return; 
-            }
-
-            const rec = new Speech();
-            recognitionInstance = rec;
-
-            rec.continuous = true;       
-            rec.interimResults = true;   
-            rec.lang = 'en-US';          
-
-            let initialText = userInput.value;
-
-            rec.onstart = () => { 
-                micBtn.classList.add('mic-active'); 
-            };
-
-            rec.onresult = (e) => {
-                let liveTranscript = '';
-                for (let i = e.resultIndex; i < e.results.length; ++i) {
-                    if (e.results[i].isFinal) {
-                        initialText += e.results[i][0].transcript;
-                    } else {
-                        liveTranscript += e.results[i][0].transcript;
-                    }
+                
+                if (isImageIntent) {
+                    // Update with self-contained high-quality asset code from Route A backend output
+                    let outputHtml = data.groq;
+                    current.messages[loadIdx].text = outputHtml;
+                    updateAiChatBubble(uniqueAiTrackId, outputHtml);
+                } else {
+                    current.messages[loadIdx].text = data.groq || "Transmission terminal response void.";
                 }
-                userInput.value = initialText + liveTranscript;
-                autoGrow(userInput); 
-                document.getElementById('sendIcon').classList.add('primed'); 
-            };
-
-            rec.onerror = (err) => { 
-                console.error("Speech Execution Error: ", err.error); 
-            };
-            
-            rec.onend = () => { 
-                micBtn.classList.remove('mic-active'); 
-                recognitionInstance = null; 
-            };
-            
-            rec.start();
+                renderChat();
+            } catch (networkError) {
+                const errTemplate = `<span style="color:var(--error);"><i class="fas fa-exclamation-circle"></i> Connection Interrupted: ${networkError.message}</span>`;
+                if (isImageIntent) {
+                    current.messages[loadIdx].text = errTemplate;
+                    updateAiChatBubble(uniqueAiTrackId, errTemplate);
+                } else {
+                    current.messages[loadIdx].text = errTemplate;
+                }
+                renderChat();
+            }
         }
     </script>
 </body>
