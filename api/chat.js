@@ -16,46 +16,25 @@ export default async function handler(req, res) {
      lowerPrompt.startsWith("generate an image of") ||
      lowerPrompt.startsWith("create an image of"));
 
-  // ROUTE A: IMAGE GENERATION PIPELINE
+  // ROUTE A: FREE IMAGE GENERATION PIPELINE (No Key / No Billing Limits)
   if (isImageGenerationIntent) {
     try {
-      // Isolate the visual subject description by stripping out the trigger phrase
+      // Isolate the visual description
       const visualDescription = prompt.replace(/(generate|create)\s+(me\s+)?a\s+(picture|image)\s+of\s+/i, "").trim();
 
-      // FIXED: Routed to the official /v1/images/generations endpoint using the active gpt-image-1.5 flagship model
-      const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: "gpt-image-1.5", 
-          prompt: visualDescription,
-          n: 1,
-          size: "1024x1024"
-        })
-      });
+      // Encode the text into a safe URL format
+      const encodedDescription = encodeURIComponent(visualDescription);
+      
+      // Generate using open-source high-speed canvas engine (Flux model variant)
+      const generatedImageUrl = `https://image.pollinations.ai/p/${encodedDescription}?width=1024&height=1024&nologo=true`;
 
-      const imageData = await imageResponse.json();
-
-      if (imageData.error) {
-        return res.status(200).json({ 
-          gpt: "Disabled", 
-          gemini: "Disabled", 
-          groq: `Image Generation Error: ${imageData.error.message || JSON.stringify(imageData.error)}` 
-        });
-      }
-
-      const generatedImageUrl = imageData.data[0].url;
-
-      // Construct a pristine HTML payload to match the frontend's innerHTML parsing rule
+      // Construct the exact HTML payload for your frontend
       const embeddedHtmlOutput = `
         <div class="generated-image-container" style="width: 100%;">
           <p style="margin-bottom: 10px; color: rgba(255,255,255,0.6); font-size: 13px;">
             <i class="fas fa-magic"></i> Generated Image for: <i>"${visualDescription}"</i>
           </p>
-          <img src="${generatedImageUrl}" class="chat-img-preview" style="max-width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.2);">
+          <img src="${generatedImageUrl}" class="chat-img-preview" style="max-width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.2);" alt="AI Output">
         </div>
       `;
 
@@ -66,7 +45,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE
+  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE (UNTOUCHED)
   const getAI = async (url, options, type) => {
     try {
       const response = await fetch(url, options);
