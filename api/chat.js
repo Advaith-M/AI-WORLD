@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       // Isolate the visual subject description by stripping out the trigger phrase
       const visualDescription = prompt.replace(/(generate|create)\s+(me\s+)?a\s+(picture|image)\s+of\s+/i, "").trim();
 
-      // Request generation from OpenAI's image suite
+      // FIXED: Routed to the official /v1/images/generations endpoint using the active gpt-image-1.5 flagship model
       const imageResponse = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: "dall-e-3",
+          model: "gpt-image-1.5", 
           prompt: visualDescription,
           n: 1,
           size: "1024x1024"
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE (UNTOUCHED)
+  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE
   const getAI = async (url, options, type) => {
     try {
       const response = await fetch(url, options);
