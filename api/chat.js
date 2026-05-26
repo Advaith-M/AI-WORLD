@@ -1,5 +1,6 @@
 export default async function handler(req, res) {
-  const { prompt } = req.body;
+  // Destructure incoming prompt, along with the custom multimodal flags sent by your frontend
+  const { prompt, multimodal, image_data } = req.body;
 
   const getAI = async (url, options, type) => {
     try {
@@ -10,35 +11,53 @@ export default async function handler(req, res) {
         return `Error from ${type}: ${data.error.message || JSON.stringify(data.error)}`;
       }
       
-      if (type === 'GPT') return data.choices[0].message.content;
-      if (type === 'GEMINI') return data.candidates[0].content.parts[0].text;
       if (type === 'GROQ') return data.choices[0].message.content;
     } catch (e) {
       return `${type} Failed: ${e.message}`;
     }
   };
 
-  // 1. OpenAI (Still requires >$0 balance)
-  const gpt = getAI('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "user", content: prompt }] })
-  }, 'GPT');
+  // 1. OpenAI (Bypassed)
+  const gptRes = "OpenAI is currently disabled.";
 
-  // 2. GEMINI - Use v1beta and the specific preview string for 3.1 Pro
-  const gemini = getAI(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-  }, 'GEMINI');
+  // 2. Gemini (Bypassed)
+  const geminiRes = "Gemini is currently disabled.";
 
-  // 3. GROQ - Using the newest Llama 3.3 70B model
-  const groq = getAI('https://api.groq.com/openai/v1/chat/completions', {
+  // 3. GROQ - Fully active with dynamic support for text prompts and vision text integration
+  let groqBody;
+
+  if (multimodal && image_data) {
+    // If the frontend passes a captured camera frame, we package it into the system context 
+    // along with the user text so Groq reads everything together.
+    groqBody = {
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: `Analyze this image asset context completely and explicitly address this user prompt: ${prompt}` },
+            { type: "image_url", image_url: { url: image_data } }
+          ]
+        }
+      ]
+    };
+  } else {
+    // Standard text-only fallback payload
+    groqBody = {
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }]
+    };
+  }
+
+  const groqRes = await getAI('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }] })
+    headers: { 
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify(groqBody)
   }, 'GROQ');
 
-  const [gptRes, geminiRes, groqRes] = await Promise.all([gpt, gemini, groq]);
+  // Return the structure cleanly so your frontend layout mapping code doesn't crash
   res.status(200).json({ gpt: gptRes, gemini: geminiRes, groq: groqRes });
 }
