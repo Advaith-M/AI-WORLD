@@ -439,7 +439,7 @@
                 const data = await response.json();
                 
                 // Essential: Groq must read the image data and reply back with both the analysis and the user's text message context included.
-                const result = `<b>OpenAI</b><br>${data.gpt}<br><br><b>Gemini</b><br>${data.gemini}<br><br><b>Groq</b><br>${data.groq}`;
+                const result = `<b></b><br>${data.gpt}<br><br><b></b><br>${data.gemini}<br><br><b>Groq</b><br>${data.groq}`;
                 current.messages[loadIdx].text = result;
             } catch (err) {
                 current.messages[loadIdx].text = "[ Multimodal Analysis Offline ]";
