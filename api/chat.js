@@ -5,49 +5,57 @@ export default async function handler(req, res) {
     return res.status(200).json({ gpt: "Disabled", gemini: "Disabled", groq: "" });
   }
 
-  // 1. ADVANCED REGEX INTENT DETECTION (Fixes matching issues completely)
-  // This matches "generate", "create", or "make" followed by "picture", "image", or "photo" anywhere in the string
+  // 1. ADVANCED REGEX INTENT DETECTION
   const imageRegex = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
   const isImageGenerationIntent = imageRegex.test(prompt);
 
-  // ROUTE A: FREE IMAGE GENERATION PIPELINE
+  // ROUTE A: IMAGE GENERATION PIPELINE WITH SERVER-SIDE BUFFER CACHING (Bypasses CORB)
   if (isImageGenerationIntent) {
     try {
-      // Isolate the subject description by stripping out the detected trigger phrase and everything before it
+      // Isolate the subject description by stripping out the detected trigger phrase
       const match = prompt.match(imageRegex);
       const triggerPhraseIndex = match.index;
       const triggerPhraseLength = match[0].length;
       
-      // Captures everything after the trigger words (the actual subject of the image)
       const visualDescription = prompt.substring(triggerPhraseIndex + triggerPhraseLength).trim();
-
-      // Fallback description if extraction leaves an empty string
       const finalSubject = visualDescription || "something beautiful";
-
-      // Encode the text string securely into URL format
       const encodedDescription = encodeURIComponent(finalSubject);
       
-      // Instant execution using the ultra-reliable, free high-speed production engine
-      const generatedImageUrl = `https://image.pollinations.ai/p/${encodedDescription}?width=1024&height=1024&nologo=true`;
+      const targetImageUrl = `https://image.pollinations.ai/p/${encodedDescription}?width=1024&height=1024&nologo=true`;
 
-      // Structure the precise layout payload mapping perfectly into your frontend's innerHTML render thread
+      // CRITICAL CORB BYPASS: Fetch the image on the server where CORB security limits don't apply
+      const imageFetchResponse = await fetch(targetImageUrl);
+      
+      if (!imageFetchResponse.ok) {
+        throw new Error(`Generation node returned status code: ${imageFetchResponse.status}`);
+      }
+
+      // Convert the raw binary data stream into a node buffer array
+      const arrayBuffer = await imageFetchResponse.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      // Convert buffer stream directly into a safe, localized base64 string
+      const base64Image = buffer.toString('base64');
+      const safeDataUri = `data:image/jpeg;base64,${base64Image}`;
+
+      // Package self-contained data URI inside HTML frame string
       const embeddedHtmlOutput = `
         <div class="generated-image-container" style="width: 100%;">
           <p style="margin-bottom: 10px; color: rgba(255,255,255,0.6); font-size: 13px;">
             <i class="fas fa-magic"></i> Generated Image for: <i>"${finalSubject}"</i>
           </p>
-          <img src="${generatedImageUrl}" class="chat-img-preview" style="max-width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.2);" alt="AI Output">
+          <img src="${safeDataUri}" class="chat-img-preview" style="max-width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.2);" alt="AI Output">
         </div>
       `;
 
       return res.status(200).json({ gpt: "Disabled", gemini: "Disabled", groq: embeddedHtmlOutput });
 
     } catch (err) {
-      return res.status(200).json({ gpt: "Disabled", gemini: "Disabled", groq: `Pipeline Failure: ${err.message}` });
+      return res.status(200).json({ gpt: "Disabled", gemini: "Disabled", groq: `Pipeline Failure (CORB Bypass Stack): ${err.message}` });
     }
   }
 
-  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE (Fires if regex pattern fails)
+  // ROUTE B: STANDARD TEXT & VISION GROQ PIPELINE
   const getAI = async (url, options, type) => {
     try {
       const response = await fetch(url, options);
