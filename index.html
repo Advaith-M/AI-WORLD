@@ -8,6 +8,8 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
+    <script src="https://js.puter.com/v2/"></script>
+    
     <style>
         :root {
             --bg: #000000;
@@ -19,6 +21,9 @@
             --modal-bg: #161616;
             --user-outline: rgba(255, 255, 255, 0.3);
             --ai-outline: rgba(255, 255, 255, 0.1);
+            --brand-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --brand-primary: #4f46e5;
+            --error: #ef4444;
         }
 
         * { 
@@ -211,6 +216,67 @@
             display: block;
             object-fit: contain;
             border: 1px solid var(--line);
+        }
+
+        /* Puter Asset Production Block Architecture Definitions */
+        .generated-image-container {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .image-header-metadata {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+        }
+
+        .image-header-metadata span {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .image-loading-state {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 10px 0;
+            min-width: 240px;
+        }
+
+        .spinner-line-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .progress-track-bar {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-active-fill {
+            position: absolute;
+            height: 100%;
+            width: 40%;
+            background: var(--brand-gradient);
+            border-radius: 2px;
+            animation: linePulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes linePulse {
+            0% { left: -40%; }
+            100% { left: 100%; }
         }
 
         /* --- FLOATING MEDIA CONTEXT MENU --- */
@@ -703,7 +769,16 @@
              renderChat();
         }
 
-        // Processing transmission execution engine routed purely to Groq endpoints without structural headings
+        function updateAiChatBubble(elementId, transformedHtmlContent) {
+            const activeTargetNode = document.getElementById(elementId);
+            if (activeTargetNode) {
+                activeTargetNode.innerHTML = transformedHtmlContent;
+                const container = document.getElementById('chat-container');
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // Processing transmission execution engine routed cleanly through text API or Puter intercept frameworks
         async function send() {
             const input = document.getElementById('userInput');
             let textVal = input.value.trim();
@@ -717,13 +792,81 @@
             }
             appendMessage("user", userDisplay);
 
+            // --- INTERCEPT SYSTEM - REGEX PROMPT ANALYSIS FOR CLIENT-SIDE GENERATION ---
+            const imageGenerationRegexPattern = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
+            
+            if (imageGenerationRegexPattern.test(textVal) && !pendingImageData) {
+                const matchOffsetResult = textVal.match(imageGenerationRegexPattern);
+                const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "digital art matrix asset";
+                
+                const uniqueAiTrackId = 'ai-node-' + Date.now();
+                
+                // Mount loading structure directly in chat layout array
+                const current = chats.find(c => c.id === currentChatId);
+                current.messages.push({
+                    role: "ai",
+                    text: `
+                        <div class="image-loading-state" id="${uniqueAiTrackId}">
+                            <div class="spinner-line-wrap">
+                                <i class="fas fa-circle-notch fa-spin" style="color: var(--brand-primary)"></i>
+                                <span>Compiling client-side image space arrays for: <i>"${targetedVisualSubject}"</i>...</span>
+                            </div>
+                            <div class="progress-track-bar">
+                                <div class="progress-active-fill"></div>
+                            </div>
+                        </div>
+                    `
+                });
+                renderChat();
+                
+                // Re-zero input elements immediately
+                input.value = ""; 
+                input.style.height = isPC ? '52px' : '44px'; 
+                document.getElementById('sendIcon').classList.remove('primed');
+
+                try {
+                    // Fire Puter's direct zero-cost serverless image pipeline matrix routine
+                    const generatedDomImageElement = await puter.ai.txt2img(targetedVisualSubject);
+                    const directEngineImageSourceUrl = generatedDomImageElement.src;
+
+                    const finalHtmlTemplate = `
+                        <div class="generated-image-container">
+                            <div class="image-header-metadata">
+                                <span><i class="far fa-image"></i> Asset Rendered via Puter Engine</span>
+                                <span>1024 × 1024</span>
+                            </div>
+                            <p style="color: rgba(255,255,255,0.4); font-size: 13px; margin-bottom: 12px; font-style: italic;">
+                                Prompt context: "${targetedVisualSubject}"
+                            </p>
+                            <img src="${directEngineImageSourceUrl}" class="chat-img-preview" alt="AI Generated Graphic Asset" onclick="window.open(this.src)" style="max-height: 512px; width: 100%;">
+                        </div>
+                    `;
+                    
+                    // Update current structural chat object array data values
+                    const targetMessageIndex = current.messages.length - 1;
+                    current.messages[targetMessageIndex].text = finalHtmlTemplate;
+                    updateAiChatBubble(uniqueAiTrackId, finalHtmlTemplate);
+                    renderChat();
+                } catch (canvasExecutionError) {
+                    const errorHtml = `
+                        <div style="color: var(--error); padding: 4px 0;">
+                            <i class="fas fa-exclamation-triangle"></i> Puter Engine Execution Failure: ${canvasExecutionError.message}
+                        </div>
+                    `;
+                    const targetMessageIndex = current.messages.length - 1;
+                    current.messages[targetMessageIndex].text = errorHtml;
+                    renderChat();
+                }
+                return; // Gracefully pop out early from runtime thread
+            }
+
+            // ROUTE B: TRADITIONAL API PIPELINE HANDOFF
             const payload = {
                 prompt: textVal,
                 multimodal: pendingImageData ? true : false,
                 image_data: pendingImageData 
             };
             
-            // Re-zeroing the input array states smoothly
             input.value = ""; 
             input.style.height = isPC ? '52px' : '44px'; 
             clearCameraData();
@@ -740,8 +883,6 @@
                     body: JSON.stringify(payload) 
                 });
                 const data = await response.json();
-                
-                // Renders pure unique system text payload dropping markup components
                 current.messages[loadIdx].text = data.groq;
             } catch (err) {
                 current.messages[loadIdx].text = "[ System Interruption: Frame Analysis Offline ]";
