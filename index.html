@@ -21,179 +21,466 @@
             --ai-outline: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+        }
         
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            overflow: hidden; 
+            font-size: 14px; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR PANEL SYSTEM --- */
         aside { 
-            width: 280px; background: var(--sidebar-bg); border-right: 3.5px solid var(--line); 
-            height: 100%; display: flex; flex-direction: column; transition: all 0.3s ease;
+            width: 280px; 
+            background: var(--sidebar-bg); 
+            border-right: 3.5px solid var(--line); 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .top-nav { 
+            padding: 15px 20px 5px 20px; 
+            display: flex; 
+            gap: 10px; 
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header { 
+            padding: 10px 20px 10px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
             flex-shrink: 0;
         }
 
-        .top-nav { padding: 10px 15px; display: flex; gap: 8px; }
-        .sidebar-header { padding: 5px 15px; display: flex; flex-direction: column; gap: 8px; }
-
         .nav-btn {
-            width: 100%; padding: 10px; background: var(--input-bg); border: 2px solid var(--line);
-            border-radius: 8px; color: white; display: flex; align-items: center; gap: 10px;
-            cursor: pointer; font-size: 13px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; 
+            padding: 12px; 
+            background: var(--input-bg); 
+            border: 2px solid var(--line);
+            border-radius: 10px; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            white-space: nowrap;
         }
-        .nav-btn:hover { background: var(--accent); transform: translateY(-1px); }
+        .nav-btn:hover { 
+            background: var(--accent); 
+            transform: translateY(-1px); 
+        }
+        .nav-btn i {
+            min-width: 16px;
+            text-align: center;
+        }
 
         .hanging-label {
-            padding: 10px 20px; font-size: 10px; font-weight: 700;
-            color: rgba(255, 255, 255, 0.5); letter-spacing: 1.3px; text-transform: uppercase;
+            padding: 15px 25px 15px 100px; 
+            font-size: 11px; 
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5); 
+            letter-spacing: 1.3px; 
+            text-transform: uppercase;
+            transition: opacity 0.2s ease, padding 0.3s ease;
+            flex-shrink: 0;
         }
 
-        #history-list { flex: 1; overflow-y: auto; padding: 5px 8px; }
+        #history-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 5px 10px; 
+            scroll-behavior: smooth;
+        }
+        #history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        #history-list::-webkit-scrollbar-thumb {
+            background: var(--line);
+            border-radius: 2px;
+        }
+        
         .history-item {
-            padding: 10px; margin-bottom: 5px; border-radius: 10px; cursor: pointer;
-            font-size: 11.5px; color: #888; transition: all 0.37s ease;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 13px; 
+            margin-bottom: 6.5px; 
+            border-radius: 13.45px; 
+            cursor: pointer;
+            font-size: 12.5px; 
+            color: #888; 
+            transition: all 0.37s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
         }
-        .history-item.active { background: var(--line); color: #fff; }
+        .history-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .history-item.active { 
+            background: var(--line); 
+            color: #fff; 
+        }
 
-        .sidebar-footer { padding: 10px 15px; border-top: 3.45px solid var(--line); }
+        .sidebar-footer { 
+            padding: 15px 20px; 
+            border-top: 3.45px solid var(--line); 
+            flex-shrink: 0;
+        }
 
-        /* --- MAIN AREA --- */
-        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; }
+        /* --- MAIN VIEW ENVIRONMENT --- */
+        main { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            position: relative; 
+            overflow: hidden;
+            background: var(--bg);
+        }
 
         #chat-container { 
-            flex: 1; overflow-y: auto; padding: 60px 15% 20px 15%; 
-            display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth;
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 80px 15% 40px 15%; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 24px; 
+            scroll-behavior: smooth;
+        }
+        #chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
         }
 
         .msg { 
-            max-width: 85%; padding: 14px 18px; font-size: 14px; line-height: 1.6;
-            color: #eee; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-            word-wrap: break-word; /* Essential: next word on next line logic */
-        }
-        @keyframes professionalEntry {
-            0% { opacity: 0; transform: translateY(15px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .user { align-self: flex-end; background: #1a1a1a; border: 1px solid var(--user-outline); border-radius: 16px 16px 4px 16px; }
-        .ai { align-self: flex-start; background: #111; border: 1px solid var(--ai-outline); border-radius: 16px 16px 16px 4px; }
-        .chat-img-preview { max-width: 200px; border-radius: 10px; margin-top: 10px; }
-
-        /* --- FLOATING POLL --- */
-        .poll-menu {
-            position: absolute; bottom: 85px; left: 15%; 
-            background: var(--modal-bg); border: 1px solid var(--line);
-            border-radius: 12px; padding: 8px; display: none;
-            flex-direction: column; gap: 4px; z-index: 100; font-size: 13px;
-        }
-        .poll-menu.show { display: flex; }
-
-        /* --- INPUT AREA --- */
-        .input-area { padding: 15px 15% 10px 15%; display: flex; gap: 10px; align-items: flex-end; position: relative; width: 100%; flex-shrink: 0;}
-        .circle-btn {
-            width: 48px; height: 48px; background: var(--input-bg); border: 1.9px solid var(--line);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #fff; transition: all 0.3s ease; flex-shrink: 0; font-size: 16px;
-        }
-        .mic-active { background: #fff !important; color: #000 !important; box-shadow: 0 0 15px #fff; }
-
-        .input-wrap { position: relative; width: 100%; display: flex; flex-direction: column; }
-        .input-box {
-            width: 100%; background: var(--input-bg); border: 2px solid var(--line); 
-            border-radius: 18px; padding: 14px 50px 14px 18px; color: var(--text);
-            outline: none; font-size: 14px; resize: none;
-            max-height: 120px; /* Essential: Limit to ~5 lines before scrolling */
-            line-height: 20px; /* Standardize line height for the 5-line calculation */
-            overflow-y: auto; /* Required for hidden scrollbar */
+            max-width: 85%; 
+            padding: 16px 20px; 
+            font-size: 15px; 
+            line-height: 1.6;
+            color: #eee; 
+            border-radius: 18px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
-        /* HIDDEN SCROLLBAR logic for input box */
-        .input-box::-webkit-scrollbar { width: 0px; background: transparent; }
+        @keyframes professionalEntry {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .user { 
+            align-self: flex-end; 
+            background: #1a1a1a; 
+            border: 1px solid var(--user-outline); 
+            border-radius: 18px 18px 4px 18px; 
+        }
+        .ai { 
+            align-self: flex-start; 
+            background: #111; 
+            border: 1px solid var(--ai-outline); 
+            border-radius: 18px 18px 18px 4px; 
+        }
+        
+        .chat-img-preview { 
+            max-width: 100%; 
+            max-height: 250px;
+            border-radius: 12px; 
+            margin-top: 12px; 
+            display: block;
+            object-fit: contain;
+            border: 1px solid var(--line);
+        }
+
+        /* --- FLOATING MEDIA CONTEXT MENU --- */
+        .poll-menu {
+            position: absolute; 
+            bottom: 85px; 
+            left: 15%; 
+            background: var(--modal-bg); 
+            border: 1px solid var(--line);
+            border-radius: 15px; 
+            padding: 10px; 
+            display: none;
+            flex-direction: column; 
+            gap: 5px; 
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: professionalEntry 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .poll-menu.show { 
+            display: flex; 
+        }
+        .poll-item {
+            padding: 10px 15px;
+            font-size: 13px;
+            color: #ccc;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .poll-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+
+        /* --- INPUT COMPONENT LAYOUT --- */
+        .input-area { 
+            padding: 20px 15%; 
+            display: flex; 
+            gap: 12px; 
+            align-items: flex-end; 
+            position: relative; 
+            width: 100%;
+            background: linear-gradient(to top, var(--bg) 80%, transparent);
+            z-index: 5;
+            flex-shrink: 0;
+        }
+        
+        .circle-btn {
+            width: 52px; 
+            height: 52px; 
+            background: var(--input-bg); 
+            border: 1.9px solid var(--line);
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            color: #fff; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+        .circle-btn:hover {
+            background: var(--accent);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .mic-active { 
+            background: #fff !important; 
+            color: #000 !important; 
+            box-shadow: 0 0 15px #fff; 
+            border-color: #fff !important;
+        }
+
+        .input-wrap { 
+            position: relative; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .input-box {
+            width: 100%; 
+            background: var(--input-bg); 
+            border: 2px solid var(--line); 
+            border-radius: 20px; 
+            padding: 15px 55px 15px 22px; 
+            color: var(--text);
+            outline: none; 
+            font-size: 15px; 
+            resize: none;
+            max-height: 120px;
+            line-height: 20px;
+            overflow-y: auto;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        .input-box:focus {
+            border-color: rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.16);
+        }
+        .input-box::-webkit-scrollbar { 
+            width: 0px; 
+            background: transparent; 
+        }
 
         .send-btn {
-            position: absolute; right: 16px; bottom: 16px; 
-            color: rgba(255,255,255,0.5); font-size: 16px; cursor: pointer; transition: 0.285s;
+            position: absolute; 
+            right: 17.59px; 
+            bottom: 16px; 
+            color: rgba(255,255,255,0.5); 
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: all 0.285s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 4px;
         }
-        .send-btn.primed { color: #fff; transform: scale(1.1); }
+        .send-btn.primed { 
+            color: #fff; 
+            transform: scale(1.15); 
+        }
 
-        /* CAMERA FEATURE - THUMBNAIL IN INPUT BAR */
-        .input-thumbnail-area { display: none; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 14px 14px 0 0; border: 2px solid var(--line); border-bottom: none; margin-bottom: -2px; }
-        .input-thumbnail-area.show { display: flex; gap: 10px; }
-        .input-thumb { height: 40px; border-radius: 8px; }
+        /* --- IMAGE BAR EXTENSION PREVIEW --- */
+        .input-thumbnail-area { 
+            display: none; 
+            padding: 12px; 
+            background: rgba(22, 22, 22, 0.95); 
+            border-radius: 18px 18px 0 0; 
+            border: 2px solid var(--line); 
+            border-bottom: none; 
+            margin-bottom: -2px; 
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .input-thumbnail-area.show { 
+            display: flex; 
+            gap: 12px; 
+        }
+        .input-thumb-container {
+            position: relative;
+            display: inline-block;
+        }
+        .input-thumb { 
+            height: 45px; 
+            width: 45px;
+            border-radius: 8px; 
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .thumb-remove {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-size: 16px;
+            color: #ff4a4a;
+            cursor: pointer;
+            background: #000;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        .thumb-remove:hover {
+            transform: scale(1.2);
+        }
 
+        /* --- GLOBAL MODAL SYSTEM --- */
         .modal-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:1000;
+            position: fixed; 
+            top:0; 
+            left:0; 
+            width:100%; 
+            height:100%;
+            background: rgba(0,0,0,0.85); 
+            display:none; 
+            justify-content:center; 
+            align-items:center; 
+            z-index:1000;
+            backdrop-filter: blur(5px);
         }
-        .modal-overlay.show { display:flex; }
-        .modal-card { background: var(--modal-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--line); width: 320px; text-align: center; }
+        .modal-overlay.show { 
+            display:flex; 
+        }
+        .modal-card { 
+            background: var(--modal-bg); 
+            padding: 40px; 
+            border-radius: 24px; 
+            border: 1px solid var(--line); 
+            width: 350px; 
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            animation: professionalEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
         
-        /* Camera button specifically enabled only for Mobile/Tablets via visibility */
-        .camera-trigger { display: none; }
+        .camera-trigger { 
+            display: none; 
+        }
 
-        /* --- DEVICE OPTIMIZATION ENGINE (RESPONSIVE BREAKPOINTS) --- */
+        /* --- HARDWARE CROSS-PLATFORM BREAKPOINTS --- */
         
-        /* 1. TABLETS & IPADS BREAKPOINT (601px to 1024px) */
+        /* 1. IPAD & TABLET SYSTEM RULES */
         @media (max-width: 1024px) {
-            body { font-size: 13px; }
             aside {
-                width: 70px; /* Extremely small sidebar optimized for tablets */
+                width: 80px;
             }
             aside .nav-btn span, aside .hanging-label, aside .top-nav i.fa-bars {
-                display: none !important; /* Drops descriptive labels and mobile bars menu */
+                display: none !important;
             }
             aside .nav-btn {
                 justify-content: center;
-                padding: 10px 0;
-                font-size: 15px;
+                padding: 12px 0;
+                font-size: 16px;
             }
             #chat-container {
-                padding: 60px 8% 20px 8%; /* Balanced margins */
+                padding: 80px 8% 40px 8%;
             }
             .input-area {
-                padding: 15px 8% 10px 8%;
+                padding: 20px 8%;
             }
-            .camera-trigger { display: flex; } /* ENABLE Camera for Tablets */
+            .camera-trigger { 
+                display: flex; 
+            }
         }
 
-        /* 2. MOBILE DEVICE BREAKPOINT (Up to 600px) */
+        /* 2. MOBILE HANDSET SYSTEM RULES */
         @media (max-width: 600px) {
-            body { font-size: 13px; overflow: hidden;}
             aside {
-                display: none !important; /* Sidebar completely hidden */
+                display: none !important;
             }
-            main { height: 100vh; width: 100vw; overflow: hidden; }
+            main {
+                height: 100vh;
+                width: 100vw;
+            }
             #chat-container {
-                padding: 20px 12px 10px 12px; /* Ultra-tight margins */
+                padding: 70px 16px 100px 16px;
             }
             .input-area {
-                padding: 10px 8px 10px 8px; /* Elements must remain small to avoid scrolling whole page */
-                gap: 5px; 
-                flex-wrap: nowrap;
-                position: fixed; bottom: 0; left: 0; background: var(--bg);
+                padding: 12px 10px;
+                gap: 6px;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                background: var(--bg);
+                box-shadow: 0 -10px 25px rgba(0,0,0,0.8);
             }
             .circle-btn {
-                width: 42px;
-                height: 42px; /* Small action icons for touch */
-                font-size: 14px;
+                width: 44px;
+                height: 44px;
+                font-size: 15px;
             }
             .input-box {
-                padding: 12px 42px 12px 14px;
-                font-size: 13px;
-                border-radius: 16px;
+                padding: 12px 45px 12px 16px;
+                font-size: 14px;
+                border-radius: 18px;
                 line-height: 18px;
-                max-height: 108px; /* 5 lines on mobile */
+                max-height: 106px; /* High calculation limit for 5 mobile bounds */
             }
             .send-btn {
-                right: 12px;
+                right: 14px;
                 bottom: 12px;
-                font-size: 14px;
+                font-size: 16px;
             }
-            .camera-trigger { display: flex; } /* ENABLE Camera for Mobile */
+            .camera-trigger { 
+                display: flex; 
+            }
             .poll-menu {
-                left: 8px;
-                bottom: 65px;
+                left: 10px;
+                bottom: 70px;
+            }
+            .msg {
+                max-width: 92%;
+                font-size: 14px;
+                padding: 12px 16px;
             }
         }
     </style>
@@ -218,8 +505,9 @@
 
     <main>
         <div id="chat-container"></div>
+        
         <div id="plusPoll" class="poll-menu">
-            <div class="poll-item" style="padding:10px; cursor:pointer;" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
+            <div class="poll-item" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
         </div>
 
         <div class="input-area">
@@ -227,10 +515,15 @@
             <div class="circle-btn camera-trigger" onclick="triggerCamera()"><i class="fas fa-camera"></i></div>
             <div id="micBtn" class="circle-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
             <div class="input-wrap">
+                
                 <div id="inputThumbnailArea" class="input-thumbnail-area">
-                    <img id="inputThumb" class="input-thumb" src="">
-                    <i class="fas fa-times-circle" style="color:rgba(255,255,255,0.5); cursor:pointer;" onclick="clearCameraData()"></i>
+                    <div class="input-thumb-container">
+                        <img id="inputThumb" class="input-thumb" src="" alt="Capture preview">
+                        <i class="fas fa-times-circle thumb-remove" onclick="clearCameraData()"></i>
+                    </div>
+                    <span style="font-size:12px; color:rgba(255,255,255,0.4);">Ready for Groq Vision execution...</span>
                 </div>
+                
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleKeyActions(event)" placeholder="Message"></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
@@ -242,15 +535,15 @@
 
     <div id="namingModal" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-bottom:20px; font-size:18px;">Naming Session</h2>
+            <h2 style="margin-bottom:20px; font-size:18px; font-weight:600;">Naming Session</h2>
             <input type="text" id="chatNameInput" class="input-box" style="border-radius:10px; margin-bottom:20px; background:rgba(255,255,255,0.05);" placeholder="Topic name...">
-            <button class="nav-btn" style="justify-content:center" onclick="createNewChat()">Initiate</button>
+            <button class="nav-btn" style="justify-content:center; font-weight:600;" onclick="createNewChat()">Initiate</button>
         </div>
     </div>
 
     <div id="genericModal" class="modal-overlay" onclick="closeGenericModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h2 id="modalTitle" style="font-size:18px;"></h2>
+            <h2 id="modalTitle" style="font-size:18px; font-weight:600;"></h2>
             <p style="color:#666; margin-top:15px; font-size:13px;">Feature coming soon.</p>
         </div>
     </div>
@@ -260,59 +553,81 @@
         let currentChatId = null;
         let lastEnterTime = 0;
         let recognitionInstance = null;
-        
-        // Essential Storage for Camera Data (Photo)
         let pendingImageData = null; 
 
-        // UTILITY: Detect device types
+        // CRITICAL: Device hardware layer queries
         const isPC = window.innerWidth > 1024;
         const isMobileOrTablet = window.innerWidth <= 1024;
 
-        function togglePlusMenu() { document.getElementById('plusPoll').classList.toggle('show'); }
-        function showNamingModal() { document.getElementById('namingModal').classList.add('show'); }
-        function openGenericModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('genericModal').classList.add('show'); }
-        function closeGenericModal() { document.getElementById('genericModal').classList.remove('show'); }
-        function toggleSidebar() { const s = document.getElementById('sidebar'); if(isPC) s.style.width = s.style.width === '80px' ? '280px' : '80px'; }
+        function togglePlusMenu() { 
+            document.getElementById('plusPoll').classList.toggle('show'); 
+        }
         
-        // Optimized AutoGrow logic for the 5-line requirement
+        function showNamingModal() { 
+            document.getElementById('namingModal').classList.add('show'); 
+            document.getElementById('chatNameInput').focus();
+        }
+        
+        function openGenericModal(title) { 
+            document.getElementById('modalTitle').innerText = title; 
+            document.getElementById('genericModal').classList.add('show'); 
+        }
+        
+        function closeGenericModal() { 
+            document.getElementById('genericModal').classList.remove('show'); 
+        }
+        
+        function toggleSidebar() { 
+            const s = document.getElementById('sidebar'); 
+            if(isPC) {
+                s.style.width = s.style.width === '80px' ? '280px' : '80px'; 
+                const labels = document.querySelectorAll('.hanging-label, .nav-btn span');
+                labels.forEach(l => l.style.opacity = s.style.width === '80px' ? '0' : '1');
+            }
+        }
+        
+        // Dynamic structural autoGrow computing layout heights dynamically up to 5 strict rows
         function autoGrow(t) {
-            if(isMobileOrTablet) {
-               // Mobile/Tablets scale based on prompt length automatically up to max-height set in CSS.
-               // Once max-height is hit, invisible scrolling activates.
-               t.style.height = 'auto'; 
-               t.style.height = (t.scrollHeight > 108 ? 108 : t.scrollHeight) + 'px'; // Max 5 lines mobile height
+            t.style.height = 'auto'; 
+            const maxHeight = isMobileOrTablet ? 106 : 120;
+            if(t.scrollHeight > maxHeight) {
+                t.style.height = maxHeight + 'px';
             } else {
-               t.style.height = 'auto'; 
-               // Max lines PC height logic: standard is ~120px for 5 lines (20px line height + padding)
-               t.style.height = (t.scrollHeight > 120 ? 120 : t.scrollHeight) + 'px';
+                t.style.height = t.scrollHeight + 'px';
             }
         }
 
-        // Modified Key Handler: Handles Mobile (Send Only) vs PC (Double Enter)
+        // Structural key handler separating desktop environment execution rules from touch panels
         function handleKeyActions(e) {
             const sendBtn = document.getElementById('sendIcon');
-            if (e.target.value.trim()) {
+            if (e.target.value.trim() || pendingImageData) {
                 sendBtn.classList.add('primed');
             } else {
                 sendBtn.classList.remove('primed');
             }
 
-            // PC ONLY: Double-Enter logic
+            // DESKTOP SYSTEM ONLY: Dual-strike Enter triggers transmission execution
             if (isPC && e.key === 'Enter' && !e.shiftKey) {
                 const now = Date.now();
-                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
+                if (now - lastEnterTime < 500) { 
+                    e.preventDefault(); 
+                    send(); 
+                }
                 lastEnterTime = now;
             }
-            // MOBILE/TABLETS: Enter key never sends. User MUST click the 'Send' button.
+            // SMARTPHONE & TABLET RULESET: Enter key acts as standard line breakout feed. Transmission requires dedicated button contact.
         }
 
-        /* --- CAMERA INTEGRATION ENGINE --- */
-        function triggerCamera() {
-            if(isPC) return; // Locked via visibility anyway, but double-secured
-            document.getElementById('cameraInput').click();
+        /* --- HARDWARE CAMERA MODULE CORE --- */
+        function triggerCamera() { 
+            if(isPC) return; 
+            document.getElementById('cameraInput').click(); 
         }
 
-        function triggerUpload() { togglePlusMenu(); document.getElementById('fileUploadInput').click(); }
+        function triggerUpload() { 
+            togglePlusMenu(); 
+            document.getElementById('fileUploadInput').click(); 
+        }
 
         function handleCameraCapture(input) {
             const file = input.files[0];
@@ -326,14 +641,13 @@
             if(file.type.startsWith('image/')) {
                 processImageForChat(file);
             } else {
-                // File upload feature for non-images logic
                 createNewChat(`File: ${file.name}`);
                 appendMessage("user", `[ File Uploaded: ${file.name} ]`);
                 togglePlusMenu();
             }
         }
 
-        // Main Image Processing (Resize and Render Preview in Chat Bar)
+        // High efficiency asynchronous image canvas serialization processor
         function processImageForChat(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -341,25 +655,18 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let ctx = canvas.getContext('2d');
-                    
-                    // Essential for Groq: Scale image small enough (~600px width)
-                    const max_w = 600;
+                    const max_w = 600; // Dimension bounds optimization for rapid ingestion speeds
                     let scale = max_w / img.width;
                     if(img.width <= max_w) scale = 1;
                     
                     canvas.width = img.width * scale;
                     canvas.height = img.height * scale;
-                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    // Essential Storage for Backend
                     pendingImageData = canvas.toDataURL('image/jpeg', 0.8);
-                    
-                    // Render thumbnail in Chat Bar
                     document.getElementById('inputThumb').src = pendingImageData;
                     document.getElementById('inputThumbnailArea').classList.add('show');
-                    
-                    // Force input box scaling
+                    document.getElementById('sendIcon').classList.add('primed');
                     autoGrow(document.getElementById('userInput')); 
                 };
                 img.src = e.target.result;
@@ -371,17 +678,22 @@
             pendingImageData = null;
             document.getElementById('inputThumbnailArea').classList.remove('show');
             document.getElementById('inputThumb').src = "";
-            document.getElementById('cameraInput').value = ""; // Clear file thread
+            document.getElementById('cameraInput').value = ""; 
+            if(!document.getElementById('userInput').value.trim()) {
+                document.getElementById('sendIcon').classList.remove('primed');
+            }
             autoGrow(document.getElementById('userInput'));
         }
 
         function createNewChat(optionalName) {
-            const name = document.getElementById('chatNameInput').value || optionalName || "Intelligence Brief";
+            const name = document.getElementById('chatNameInput').value || optionalName || "Brief";
             const chat = { id: Date.now(), name, messages: [] };
-            chats.unshift(chat); currentChatId = chat.id;
+            chats.unshift(chat); 
+            currentChatId = chat.id;
             document.getElementById('namingModal').classList.remove('show');
             document.getElementById('chatNameInput').value = "";
-            renderHistory(); renderChat();
+            renderHistory(); 
+            renderChat();
         }
 
         function appendMessage(role, text) {
@@ -391,46 +703,37 @@
              renderChat();
         }
 
+        // Processing transmission execution engine routed purely to Groq endpoints without structural headings
         async function send() {
             const input = document.getElementById('userInput');
             let textVal = input.value.trim();
-            if (!textVal && !pendingImageData) return; // Send blocked if nothing is provided
+            if (!textVal && !pendingImageData) return; 
             
-            if (!currentChatId) createNewChat(pendingImageData ? "Image Analysis" : textVal.substring(0, 20));
+            if (!currentChatId) createNewChat(pendingImageData ? "Image Context Analysis" : textVal.substring(0, 20));
 
-            // Append User Message (Text + Image if available)
             let userDisplay = textVal;
             if(pendingImageData) {
                 userDisplay = `<div>${textVal}</div><img class="chat-img-preview" src="${pendingImageData}">`;
             }
             appendMessage("user", userDisplay);
 
-            // Essential Prompt Engineering for Groq Multimodal:
-            // Instruct the backend to handle the prompt as multimodal if pendingImageData is set.
-            // Example Prompt Structure sent to backend:
-            // { 
-            //   multimodal: true, 
-            //   image_data: "[base64ImageData...]", 
-            //   prompt: "Analyze this image and accordingly reply back with this text message: ${textVal}"
-            // }
             const payload = {
                 prompt: textVal,
                 multimodal: pendingImageData ? true : false,
-                image_data: pendingImageData // Backend must handle this Base64 key
+                image_data: pendingImageData 
             };
             
-            // Clear inputs immediately
+            // Re-zeroing the input array states smoothly
             input.value = ""; 
-            input.style.height = isPC ? '52px' : '44px'; // Reset base height
+            input.style.height = isPC ? '52px' : '44px'; 
             clearCameraData();
             document.getElementById('sendIcon').classList.remove('primed');
 
             const current = chats.find(c => c.id === currentChatId);
             const loadIdx = current.messages.length;
-            appendMessage("ai", "..."); // Loading state
+            appendMessage("ai", "..."); 
 
             try {
-                // Securely calls the bridge in your /api/chat.js (Backend must support 'multimodal' key)
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -438,11 +741,10 @@
                 });
                 const data = await response.json();
                 
-                // Essential: Groq must read the image data and reply back with both the analysis and the user's text message context included.
-                const result = `<b></b><br>${data.gpt}<br><br><b></b><br>${data.gemini}<br><br><b>Groq</b><br>${data.groq}`;
-                current.messages[loadIdx].text = result;
+                // Renders pure unique system text payload dropping markup components
+                current.messages[loadIdx].text = data.groq;
             } catch (err) {
-                current.messages[loadIdx].text = "[ Multimodal Analysis Offline ]";
+                current.messages[loadIdx].text = "[ System Interruption: Frame Analysis Offline ]";
             }
             renderChat();
             renderHistory();
@@ -474,27 +776,34 @@
             });
         }
 
-        /* --- PRESTINE WEB SPEECH API ENGINE --- */
+        /* --- PRESTINE SPEECH SYNCHRONIZATION ENGINE --- */
         function startVoice() {
             const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!Speech) { return; }
+            if (!Speech) { 
+                alert("Speech recognition engine unvetted or disabled on this specific client application.");
+                return; 
+            }
 
             const micBtn = document.getElementById('micBtn');
             const userInput = document.getElementById('userInput');
 
-            if (recognitionInstance) { recognitionInstance.stop(); return; }
+            if (recognitionInstance) { 
+                recognitionInstance.stop(); 
+                return; 
+            }
 
             const rec = new Speech();
             recognitionInstance = rec;
 
-            /* Continuous configurations to hear noise and display message */
             rec.continuous = true;       
             rec.interimResults = true;   
             rec.lang = 'en-US';          
 
             let initialText = userInput.value;
 
-            rec.onstart = () => { micBtn.classList.add('mic-active'); };
+            rec.onstart = () => { 
+                micBtn.classList.add('mic-active'); 
+            };
 
             rec.onresult = (e) => {
                 let liveTranscript = '';
@@ -506,12 +815,19 @@
                     }
                 }
                 userInput.value = initialText + liveTranscript;
-                autoGrow(userInput); // Force input bar scaling based on voice dictation length
-                document.getElementById('sendIcon').classList.add('primed'); // Prime send button
+                autoGrow(userInput); 
+                document.getElementById('sendIcon').classList.add('primed'); 
             };
 
-            rec.onerror = (err) => { console.error("Speech Error: ", err.error); };
-            rec.onend = () => { micBtn.classList.remove('mic-active'); recognitionInstance = null; };
+            rec.onerror = (err) => { 
+                console.error("Speech Execution Error: ", err.error); 
+            };
+            
+            rec.onend = () => { 
+                micBtn.classList.remove('mic-active'); 
+                recognitionInstance = null; 
+            };
+            
             rec.start();
         }
     </script>
