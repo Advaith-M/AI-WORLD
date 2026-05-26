@@ -210,7 +210,7 @@
         
         .chat-img-preview { 
             max-width: 100%; 
-            max-height: 250px;
+            max-height: 500px;
             border-radius: 12px; 
             margin-top: 12px; 
             display: block;
@@ -473,8 +473,6 @@
         }
 
         /* --- HARDWARE CROSS-PLATFORM BREAKPOINTS --- */
-        
-        /* 1. IPAD & TABLET SYSTEM RULES */
         @media (max-width: 1024px) {
             aside {
                 width: 80px;
@@ -498,7 +496,6 @@
             }
         }
 
-        /* 2. MOBILE HANDSET SYSTEM RULES */
         @media (max-width: 600px) {
             aside {
                 display: none !important;
@@ -529,7 +526,7 @@
                 font-size: 14px;
                 border-radius: 18px;
                 line-height: 18px;
-                max-height: 106px; /* High calculation limit for 5 mobile bounds */
+                max-height: 106px;
             }
             .send-btn {
                 right: 14px;
@@ -621,7 +618,6 @@
         let recognitionInstance = null;
         let pendingImageData = null; 
 
-        // CRITICAL: Device hardware layer queries
         const isPC = window.innerWidth > 1024;
         const isMobileOrTablet = window.innerWidth <= 1024;
 
@@ -640,7 +636,6 @@
         }
         
         function closeGenericModal() { 
-            document.getElementById('genericModal').classList.remove('remove'); 
             document.getElementById('genericModal').classList.remove('show'); 
         }
         
@@ -653,7 +648,6 @@
             }
         }
         
-        // Dynamic structural autoGrow computing layout heights dynamically up to 5 strict rows
         function autoGrow(t) {
             t.style.height = 'auto'; 
             const maxHeight = isMobileOrTablet ? 106 : 120;
@@ -664,7 +658,6 @@
             }
         }
 
-        // Structural key handler separating desktop environment execution rules from touch panels
         function handleKeyActions(e) {
             const sendBtn = document.getElementById('sendIcon');
             if (e.target.value.trim() || pendingImageData) {
@@ -673,7 +666,6 @@
                 sendBtn.classList.remove('primed');
             }
 
-            // DESKTOP SYSTEM ONLY: Dual-strike Enter triggers transmission execution
             if (isPC && e.key === 'Enter' && !e.shiftKey) {
                 const now = Date.now();
                 if (now - lastEnterTime < 500) { 
@@ -684,7 +676,6 @@
             }
         }
 
-        /* --- HARDWARE CAMERA MODULE CORE --- */
         function triggerCamera() { 
             if(isPC) return; 
             document.getElementById('cameraInput').click(); 
@@ -713,7 +704,6 @@
             }
         }
 
-        // High efficiency asynchronous image canvas serialization processor
         function processImageForChat(file) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -721,7 +711,7 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let ctx = canvas.getContext('2d');
-                    const max_w = 600; // Dimension bounds optimization for rapid ingestion speeds
+                    const max_w = 600; 
                     let scale = max_w / img.width;
                     if(img.width <= max_w) scale = 1;
                     
@@ -769,31 +759,20 @@
              renderChat();
         }
 
+        /* FIX: Render text content securely via innerHTML if it contains layout structures or base64 images */
         function updateAiChatBubble(elementId, transformedHtmlContent) {
             const activeTargetNode = document.getElementById(elementId);
             if (activeTargetNode) {
                 activeTargetNode.innerHTML = transformedHtmlContent;
-                const container = document.getElementById('chat-container');
-                container.scrollTop = container.scrollHeight;
+            } else {
+                // Fallback catch if the asynchronous response returns faster than the immediate UI drawing loop
+                renderChat();
             }
+            const container = document.getElementById('chat-container');
+            container.scrollTop = container.scrollHeight;
         }
 
-        function renderHistory() {
-            const container = document.getElementById('history-list');
-            container.innerHTML = "";
-            chats.forEach(c => {
-                const item = document.createElement('div');
-                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
-                item.innerText = c.name;
-                item.onclick = () => {
-                    currentChatId = c.id;
-                    renderHistory();
-                    renderChat();
-                };
-                container.appendChild(item);
-            });
-        }
-
+        /* FIX: Added full fallback support to detect both text messages and explicit server image tags */
         function renderChat() {
             const container = document.getElementById('chat-container');
             container.innerHTML = "";
@@ -803,8 +782,8 @@
                 const msgNode = document.createElement('div');
                 msgNode.className = `msg ${m.role}`;
                 
-                // If it contains a custom ID placeholder block, wrap it so updateAiChatBubble target works
-                if (m.text.includes('id="ai-node-') || m.text.includes('generated-image-container')) {
+                // CRITICAL SAFETY FOR IMAGE OVERRIDE: If the string contains HTML markup or data URIs, render it explicitly
+                if (m.text.includes('<') || m.text.includes('data:image/') || m.text.includes('generated-image-container')) {
                     msgNode.innerHTML = m.text;
                 } else {
                     msgNode.innerText = m.text;
@@ -850,7 +829,6 @@
             recognitionInstance.start();
         }
 
-        // Processing transmission execution engine routed cleanly through backend /api/chat endpoints
         async function send() {
             const input = document.getElementById('userInput');
             let textVal = input.value.trim();
@@ -864,7 +842,6 @@
             }
             appendMessage("user", userDisplay);
 
-            // --- INTERCEPT SYSTEM - REGEX PROMPT ANALYSIS FOR ROUTING TO BACKEND PIPELINE ---
             const imageGenerationRegexPattern = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
             const isImageIntent = imageGenerationRegexPattern.test(textVal) && !pendingImageData;
             
@@ -876,30 +853,27 @@
                 const matchOffsetResult = textVal.match(imageGenerationRegexPattern);
                 const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "digital art matrix asset";
                 
-                // Mount high-fidelity loading structure directly into chat layout array
+                // Mount a unique outer block container tracking system
                 current.messages.push({
                     role: "ai",
-                    text: `
-                        <div class="image-loading-state" id="${uniqueAiTrackId}">
+                    text: `<div class="image-loading-state" id="${uniqueAiTrackId}">
                             <div class="spinner-line-wrap">
                                 <i class="fas fa-circle-notch fa-spin" style="color: var(--brand-primary)"></i>
-                                <span>Generating server-side infinite asset matrix for: <i>"${targetedVisualSubject}"</i>...</span>
+                                <span>Generating server-side image for: <i>"${targetedVisualSubject}"</i>...</span>
                             </div>
                             <div class="progress-track-bar">
                                 <div class="progress-active-fill"></div>
                             </div>
-                        </div>
-                    `
+                        </div>`
                 });
                 renderChat();
             } else {
                 appendMessage("ai", "..."); 
             }
             
-            // Re-zero input elements immediately
-            const cachedPrompt = textVal;
             input.value = ""; 
             input.style.height = isPC ? '52px' : '44px'; 
+            const cachedPrompt = textVal;
             const cachedImageData = pendingImageData;
             clearCameraData();
             document.getElementById('sendIcon').classList.remove('primed');
@@ -918,14 +892,13 @@
                 const data = await response.json();
                 
                 if (isImageIntent) {
-                    // Update with self-contained high-quality asset code from Route A backend output
                     let outputHtml = data.groq;
                     current.messages[loadIdx].text = outputHtml;
                     updateAiChatBubble(uniqueAiTrackId, outputHtml);
                 } else {
                     current.messages[loadIdx].text = data.groq || "Transmission terminal response void.";
+                    renderChat();
                 }
-                renderChat();
             } catch (networkError) {
                 const errTemplate = `<span style="color:var(--error);"><i class="fas fa-exclamation-circle"></i> Connection Interrupted: ${networkError.message}</span>`;
                 if (isImageIntent) {
@@ -933,8 +906,8 @@
                     updateAiChatBubble(uniqueAiTrackId, errTemplate);
                 } else {
                     current.messages[loadIdx].text = errTemplate;
+                    renderChat();
                 }
-                renderChat();
             }
         }
     </script>
