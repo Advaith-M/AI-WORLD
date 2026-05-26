@@ -2,12 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Helps browser understand we only want styles and fonts from trusted sources -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>AI VILE | Collective Intelligence</title>
     
-    <!-- Updated Link with specific attribution to bypass strict tracking filters -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <style>
@@ -25,7 +23,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
-        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; font-size: 14px; }
 
         /* --- SIDEBAR --- */
         aside { 
@@ -34,140 +32,168 @@
             flex-shrink: 0;
         }
 
-        .top-nav { padding: 15px 20px 5px 20px; display: flex; gap: 10px; }
-        .sidebar-header { padding: 10px 20px 10px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .top-nav { padding: 10px 15px; display: flex; gap: 8px; }
+        .sidebar-header { padding: 5px 15px; display: flex; flex-direction: column; gap: 8px; }
 
         .nav-btn {
-            width: 100%; padding: 12px; background: var(--input-bg); border: 2px solid var(--line);
-            border-radius: 10px; color: white; display: flex; align-items: center; gap: 12px;
-            cursor: pointer; font-size: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; padding: 10px; background: var(--input-bg); border: 2px solid var(--line);
+            border-radius: 8px; color: white; display: flex; align-items: center; gap: 10px;
+            cursor: pointer; font-size: 13px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .nav-btn:hover { background: var(--accent); transform: translateY(-1px); }
 
         .hanging-label {
-            padding: 15px 25px 15px 100px; font-size: 11px; font-weight: 700;
+            padding: 10px 20px; font-size: 10px; font-weight: 700;
             color: rgba(255, 255, 255, 0.5); letter-spacing: 1.3px; text-transform: uppercase;
         }
 
-        #history-list { flex: 1; overflow-y: auto; padding: 5px 10px; }
+        #history-list { flex: 1; overflow-y: auto; padding: 5px 8px; }
         .history-item {
-            padding: 13px; margin-bottom: 6.5px; border-radius: 13.45px; cursor: pointer;
-            font-size: 12.5px; color: #888; transition: all 0.37s ease;
+            padding: 10px; margin-bottom: 5px; border-radius: 10px; cursor: pointer;
+            font-size: 11.5px; color: #888; transition: all 0.37s ease;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .history-item.active { background: var(--line); color: #fff; }
 
-        .sidebar-footer { padding: 15px 20px; border-top: 3.45px solid var(--line); }
+        .sidebar-footer { padding: 10px 15px; border-top: 3.45px solid var(--line); }
 
         /* --- MAIN AREA --- */
-        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; width: 100%; }
+        main { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; overflow: hidden; }
 
         #chat-container { 
-            flex: 1; overflow-y: auto; padding: 80px 15% 40px 15%; 
-            display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth;
+            flex: 1; overflow-y: auto; padding: 60px 15% 20px 15%; 
+            display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth;
         }
 
         .msg { 
-            max-width: 85%; padding: 16px 20px; font-size: 15px; line-height: 1.6;
-            color: #eee; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 85%; padding: 14px 18px; font-size: 14px; line-height: 1.6;
+            color: #eee; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            word-wrap: break-word; /* Essential: next word on next line logic */
         }
         @keyframes professionalEntry {
-            0% { opacity: 0; transform: translateY(20px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        .user { align-self: flex-end; background: #1a1a1a; border: 1px solid var(--user-outline); border-radius: 18px 18px 4px 18px; }
-        .ai { align-self: flex-start; background: #111; border: 1px solid var(--ai-outline); border-radius: 18px 18px 18px 4px; }
+        .user { align-self: flex-end; background: #1a1a1a; border: 1px solid var(--user-outline); border-radius: 16px 16px 4px 16px; }
+        .ai { align-self: flex-start; background: #111; border: 1px solid var(--ai-outline); border-radius: 16px 16px 16px 4px; }
+        .chat-img-preview { max-width: 200px; border-radius: 10px; margin-top: 10px; }
 
         /* --- FLOATING POLL --- */
         .poll-menu {
             position: absolute; bottom: 85px; left: 15%; 
             background: var(--modal-bg); border: 1px solid var(--line);
-            border-radius: 15px; padding: 10px; display: none;
-            flex-direction: column; gap: 5px; z-index: 100;
+            border-radius: 12px; padding: 8px; display: none;
+            flex-direction: column; gap: 4px; z-index: 100; font-size: 13px;
         }
         .poll-menu.show { display: flex; }
 
         /* --- INPUT AREA --- */
-        .input-area { padding: 20px 15%; display: flex; gap: 12px; align-items: flex-end; position: relative; width: 100%; }
+        .input-area { padding: 15px 15% 10px 15%; display: flex; gap: 10px; align-items: flex-end; position: relative; width: 100%; flex-shrink: 0;}
         .circle-btn {
-            width: 52px; height: 52px; background: var(--input-bg); border: 1.9px solid var(--line);
+            width: 48px; height: 48px; background: var(--input-bg); border: 1.9px solid var(--line);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #fff; transition: all 0.3s ease; flex-shrink: 0;
+            cursor: pointer; color: #fff; transition: all 0.3s ease; flex-shrink: 0; font-size: 16px;
         }
         .mic-active { background: #fff !important; color: #000 !important; box-shadow: 0 0 15px #fff; }
 
-        .input-wrap { position: relative; width: 100%; }
+        .input-wrap { position: relative; width: 100%; display: flex; flex-direction: column; }
         .input-box {
             width: 100%; background: var(--input-bg); border: 2px solid var(--line); 
-            border-radius: 20px; padding: 15px 55px 15px 22px; color: var(--text);
-            outline: none; font-size: 15px; resize: none;
+            border-radius: 18px; padding: 14px 50px 14px 18px; color: var(--text);
+            outline: none; font-size: 14px; resize: none;
+            max-height: 120px; /* Essential: Limit to ~5 lines before scrolling */
+            line-height: 20px; /* Standardize line height for the 5-line calculation */
+            overflow-y: auto; /* Required for hidden scrollbar */
         }
+        
+        /* HIDDEN SCROLLBAR logic for input box */
+        .input-box::-webkit-scrollbar { width: 0px; background: transparent; }
+
         .send-btn {
-            position: absolute; right: 17.59px; bottom: 20px; 
-            color: rgba(255,255,255,0.5); font-size: 18px; cursor: pointer; transition: 0.285s;
+            position: absolute; right: 16px; bottom: 16px; 
+            color: rgba(255,255,255,0.5); font-size: 16px; cursor: pointer; transition: 0.285s;
         }
         .send-btn.primed { color: #fff; transform: scale(1.1); }
+
+        /* CAMERA FEATURE - THUMBNAIL IN INPUT BAR */
+        .input-thumbnail-area { display: none; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 14px 14px 0 0; border: 2px solid var(--line); border-bottom: none; margin-bottom: -2px; }
+        .input-thumbnail-area.show { display: flex; gap: 10px; }
+        .input-thumb { height: 40px; border-radius: 8px; }
 
         .modal-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:1000;
         }
         .modal-overlay.show { display:flex; }
-        .modal-card { background: var(--modal-bg); padding: 40px; border-radius: 24px; border: 1px solid var(--line); width: 350px; text-align: center; }
+        .modal-card { background: var(--modal-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--line); width: 320px; text-align: center; }
+        
+        /* Camera button specifically enabled only for Mobile/Tablets via visibility */
+        .camera-trigger { display: none; }
 
         /* --- DEVICE OPTIMIZATION ENGINE (RESPONSIVE BREAKPOINTS) --- */
         
         /* 1. TABLETS & IPADS BREAKPOINT (601px to 1024px) */
         @media (max-width: 1024px) {
+            body { font-size: 13px; }
             aside {
-                width: 80px; /* Slim view optimized for tablets */
+                width: 70px; /* Extremely small sidebar optimized for tablets */
             }
-            aside .nav-btn span, aside .hanging-label {
-                display: none; /* Hide descriptive typography labels to maximize real estate */
+            aside .nav-btn span, aside .hanging-label, aside .top-nav i.fa-bars {
+                display: none !important; /* Drops descriptive labels and mobile bars menu */
             }
             aside .nav-btn {
                 justify-content: center;
-                padding: 12px 0;
+                padding: 10px 0;
+                font-size: 15px;
             }
             #chat-container {
-                padding: 80px 8% 40px 8%; /* Balanced margins for mid-size touch displays */
+                padding: 60px 8% 20px 8%; /* Balanced margins */
             }
             .input-area {
-                padding: 20px 8%;
+                padding: 15px 8% 10px 8%;
             }
+            .camera-trigger { display: flex; } /* ENABLE Camera for Tablets */
         }
 
         /* 2. MOBILE DEVICE BREAKPOINT (Up to 600px) */
         @media (max-width: 600px) {
+            body { font-size: 13px; overflow: hidden;}
             aside {
-                display: none !important; /* Drops the sidebar completely on phone viewports */
+                display: none !important; /* Sidebar completely hidden */
             }
+            main { height: 100vh; width: 100vw; overflow: hidden; }
             #chat-container {
-                padding: 40px 16px 20px 16px; /* Tight mobile layouts to fit max text content */
+                padding: 20px 12px 10px 12px; /* Ultra-tight margins */
             }
             .input-area {
-                padding: 12px 10px;
-                gap: 6px; /* Compact structural gaps for mini touch panels */
+                padding: 10px 8px 10px 8px; /* Elements must remain small to avoid scrolling whole page */
+                gap: 5px; 
+                flex-wrap: nowrap;
+                position: fixed; bottom: 0; left: 0; background: var(--bg);
             }
             .circle-btn {
-                width: 44px;
-                height: 44px; /* Scaled down action icons for thumb accessibility */
+                width: 42px;
+                height: 42px; /* Small action icons for touch */
+                font-size: 14px;
             }
             .input-box {
-                padding: 12px 45px 12px 16px;
-                font-size: 14px;
+                padding: 12px 42px 12px 14px;
+                font-size: 13px;
                 border-radius: 16px;
+                line-height: 18px;
+                max-height: 108px; /* 5 lines on mobile */
             }
             .send-btn {
-                right: 14px;
-                bottom: 14px;
-                font-size: 16px;
+                right: 12px;
+                bottom: 12px;
+                font-size: 14px;
             }
+            .camera-trigger { display: flex; } /* ENABLE Camera for Mobile */
             .poll-menu {
-                left: 10px;
-                bottom: 70px;
+                left: 8px;
+                bottom: 65px;
             }
         }
     </style>
@@ -193,34 +219,39 @@
     <main>
         <div id="chat-container"></div>
         <div id="plusPoll" class="poll-menu">
-            <div class="poll-item" style="padding:10px; cursor:pointer;" onclick="openGenericModal('Upload')"><i class="fas fa-file-upload"></i> Upload File</div>
+            <div class="poll-item" style="padding:10px; cursor:pointer;" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
         </div>
 
         <div class="input-area">
             <div class="circle-btn" onclick="togglePlusMenu()"><i class="fas fa-plus"></i></div>
-            <!-- Added Dedicated Camera Button Structurally Positioned next to Plus Menu -->
-            <div class="circle-btn" onclick="openGenericModal('Camera')"><i class="fas fa-camera"></i></div>
+            <div class="circle-btn camera-trigger" onclick="triggerCamera()"><i class="fas fa-camera"></i></div>
             <div id="micBtn" class="circle-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
             <div class="input-wrap">
-                <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleDoubleEnter(event)" placeholder="Message"></textarea>
+                <div id="inputThumbnailArea" class="input-thumbnail-area">
+                    <img id="inputThumb" class="input-thumb" src="">
+                    <i class="fas fa-times-circle" style="color:rgba(255,255,255,0.5); cursor:pointer;" onclick="clearCameraData()"></i>
+                </div>
+                <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleKeyActions(event)" placeholder="Message"></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
         </div>
     </main>
 
-    <!-- Modals -->
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(this)">
+    <input type="file" id="fileUploadInput" style="display:none;" onchange="handleFileUpload(this)">
+
     <div id="namingModal" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin-bottom:20px">Naming Session</h2>
-            <input type="text" id="chatNameInput" class="input-box" style="border-radius:10px; margin-bottom:20px" placeholder="Topic name...">
+            <h2 style="margin-bottom:20px; font-size:18px;">Naming Session</h2>
+            <input type="text" id="chatNameInput" class="input-box" style="border-radius:10px; margin-bottom:20px; background:rgba(255,255,255,0.05);" placeholder="Topic name...">
             <button class="nav-btn" style="justify-content:center" onclick="createNewChat()">Initiate</button>
         </div>
     </div>
 
     <div id="genericModal" class="modal-overlay" onclick="closeGenericModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h2 id="modalTitle"></h2>
-            <p style="color:#666; margin-top:15px">Feature coming soon.</p>
+            <h2 id="modalTitle" style="font-size:18px;"></h2>
+            <p style="color:#666; margin-top:15px; font-size:13px;">Feature coming soon.</p>
         </div>
     </div>
 
@@ -228,27 +259,124 @@
         let chats = [];
         let currentChatId = null;
         let lastEnterTime = 0;
-        let recognitionInstance = null; // Global instance placeholder to protect mic cycle threads
+        let recognitionInstance = null;
+        
+        // Essential Storage for Camera Data (Photo)
+        let pendingImageData = null; 
+
+        // UTILITY: Detect device types
+        const isPC = window.innerWidth > 1024;
+        const isMobileOrTablet = window.innerWidth <= 1024;
 
         function togglePlusMenu() { document.getElementById('plusPoll').classList.toggle('show'); }
         function showNamingModal() { document.getElementById('namingModal').classList.add('show'); }
         function openGenericModal(title) { document.getElementById('modalTitle').innerText = title; document.getElementById('genericModal').classList.add('show'); }
         function closeGenericModal() { document.getElementById('genericModal').classList.remove('show'); }
-        function toggleSidebar() { const s = document.getElementById('sidebar'); s.style.width = s.style.width === '80px' ? '280px' : '80px'; }
-        function autoGrow(t) { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }
-
-        function handleDoubleEnter(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                const now = Date.now();
-                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
-                lastEnterTime = now;
-                document.getElementById('sendIcon').classList.add('primed');
-                setTimeout(() => document.getElementById('sendIcon').classList.remove('primed'), 500);
+        function toggleSidebar() { const s = document.getElementById('sidebar'); if(isPC) s.style.width = s.style.width === '80px' ? '280px' : '80px'; }
+        
+        // Optimized AutoGrow logic for the 5-line requirement
+        function autoGrow(t) {
+            if(isMobileOrTablet) {
+               // Mobile/Tablets scale based on prompt length automatically up to max-height set in CSS.
+               // Once max-height is hit, invisible scrolling activates.
+               t.style.height = 'auto'; 
+               t.style.height = (t.scrollHeight > 108 ? 108 : t.scrollHeight) + 'px'; // Max 5 lines mobile height
+            } else {
+               t.style.height = 'auto'; 
+               // Max lines PC height logic: standard is ~120px for 5 lines (20px line height + padding)
+               t.style.height = (t.scrollHeight > 120 ? 120 : t.scrollHeight) + 'px';
             }
         }
 
-        function createNewChat() {
-            const name = document.getElementById('chatNameInput').value || "Intelligence Brief";
+        // Modified Key Handler: Handles Mobile (Send Only) vs PC (Double Enter)
+        function handleKeyActions(e) {
+            const sendBtn = document.getElementById('sendIcon');
+            if (e.target.value.trim()) {
+                sendBtn.classList.add('primed');
+            } else {
+                sendBtn.classList.remove('primed');
+            }
+
+            // PC ONLY: Double-Enter logic
+            if (isPC && e.key === 'Enter' && !e.shiftKey) {
+                const now = Date.now();
+                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
+                lastEnterTime = now;
+            }
+            // MOBILE/TABLETS: Enter key never sends. User MUST click the 'Send' button.
+        }
+
+        /* --- CAMERA INTEGRATION ENGINE --- */
+        function triggerCamera() {
+            if(isPC) return; // Locked via visibility anyway, but double-secured
+            document.getElementById('cameraInput').click();
+        }
+
+        function triggerUpload() { togglePlusMenu(); document.getElementById('fileUploadInput').click(); }
+
+        function handleCameraCapture(input) {
+            const file = input.files[0];
+            if (!file) return;
+            processImageForChat(file);
+        }
+        
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if(file.type.startsWith('image/')) {
+                processImageForChat(file);
+            } else {
+                // File upload feature for non-images logic
+                createNewChat(`File: ${file.name}`);
+                appendMessage("user", `[ File Uploaded: ${file.name} ]`);
+                togglePlusMenu();
+            }
+        }
+
+        // Main Image Processing (Resize and Render Preview in Chat Bar)
+        function processImageForChat(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+                    
+                    // Essential for Groq: Scale image small enough (~600px width)
+                    const max_w = 600;
+                    let scale = max_w / img.width;
+                    if(img.width <= max_w) scale = 1;
+                    
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Essential Storage for Backend
+                    pendingImageData = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // Render thumbnail in Chat Bar
+                    document.getElementById('inputThumb').src = pendingImageData;
+                    document.getElementById('inputThumbnailArea').classList.add('show');
+                    
+                    // Force input box scaling
+                    autoGrow(document.getElementById('userInput')); 
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearCameraData() {
+            pendingImageData = null;
+            document.getElementById('inputThumbnailArea').classList.remove('show');
+            document.getElementById('inputThumb').src = "";
+            document.getElementById('cameraInput').value = ""; // Clear file thread
+            autoGrow(document.getElementById('userInput'));
+        }
+
+        function createNewChat(optionalName) {
+            const name = document.getElementById('chatNameInput').value || optionalName || "Intelligence Brief";
             const chat = { id: Date.now(), name, messages: [] };
             chats.unshift(chat); currentChatId = chat.id;
             document.getElementById('namingModal').classList.remove('show');
@@ -256,35 +384,65 @@
             renderHistory(); renderChat();
         }
 
+        function appendMessage(role, text) {
+             if (!currentChatId) createNewChat();
+             const current = chats.find(c => c.id === currentChatId);
+             current.messages.push({ role, text });
+             renderChat();
+        }
+
         async function send() {
             const input = document.getElementById('userInput');
-            const val = input.value.trim();
-            if (!val) return;
-            if (!currentChatId) createNewChat();
+            let textVal = input.value.trim();
+            if (!textVal && !pendingImageData) return; // Send blocked if nothing is provided
+            
+            if (!currentChatId) createNewChat(pendingImageData ? "Image Analysis" : textVal.substring(0, 20));
+
+            // Append User Message (Text + Image if available)
+            let userDisplay = textVal;
+            if(pendingImageData) {
+                userDisplay = `<div>${textVal}</div><img class="chat-img-preview" src="${pendingImageData}">`;
+            }
+            appendMessage("user", userDisplay);
+
+            // Essential Prompt Engineering for Groq Multimodal:
+            // Instruct the backend to handle the prompt as multimodal if pendingImageData is set.
+            // Example Prompt Structure sent to backend:
+            // { 
+            //   multimodal: true, 
+            //   image_data: "[base64ImageData...]", 
+            //   prompt: "Analyze this image and accordingly reply back with this text message: ${textVal}"
+            // }
+            const payload = {
+                prompt: textVal,
+                multimodal: pendingImageData ? true : false,
+                image_data: pendingImageData // Backend must handle this Base64 key
+            };
+            
+            // Clear inputs immediately
+            input.value = ""; 
+            input.style.height = isPC ? '52px' : '44px'; // Reset base height
+            clearCameraData();
+            document.getElementById('sendIcon').classList.remove('primed');
 
             const current = chats.find(c => c.id === currentChatId);
-            current.messages.push({ role: "user", text: val });
-            renderChat();
-            input.value = ""; input.style.height = 'auto';
-
             const loadIdx = current.messages.length;
-            current.messages.push({ role: "ai", text: "..." });
-            renderChat();
+            appendMessage("ai", "..."); // Loading state
 
             try {
-                // Securely calls the bridge in your /api/chat.js
+                // Securely calls the bridge in your /api/chat.js (Backend must support 'multimodal' key)
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: val })
+                    body: JSON.stringify(payload) 
                 });
                 const data = await response.json();
                 
-                // Render the unified response
+                // Essential: Groq must read the image data and reply back with both the analysis and the user's text message context included.
                 const result = `<b>OpenAI</b><br>${data.gpt}<br><br><b>Gemini</b><br>${data.gemini}<br><br><b>Groq</b><br>${data.groq}`;
                 current.messages[loadIdx].text = result;
             } catch (err) {
-                current.messages[loadIdx].text = "[ OFFLINE ] Check Vercel Logs for API errors.";
+                current.messages[loadIdx].text = "[ Multimodal Analysis Offline ]";
             }
             renderChat();
             renderHistory();
@@ -319,33 +477,24 @@
         /* --- PRESTINE WEB SPEECH API ENGINE --- */
         function startVoice() {
             const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!Speech) {
-                alert("Web Speech API is not supported in this browser platform. Please use Chrome or Safari.");
-                return;
-            }
+            if (!Speech) { return; }
 
             const micBtn = document.getElementById('micBtn');
             const userInput = document.getElementById('userInput');
 
-            // Toggle mechanism if clicked while currently actively transcribing
-            if (recognitionInstance) {
-                recognitionInstance.stop();
-                return;
-            }
+            if (recognitionInstance) { recognitionInstance.stop(); return; }
 
             const rec = new Speech();
             recognitionInstance = rec;
 
-            /* High Performance Continuous Voice Configurations */
-            rec.continuous = true;       // Prevents engine cutting out early when user takes breath pauses
-            rec.interimResults = true;   // Allows fast live rendering directly inside text box while talking
-            rec.lang = 'en-US';          // Forced standard layout for crisp parsing acceleration
+            /* Continuous configurations to hear noise and display message */
+            rec.continuous = true;       
+            rec.interimResults = true;   
+            rec.lang = 'en-US';          
 
             let initialText = userInput.value;
 
-            rec.onstart = () => {
-                micBtn.classList.add('mic-active');
-            };
+            rec.onstart = () => { micBtn.classList.add('mic-active'); };
 
             rec.onresult = (e) => {
                 let liveTranscript = '';
@@ -356,20 +505,13 @@
                         liveTranscript += e.results[i][0].transcript;
                     }
                 }
-                // Appends captured text in perfect sync sequence to current inputs
                 userInput.value = initialText + liveTranscript;
-                autoGrow(userInput);
+                autoGrow(userInput); // Force input bar scaling based on voice dictation length
+                document.getElementById('sendIcon').classList.add('primed'); // Prime send button
             };
 
-            rec.onerror = (err) => {
-                console.error("Speech Recognition Engine Internal Error: ", err.error);
-            };
-
-            rec.onend = () => {
-                micBtn.classList.remove('mic-active');
-                recognitionInstance = null;
-            };
-
+            rec.onerror = (err) => { console.error("Speech Error: ", err.error); };
+            rec.onend = () => { micBtn.classList.remove('mic-active'); recognitionInstance = null; };
             rec.start();
         }
     </script>
