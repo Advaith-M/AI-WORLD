@@ -21,7 +21,9 @@ export default async function handler(req, res) {
       const finalSubject = visualDescription || "something beautiful";
       const encodedDescription = encodeURIComponent(finalSubject);
       
-      const targetImageUrl = `https://image.pollinations.ai/p/${encodedDescription}?width=1024&height=1024&nologo=true`;
+      // OPTIMIZATION: Enforcing Flux model, crisp dimensions, and cache-busting seed for infinite unique generations
+      const randomSeed = Math.floor(Math.random() * 1000000);
+      const targetImageUrl = `https://image.pollinations.ai/p/${encodedDescription}?width=1024&height=1024&nologo=true&model=flux&seed=${randomSeed}`;
 
       // CRITICAL CORB BYPASS: Fetch the image on the server where CORB security limits don't apply
       const imageFetchResponse = await fetch(targetImageUrl);
@@ -69,8 +71,9 @@ export default async function handler(req, res) {
 
   let groqBody;
   if (multimodal && image_data) {
+    // OPTIMIZATION: Switched to Groq's dedicated vision model to prevent API structural crashes
     groqBody = {
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.2-11b-vision-preview",
       messages: [{
         role: "user",
         content: [
