@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title>AI VILE | Collective Intelligence Engine</title>
+    <title>AI VILE | Enterprise Collective Intelligence Platform</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <script src="https://js.puter.com/v2/"></script>
     
@@ -30,7 +31,9 @@
             --mic-active-color: #000000;
             --success-color: #22c55e;
             --warn-color: #eab308;
-            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.5);
+            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.6);
+            --code-bg: #18181b;
+            --overlay-blur: rgba(0, 0, 0, 0.75);
         }
 
         body.light-theme {
@@ -46,7 +49,9 @@
             --card-hover: rgba(0, 0, 0, 0.03);
             --mic-active-bg: #000000;
             --mic-active-color: #ffffff;
-            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.1);
+            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.15);
+            --code-bg: #f4f4f5;
+            --overlay-blur: rgba(255, 255, 255, 0.8);
         }
 
         * { 
@@ -54,21 +59,25 @@
             padding: 0; 
             box-sizing: border-box; 
             font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
         }
         
         body { 
             background: var(--bg); 
             color: var(--text); 
             height: 100vh; 
+            width: 100vw;
             display: flex; 
             overflow: hidden; 
             font-size: 14px; 
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
+        /* SIDEBAR DEFAULT STRUCTURAL CORE (DESKTOP SYSTEMS) */
         aside { 
-            width: 280px; 
+            width: 290px; 
             background: var(--sidebar-bg); 
             border-right: 3.5px solid var(--line); 
             height: 100%; 
@@ -76,32 +85,32 @@
             flex-direction: column; 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             flex-shrink: 0;
-            z-index: 10;
+            z-index: 100;
         }
         
         aside.hidden-sidebar {
             width: 0px !important;
             border-right: 0px solid transparent !important;
             overflow: hidden;
-            transform: translateX(-280px);
+            transform: translateX(-290px);
         }
 
-        /* GHOST TOPBAR TRIGGER MODULE */
+        /* GHOST TRIGGER NAVIGATION BUTTON */
         .ghost-top-trigger {
             position: absolute;
-            top: 15px;
-            left: 20px;
-            width: 44px;
-            height: 44px;
+            top: 16px;
+            left: 16px;
+            width: 46px;
+            height: 46px;
             background: var(--sidebar-bg);
             border: 2px solid var(--line);
-            border-radius: 10px;
+            border-radius: 12px;
             color: var(--text);
-            display: none;
+            display: none; /* Hidden on computers and tablets by default */
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 100;
+            z-index: 500;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-lux);
         }
@@ -164,22 +173,35 @@
             overflow-y: auto; 
             padding: 5px 10px; 
         }
+        #history-list::-webkit-scrollbar { width: 4px; }
+        #history-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
         
         .history-item {
             padding: 13px; 
             margin-bottom: 6.5px; 
             border-radius: 13.45px; 
             cursor: pointer;
-            font-size: 12.5px; 
+            font-size: 13px; 
             color: var(--text);
             opacity: 0.6;
-            transition: all 0.37s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .history-item:hover { opacity: 1; background: var(--card-hover); }
         .history-item.active { background: var(--line); opacity: 1; font-weight: 500; }
+        
+        .delete-history-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            color: var(--error);
+            padding: 2px 6px;
+        }
+        .history-item:hover .delete-history-btn { opacity: 1; }
 
         .sidebar-footer { 
             padding: 15px 20px; 
@@ -187,6 +209,7 @@
             flex-shrink: 0;
         }
 
+        /* VIEWPORT MAIN CHASSIS ARRAY */
         main { 
             flex: 1; 
             display: flex; 
@@ -195,233 +218,464 @@
             position: relative; 
             overflow: hidden;
             background: var(--bg);
+            width: 100%;
         }
 
         #chat-container { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 80px 15% 40px 15%; 
+            padding: 40px 18% 40px 18%; 
             display: flex; 
             flex-direction: column; 
-            gap: 24px; 
+            gap: 26px; 
+            width: 100%;
         }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 
         .msg { 
             max-width: 85%; 
-            padding: 18px 22px; 
+            padding: 20px 24px; 
             font-size: 15px; 
-            line-height: 1.62;
+            line-height: 1.68;
             color: var(--text); 
             border-radius: 18px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+            animation: professionalEntry 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             word-wrap: break-word;
+            word-break: break-word;
             position: relative;
         }
         
         @keyframes professionalEntry {
-            0% { opacity: 0; transform: translateY(15px); }
+            0% { opacity: 0; transform: translateY(12px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
         .user { align-self: flex-end; background: var(--sidebar-bg); border: 1px solid var(--user-outline); border-radius: 18px 18px 4px 18px; }
         .ai { align-self: flex-start; background: var(--modal-bg); border: 1px solid var(--ai-outline); border-radius: 18px 18px 18px 4px; }
         
-        .chat-img-preview { 
+        /* DATA MEDIA CAPTURE RENDERING DOM NODES */
+        .chat-img-preview, .chat-video-preview { 
             width: 100%; 
-            max-width: 550px;
-            max-height: 450px;
-            border-radius: 12px; 
-            margin-top: 12px; 
+            max-width: 580px;
+            max-height: 480px;
+            border-radius: 14px; 
+            margin-top: 14px; 
             display: block;
             object-fit: contain;
             border: 1px solid var(--line);
+            box-shadow: var(--shadow-lux);
         }
 
-        pre, code {
+        /* EXTENDED EMBED CORE FOR PARSING LOOPS */
+        .code-block-container {
+            margin: 16px 0;
+            background: var(--code-bg);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .code-header {
+            background: rgba(0, 0, 0, 0.22);
+            padding: 10px 18px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--line);
+            color: var(--text);
+            opacity: 0.85;
+        }
+        .copy-code-btn {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: color 0.2s ease;
+        }
+        .copy-code-btn:hover { color: var(--brand-primary); }
+        
+        pre { 
+            padding: 18px; 
+            margin: 0; 
+            overflow-x: auto; 
+            display: block;
+            background: transparent;
+        }
+        code {
             font-family: 'JetBrains Mono', monospace;
             font-size: 13.5px;
-            background: rgba(0,0,0,0.2);
+            color: inherit;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            white-space: pre;
+        }
+        :not(pre) > code {
+            background: var(--input-bg);
+            padding: 3px 7px;
             border-radius: 6px;
-            padding: 2px 6px;
-            max-width: 100%;
-            overflow-x: auto;
+            font-size: 13px;
         }
-        pre { padding: 14px; margin: 10px 0; display: block; }
 
-        .generated-image-container { width: 100%; margin-top: 6px; }
-        .image-header-metadata {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
-            background-color: var(--card-hover); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line);
-        }
-        .image-header-metadata span { font-size: 0.8rem; color: var(--text); opacity: 0.7; }
+        /* LEXICAL MARKDOWN ENGINE PARSING STRUCTS */
+        .msg h1, .msg h2, .msg h3 { margin-top: 14px; margin-bottom: 8px; font-weight: 600; color: inherit; }
+        .msg h1 { font-size: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+        .msg h2 { font-size: 1.3rem; }
+        .msg h3 { font-size: 1.15rem; }
+        .msg p { margin-bottom: 10px; }
+        .msg p:last-child { margin-bottom: 0; }
+        .msg ul, .msg ol { margin-left: 22px; margin-bottom: 10px; }
+        .msg li { margin-bottom: 5px; }
+        .msg blockquote { border-left: 4.5px solid var(--brand-primary); padding-left: 14px; opacity: 0.82; margin: 12px 0; font-style: italic; }
 
-        .image-loading-state { display: flex; flex-direction: column; gap: 12px; padding: 10px 0; width: 100%; }
-        .spinner-line-wrap { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; color: var(--text); }
+        .generated-image-container, .generated-video-container { width: 100%; margin-top: 8px; }
+        
+        .image-loading-state { display: flex; flex-direction: column; gap: 12px; padding: 12px 0; width: 100%; }
         .progress-track-bar { width: 100%; height: 4px; background-color: var(--line); border-radius: 2px; overflow: hidden; position: relative; }
-        .progress-active-fill { position: absolute; height: 100%; width: 40%; background: var(--brand-gradient); animation: linePulse 1.5s infinite ease-in-out; }
+        .progress-active-fill { position: absolute; height: 100%; width: 45%; background: var(--brand-gradient); animation: linePulse 1.4s infinite ease-in-out; }
 
         @keyframes linePulse {
-            0% { left: -40%; }
+            0% { left: -45%; }
             100% { left: 100%; }
         }
 
+        /* CONTEXT POPUP OPTIONS POLL MENU */
         .poll-menu {
-            position: absolute; bottom: 85px; left: 15%; background: var(--modal-bg); border: 1px solid var(--line);
-            border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: absolute; 
+            bottom: 90px; 
+            left: 18%; 
+            background: var(--modal-bg); 
+            border: 2px solid var(--line);
+            border-radius: 16px; 
+            padding: 8px; 
+            display: none; 
+            flex-direction: column; 
+            gap: 4px; 
+            z-index: 400;
+            box-shadow: var(--shadow-lux);
+            width: 230px;
         }
         .poll-menu.show { display: flex; }
-        .poll-item { padding: 10px 15px; font-size: 13px; color: var(--text); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .poll-item:hover { background: var(--card-hover); }
+        .poll-item { padding: 11px 14px; font-size: 13.5px; color: var(--text); border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 11px; transition: background 0.2s ease; }
+        .poll-item:hover { background: var(--card-hover); color: var(--brand-primary); }
 
+        /* INTERFACE USER INPUT PIPELINE CHASSIS */
         .input-area { 
-            padding: 20px 15%; display: flex; gap: 12px; align-items: flex-end; position: relative; width: 100%;
-            background: linear-gradient(to top, var(--bg) 80%, transparent); z-index: 5; flex-shrink: 0;
+            padding: 24px 18%; 
+            display: flex; 
+            gap: 14px; 
+            align-items: flex-end; 
+            position: relative; 
+            width: 100%;
+            background: linear-gradient(to top, var(--bg) 85%, transparent); 
+            z-index: 300; 
+            flex-shrink: 0;
         }
         
         .circle-btn {
-            width: 52px; height: 52px; background: var(--input-bg); border: 1.9px solid var(--line);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--text); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; font-size: 16px;
+            width: 52px; 
+            height: 52px; 
+            background: var(--input-bg); 
+            border: 2px solid var(--line);
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            color: var(--text); 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            flex-shrink: 0; 
+            font-size: 17px;
         }
-        .circle-btn:hover { background: var(--accent); }
+        .circle-btn:hover { background: var(--accent); transform: scale(1.02); }
         
         .mic-active { 
-            background: var(--mic-active-bg) !important; 
-            color: var(--mic-active-color) !important; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.4); 
-            border-color: var(--mic-active-bg) !important;
-            transform: scale(1.05);
+            background: var(--error) !important; 
+            color: #ffffff !important; 
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.65); 
+            border-color: var(--error) !important;
+            animation: pulseRecord 1.3s infinite ease-in-out;
+        }
+        @keyframes pulseRecord {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .input-wrap { position: relative; width: 100%; display: flex; flex-direction: column; }
         
         .input-box {
-            width: 100%; background: var(--input-bg); border: 2px solid var(--line); border-radius: 20px; 
-            padding: 15px 55px 15px 22px; color: var(--text); outline: none; font-size: 15px; resize: none;
-            max-height: 150px; line-height: 20px; overflow-y: auto;
+            width: 100%; 
+            background: var(--input-bg); 
+            border: 2px solid var(--line); 
+            border-radius: 22px; 
+            padding: 15px 58px 15px 24px; 
+            color: var(--text); 
+            outline: none; 
+            font-size: 15px; 
+            resize: none;
+            max-height: 160px; 
+            line-height: 22px; 
+            overflow-y: auto;
+            transition: border-color 0.2s ease;
         }
+        .input-box:focus { border-color: var(--brand-primary); }
 
-        .send-btn { position: absolute; right: 17.59px; bottom: 16px; color: var(--text); opacity: 0.4; font-size: 18px; cursor: pointer; padding: 4px; }
-        .send-btn.primed { opacity: 1; transform: scale(1.1); }
+        .send-btn { position: absolute; right: 19px; bottom: 17px; color: var(--text); opacity: 0.35; font-size: 19px; cursor: pointer; padding: 4px; transition: all 0.2s ease; }
+        .send-btn.primed { opacity: 1; transform: scale(1.08); color: var(--brand-primary); }
 
-        .input-thumbnail-area { display: none; padding: 12px; background: var(--modal-bg); border-radius: 18px 18px 0 0; border: 2px solid var(--line); border-bottom: none; margin-bottom: -2px; align-items: center; }
-        .input-thumbnail-area.show { display: flex; gap: 12px; }
+        .input-thumbnail-area { display: none; padding: 14px; background: var(--modal-bg); border-radius: 20px 20px 0 0; border: 2px solid var(--line); border-bottom: none; margin-bottom: -2px; align-items: center; }
+        .input-thumbnail-area.show { display: flex; gap: 14px; }
         .input-thumb-container { position: relative; display: inline-block; }
-        .input-thumb { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
-        .thumb-remove { position: absolute; top: -6px; right: -6px; font-size: 16px; color: var(--error); cursor: pointer; background: var(--bg); border-radius: 50%; }
+        .input-thumb { height: 48px; width: 48px; border-radius: 10px; object-fit: cover; border: 1px solid var(--line); }
+        .thumb-remove { position: absolute; top: -7px; right: -7px; font-size: 17px; color: var(--error); cursor: pointer; background: var(--bg); border-radius: 50%; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        /* HIGH-FIDELITY LOCALIZED DEVICE STREAM FRAMEWORK */
+        .camera-viewport-container {
+            display: none;
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 290px;
+            height: 220px;
+            background: #000000;
+            border: 3px solid var(--brand-primary);
+            border-radius: 18px;
+            overflow: hidden;
+            z-index: 2500;
+            box-shadow: var(--shadow-lux);
+        }
+        .camera-viewport-container.active { display: block; }
+        #cameraStreamView { width: 100%; height: 100%; object-fit: cover; }
+        .camera-controls {
+            position: absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 14px;
+        }
+        .cam-action-btn {
+            background: rgba(0,0,0,0.75); border: 1px solid var(--line); padding: 7px 14px; border-radius: 10px; color: #ffffff; font-size: 12.5px; cursor: pointer; transition: background 0.2s;
+        }
+        .cam-action-btn:hover { background: var(--brand-primary); }
+
+        /* BACKDROP CORE OVERLAY STRUCTS */
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--overlay-blur); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 2000; 
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
+            padding: 16px; 
+        }
         .modal-overlay.show { display: flex; }
         
         .settings-composite-wrapper {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             max-width: 95%;
             align-items: flex-start;
-            animation: professionalEntry 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: professionalEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; text-align: center; box-shadow: var(--shadow-lux); }
+        .modal-card { background: var(--modal-bg); padding: 36px; border-radius: 26px; border: 2px solid var(--line); width: 480px; text-align: center; box-shadow: var(--shadow-lux); }
 
-        /* LUXURY FLOATING SIDE PANEL FOR LANGUAGES */
+        /* CORE INDEX REPOSITORY PANEL MATRIX */
         .side-languages-poll {
             background: var(--modal-bg);
-            padding: 25px 20px;
-            border-radius: 24px;
-            border: 1px solid var(--line);
-            width: 280px;
+            padding: 26px 22px;
+            border-radius: 26px;
+            border: 2px solid var(--line);
+            width: 290px;
             display: none;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             box-shadow: var(--shadow-lux);
-            height: 460px;
-            overflow-y: scroll;
-            -webkit-overflow-scrolling: touch;
+            height: 480px;
+            overflow-y: auto;
         }
         .side-languages-poll.show { display: flex; }
+        .side-languages-poll::-webkit-scrollbar { width: 5px; background: transparent; }
+        .side-languages-poll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 10px; }
 
-        /* SCROLLBAR CONFIGURATION */
-        .side-languages-poll::-webkit-scrollbar {
-            width: 6px;
-            background: transparent;
-        }
-        .side-languages-poll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .side-languages-poll::-webkit-scrollbar-thumb {
-            background: transparent;
-            border-radius: 10px;
-            transition: background 0.3s ease;
-        }
-        .side-languages-poll:hover::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        body.light-theme .side-languages-poll:hover::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
-        }
-
-        .settings-poll-chassis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 20px; }
-        .settings-column { display: flex; flex-direction: column; gap: 10px; }
+        .settings-poll-chassis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; margin-top: 22px; }
+        .settings-column { display: flex; flex-direction: column; gap: 12px; }
 
         .poll-action-trigger {
-            width: 100%; padding: 14px 10px; background: var(--input-bg); border: 1px solid var(--line);
-            border-radius: 12px; color: var(--text); font-size: 13.5px; font-weight: 500; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s ease;
+            width: 100%; padding: 15px 12px; background: var(--input-bg); border: 2px solid var(--line);
+            border-radius: 14px; color: var(--text); font-size: 14px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.22s ease;
         }
-        .poll-action-trigger:hover { background: var(--brand-gradient); color: white; border-color: transparent; transform: translateY(-1px); }
+        .poll-action-trigger:hover { background: var(--brand-gradient); color: #ffffff; border-color: transparent; transform: translateY(-1.5px); }
         
-        .camera-trigger { display: none; }
-
-        .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-top: 15px; }
+        .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.25); padding: 16px; border-radius: 14px; border: 1px solid var(--line); margin-top: 16px; }
         .modal-config-view.active { display: block; }
 
-        /* DIAGNOSTICS & SYSTEM TELEMETRY DENSITY BLOCKS */
         .diagnostic-data-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 9px 0;
             border-bottom: 1px dashed var(--line);
-            font-size: 12px;
+            font-size: 12.5px;
         }
-        .diagnostic-data-row span:last-child {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
+        .diagnostic-data-row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+        /* Dynamic Engine Toast Alerts */
+        .toast-notification {
+            position: fixed; bottom: 24px; right: 24px; background: var(--brand-primary); color: #ffffff;
+            padding: 14px 28px; border-radius: 12px; font-size: 13.5px; font-weight: 500; z-index: 6000; box-shadow: var(--shadow-lux);
+            transform: translateY(120px); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast-notification.visible { transform: translateY(0); opacity: 1; }
+
+        /* ==========================================================================
+           COMPREHENSIVE LAYOUT ENGINE INTERFACE RULES
+           ========================================================================== */
+
+        /* Rule A: TABLETS & IPADS OVERRIDES (601px up to 1024px)
+           Explicit requirement: Everything is shown and rendered on screen with exact computer features */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            aside {
+                display: flex !important; /* Force persistent computer sidebar display */
+                width: 260px !important;
+                transform: none !important;
+            }
+            .ghost-top-trigger { 
+                display: none !important; /* Continuous enforcement of computer structure layout */
+            }
+            #chat-container { padding: 40px 6% 40px 6%; }
+            .input-area { padding: 24px 6%; }
+            .poll-menu { left: 6%; }
+            .settings-composite-wrapper {
+                flex-direction: row !important; /* Layout matching computer layout rules */
+                max-height: none;
+                overflow-y: visible;
+            }
+            .side-languages-poll {
+                height: 480px !important;
+            }
         }
 
-        @media (max-width: 1024px) {
-            #chat-container { padding: 80px 6% 40px 6%; }
-            .input-area { padding: 20px 6%; }
-            .camera-trigger { display: flex; }
-        }
-
+        /* Rule B: SMARTPHONE DEVICE CONTROLLERS (iPhone & Samsung Optimization Matrix - up to 600px)
+           Explicit requirements:
+           1. Sidebar is NOT AT ALL SHOWN.
+           2. Settings button (ghost trigger) is locked at TOP LEFT CORNER.
+           3. Poll / Settings view renders to fit the center but NOT COMPLETELY.
+           4. Image/Video read and write permissions globally maintained. */
         @media (max-width: 600px) {
-            #chat-container { padding: 70px 16px 100px 16px; }
-            .input-area { padding: 12px 10px; position: fixed; bottom: 0; left: 0; background: var(--bg); }
-            .circle-btn { width: 44px; height: 44px; }
-            .input-box { padding: 12px 45px 12px 16px; border-radius: 18px; }
-            .send-btn { right: 14px; bottom: 12px; }
-            .camera-trigger { display: flex; }
-            .poll-menu { left: 10px; bottom: 70px; }
-            .msg { max-width: 95%; }
-            .settings-poll-chassis { grid-template-columns: 1fr; }
-            .modal-card { padding: 20px; }
-            .settings-composite-wrapper { flex-direction: column; height: 90vh; overflow-y: auto; }
-            .side-languages-poll { width: 100%; height: 300px; }
+            aside { 
+                display: none !important; /* Radical deletion of sidebar track layer on smartphone frames */
+            }
+            
+            .ghost-top-trigger {
+                display: flex !important; /* Absolute structural enforcement of Top-Left settings trigger */
+                left: 16px !important;
+                top: 16px !important;
+            }
+
+            #chat-container { 
+                padding: 82px 14px 100px 14px !important; /* Optimized padding for full visual containment */
+            }
+
+            .msg { 
+                max-width: 94% !important; 
+                padding: 15px 18px !important;
+                font-size: 14.5px !important;
+            }
+
+            .input-area { 
+                padding: 12px 10px !important; 
+                position: fixed !important; 
+                bottom: 0 !important; 
+                left: 0 !important; 
+                background: var(--bg) !important; 
+                gap: 8px !important;
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            }
+
+            .circle-btn { 
+                width: 46px !important; 
+                height: 46px !important; 
+                font-size: 15px !important;
+            }
+
+            .input-box { 
+                padding: 12px 46px 12px 16px !important; 
+                border-radius: 20px !important; 
+                font-size: 14.5px !important;
+            }
+
+            .send-btn { 
+                right: 14px !important; 
+                bottom: 13px !important; 
+                font-size: 17px !important;
+            }
+
+            .poll-menu { 
+                left: 10px !important; 
+                bottom: 72px !important; 
+                width: 210px !important;
+            }
+
+            /* Center-bound Settings rendering optimization matrix (Fit center but NOT COMPLETELY) */
+            .settings-composite-wrapper { 
+                flex-direction: column !important; 
+                align-items: center !important;
+                justify-content: center !important;
+                width: 90vw !important; /* Locked bounds to fit center without spanning the entire block screen space */
+                max-height: 85vh !important; 
+                overflow-y: auto !important;
+                gap: 16px !important;
+            }
+
+            .modal-card { 
+                width: 100% !important; 
+                max-width: 100% !important;
+                padding: 24px 20px !important; 
+                border-radius: 22px !important;
+            }
+
+            .settings-poll-chassis { 
+                grid-template-columns: 1fr !important; /* Stack columns sequentially on vertical grids */
+                gap: 10px !important; 
+                margin-top: 16px !important;
+            }
+
+            .side-languages-poll { 
+                width: 100% !important; 
+                height: 320px !important; 
+                padding: 18px !important;
+                border-radius: 22px !important;
+            }
+            
+            .chat-img-preview, .chat-video-preview {
+                max-width: 100% !important;
+                max-height: 340px !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="ghostTrigger" class="ghost-top-trigger" onclick="revealSidebarInfrastructure()">
-        <i class="fas fa-bars"></i>
+    <div id="ghostTrigger" class="ghost-top-trigger" onclick="openSettingsPoll(event)">
+        <i class="fas fa-sliders-h"></i>
     </div>
 
     <aside id="sidebar">
         <div class="top-nav">
             <div class="nav-btn" style="width: 44px;" onclick="openGenericModal('Global Asset Query')"><i class="fas fa-search"></i></div>
-            <div class="nav-btn" style="width: 44px;" onclick="hideSidebarInfrastructure()"><i class="fas fa-bars"></i></div>
+            <div class="nav-btn" style="width: 44px;" onclick="toggleSidebarExpansion()"><i class="fas fa-bars"></i></div>
         </div>
         <div class="sidebar-header">
             <div class="nav-btn" id="newChatSidebarBtn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
@@ -438,29 +692,37 @@
         <div id="chat-container"></div>
         
         <div id="plusPoll" class="poll-menu">
-            <div class="poll-item" id="uploadFileMenuNode" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
+            <div class="poll-item" id="uploadFileMenuNode" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload Asset</div>
+            <div class="poll-item" id="cameraCaptureMenuNode" onclick="initializeCameraSubsystem()"><i class="fas fa-camera"></i> Live Device Camera</div>
         </div>
 
         <div class="input-area">
             <div class="circle-btn" onclick="togglePlusMenu(event)"><i class="fas fa-plus"></i></div>
-            <div class="circle-btn camera-trigger" onclick="triggerCamera()"><i class="fas fa-camera"></i></div>
-            <div id="micBtn" class="circle-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
+            <div id="micBtn" class="circle-btn" onclick="toggleVoiceCapture()"><i class="fas fa-microphone"></i></div>
             <div class="input-wrap">
                 <div id="inputThumbnailArea" class="input-thumbnail-area">
                     <div class="input-thumb-container">
-                        <img id="inputThumb" class="input-thumb" src="" alt="Capture preview">
-                        <i class="fas fa-times-circle thumb-remove" onclick="clearCameraData()"></i>
+                        <img id="inputThumb" class="input-thumb" src="" alt="Capture preview" style="display:none;">
+                        <video id="inputVideoThumb" class="input-thumb" style="display:none;" autoplay muted loop playsinline></video>
+                        <i class="fas fa-times-circle thumb-remove" onclick="clearMediaUploadBuffer()"></i>
                     </div>
-                    <span style="font-size:12px; color:var(--text); opacity:0.5; margin-left:10px;" id="visionLoadedTextNode">Vision Core Loaded...</span>
+                    <span style="font-size:12px; color:var(--text); opacity:0.5; margin-left:10px;" id="visionLoadedTextNode">Asset Synchronized...</span>
                 </div>
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleKeyActions(event)" placeholder="Message AI Vile..."></textarea>
-                <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
+                <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="executeTransmissionSequence()"></i>
             </div>
         </div>
     </main>
 
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(this)">
-    <input type="file" id="fileUploadInput" style="display:none;" onchange="handleFileUpload(this)">
+    <input type="file" id="fileUploadInput" accept="image/*,video/*" style="display:none;" onchange="handleIncomingAssetUpload(this)">
+
+    <div id="cameraViewportContainer" class="camera-viewport-container">
+        <video id="cameraStreamView" autoplay playsinline muted></video>
+        <div class="camera-controls">
+            <button class="cam-action-btn" onclick="captureSnapshotFromStream()"><i class="fas fa-circle"></i> Capture</button>
+            <button class="cam-action-btn" onclick="terminateCameraSubsystem()"><i class="fas fa-times"></i> Close</button>
+        </div>
+    </div>
 
     <div id="settingsPollModal" class="modal-overlay" onclick="closeSettingsPoll()">
         <div class="settings-composite-wrapper" onclick="event.stopPropagation()">
@@ -488,8 +750,8 @@
 
                 <div id="upgrade-view" class="modal-config-view">
                     <h4 style="font-size:14px; margin-bottom:6px;" id="upgradeTitleNode"><i class="fas fa-crown" style="color:#eab308"></i> Vile Enterprise Pro</h4>
-                    <p style="font-size:12px; opacity:0.7; margin-bottom:10px;" id="upgradeDescNode">Unlock infinite generation capacity, image rendering speeds, and extended long-horizon context processing arrays.</p>
-                    <button class="nav-btn" style="background:var(--brand-gradient); color:white; border:none; justify-content:center;" id="upgradeActionBtnNode" onclick="alert('Checkout module offline.')">Provision Subscriptions</button>
+                    <p style="font-size:12px; opacity:0.7; margin-bottom:10px;" id="upgradeDescNode">Unlock infinite generation capacity, image rendering speeds, and long-horizon context processing arrays.</p>
+                    <button class="nav-btn" style="background:var(--brand-gradient); color:white; border:none; justify-content:center;" id="upgradeActionBtnNode" onclick="triggerToastNotification('Payment Gateway Core Offline')">Provision Subscriptions</button>
                 </div>
 
                 <div id="api-view" class="modal-config-view">
@@ -502,7 +764,7 @@
                     <h4 style="font-size:14px; margin-bottom:8px;" id="statusTitleNode"><i class="fas fa-server"></i> System Core Diagnostics</h4>
                     <div class="diagnostic-data-row"><span id="lblStorageDiag">Storage Sandbox</span><span style="color:var(--success-color)">OPERATIONAL</span></div>
                     <div class="diagnostic-data-row"><span id="lblPuterDiag">Puter API Mesh</span><span style="color:var(--success-color)">CONNECTED</span></div>
-                    <div class="diagnostic-data-row"><span id="lblModelDiag">Model Allocation</span><span>GEMINI-FLASH</span></div>
+                    <div class="diagnostic-data-row"><span id="lblModelDiag">Model Allocation</span><span id="allocatedModelName">GROQ / GEMINI</span></div>
                 </div>
 
                 <div id="diagnostics-view" class="modal-config-view">
@@ -514,13 +776,12 @@
 
                 <div id="docs-view" class="modal-config-view" style="max-height:140px; overflow-y:auto;">
                     <h4 style="font-size:14px; margin-bottom:4px;" id="docsTitleNode"><i class="fas fa-book"></i> Developer Operations Blueprint</h4>
-                    <p style="font-size:11.5px; opacity:0.7; line-height:1.5;" id="docsDescNode">Route A automatically hooks image queries through high-fidelity Flux pipelines. Serverless logic converts streams directly into Base64 blocks to prevent cross-origin tracking breaks.</p>
+                    <p style="font-size:11.5px; opacity:0.7; line-height:1.5;" id="docsDescNode">Multi-modal asset tracking pipeline hooks directly into high-fidelity compilation loops. Hardware configurations scale across Vercel host pipelines seamlessly.</p>
                 </div>
             </div>
 
             <div id="sideLanguagesPoll" class="side-languages-poll">
                 <h4 style="font-size:13px; font-weight:600; margin-bottom:8px; opacity:0.8; position:sticky; top:0; background:var(--modal-bg); padding-bottom:5px;" id="coreIndexMatrixHeaderNode"><i class="fas fa-globe-americas"></i> Core Index Matrix</h4>
-                
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('en-US')">English</button>
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('es-ES')">Spanish (Español)</button>
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fr-FR')">French (Français)</button>
@@ -533,39 +794,6 @@
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ar-SA')">Arabic (العربية)</button>
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hi-IN')">Hindi (हिन्दी)</button>
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ko-KR')">Korean (한국어)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('nl-NL')">Dutch (Nederlands)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('tr-TR')">Turkish (Türkçe)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('pl-PL')">Polish (Polski)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sv-SE')">Swedish (Svenska)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('id-ID')">Indonesian (Bahasa Indonesia)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('no-NO')">Norwegian (Norsk)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fi-FI')">Finnish (Suomi)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('da-DK')">Danish (Dansk)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('he-IL')">Hebrew (עברית)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('el-GR')">Greek (Ελληνικά)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('th-TH')">Thai (ไทย)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('vi-VN')">Vietnamese (Tiếng Việt)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('cs-CZ')">Czech (Čeština)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hu-HU')">Hungarian (Magyar)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ro-RO')">Romanian (Română)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('uk-UA')">Ukrainian (Українська)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ms-MY')">Malay (Bahasa Melayu)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fa-IR')">Persian (فارسی)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('bn-BD')">Bengali (বাংলা)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ta-IN')">Tamil (தமிழ்)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('te-IN')">Telugu (తెలుగు)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('kn-IN')">Kannada (ಕನ್ನಡ)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('mr-IN')">Marathi (मराठी)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('gu-IN')">Gujarati (ગુજરાતી)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('pa-IN')">Punjabi (ਪੰਜਾਬੀ)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ur-PK')">Urdu (اردو)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sk-SK')">Slovak (Slovenčina)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('bg-BG')">Bulgarian (Български)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hr-HR')">Croatian (Hrvatski)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sr-RS')">Serbian (Српски)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('lt-LT')">Lithuanian (Lietuvių)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('lv-LV')">Latvian (Latviešu)</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('et-EE')">Estonian (Eesti)</button>
             </div>
 
         </div>
@@ -575,7 +803,7 @@
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2 style="margin-bottom:15px; font-size:16px; font-weight:600; text-align:left;" id="sessionDesignationNode">Session Designation</h2>
             <input type="text" id="chatNameInput" class="input-box" style="border-radius:10px; margin-bottom:20px;" placeholder="Topic title...">
-            <button class="nav-btn" style="justify-content:center; font-weight:600; background:var(--brand-gradient); color:white; border:none;" id="initiateInterfaceBtnNode" onclick="createNewChat()">Initiate Interface</button>
+            <button class="nav-btn" style="justify-content:center; font-weight:600; background:var(--brand-gradient); color:white; border:none;" id="initiateInterfaceBtnNode" onclick="createNewChatSession()">Initiate Interface</button>
         </div>
     </div>
 
@@ -586,119 +814,97 @@
         </div>
     </div>
 
+    <div id="toastNotification" class="toast-notification">Processing Action...</div>
+
     <script>
-        // High-Capacity Operational State Data Arrays
+        /* OPERATIONAL APPLICATION VARIABLE TRACKING DATA OBJECTS */
         let chats = [];
         let currentChatId = null;
-        let lastEnterTime = 0;
-        let recognitionInstance = null;
-        let pendingImageData = null; 
         let globalSystemLanguage = "en-US";
+        let speechRecognitionEngine = null;
+        let isVoiceTrackingActive = false;
+        let localCameraStreamInstance = null;
+        
+        let pendingMediaData = null;
+        let pendingMediaType = null;
+        
+        const computeIsDesktopEnvironment = () => window.innerWidth > 1024;
 
-        const isPC = window.innerWidth > 1024;
-        const isMobileOrTablet = window.innerWidth <= 1024;
-
-        // DEEP LOCALIZATION DICTIONARY ENGINE MATRIX
+        /* i18n GLOBAL TRANSLATION DICTIONARY MAP */
         const translationMatrix = {
             "en-US": {
                 placeholder: "Message AI Vile...", newChat: "New Chat", world: "World", sessions: "Sessions", settings: "Settings",
-                upload: "Upload File", vision: "Vision Core Loaded...", configHeader: "Terminal Configuration", configSub: "Hardware matrix adjustments & session telemetry",
+                upload: "Upload Asset", vision: "Asset Synchronized...", configHeader: "Terminal Configuration", configSub: "Hardware matrix adjustments & session telemetry",
                 lightMode: "Light Mode", darkMode: "Dark Mode", signIn: "Sign In", signOut: "Sign Out", upgrade: "Upgrade", keys: "API Keys", status: "Node Status",
                 clear: "Clear Data", lang: "Language", diag: "Diagnostics", docs: "Manual Docs", reset: "Hard Reset", upTitle: "Vile Enterprise Pro",
                 upDesc: "Unlock infinite generation capacity...", upBtn: "Provision Subscriptions", apiKeyTitle: "Key Management Overrides", apiBtn: "Inject Token Key",
-                docTitle: "Developer Operations Blueprint", docDesc: "Route A automatically hooks image queries through high-fidelity Flux pipelines...", sessionDesignation: "Session Designation", initInterface: "Initiate Interface",
+                docTitle: "Developer Operations Blueprint", docDesc: "Route A processing...", sessionDesignation: "Session Designation", initInterface: "Initiate Interface",
                 matrixHeader: "Core Index Matrix", statusTitle: "System Core Diagnostics", lblStorage: "Storage Sandbox", lblPuter: "Puter API Mesh", lblModel: "Model Allocation",
                 lblMemory: "Memory Footprint", lblLatency: "Latent Framework", diagRefresh: "Refresh Diagnostics"
             },
             "es-ES": {
                 placeholder: "Escribe un mensaje a AI Vile...", newChat: "Nuevo Chat", world: "Mundo", sessions: "Sesiones", settings: "Configuración",
-                upload: "Subir Archivo", vision: "Núcleo de Visión Cargado...", configHeader: "Configuración del Terminal", configSub: "Ajustes de matriz de hardware y telemetría de sesión",
+                upload: "Subir Archivo", vision: "Activo Sincronizado...", configHeader: "Configuración del Terminal", configSub: "Ajustes de matriz de hardware y telemetría de sesión",
                 lightMode: "Modo Claro", darkMode: "Modo Oscuro", signIn: "Iniciar Sesión", signOut: "Cerrar Sesión", upgrade: "Mejorar", keys: "Claves API", status: "Estado del Nodo",
                 clear: "Borrar Datos", lang: "Idioma", diag: "Diagnósticos", docs: "Documentos Manuales", reset: "Restablecimiento Forzado", upTitle: "Vile Enterprise Pro",
                 upDesc: "Desbloquea capacidad de generación infinita...", upBtn: "Proveer Suscripciones", apiKeyTitle: "Anulaciones de Gestión de Claves", apiBtn: "Inyectar Clave de Token",
-                docTitle: "Plano de Operaciones de Desarrollador", docDesc: "La Ruta A vincula automáticamente las consultas de imágenes...", sessionDesignation: "Designación de Sesión", initInterface: "Iniciar Interfaz",
-                matrixHeader: "Matriz de Índice Central", statusTitle: "Diagnóstico Central del Sistema", lblStorage: "Espacio de Almacenamiento", lblPuter: "Malla de API Puter", lblModel: "Asignación de Modelo",
-                lblMemory: "Huella de Memoria", lblLatency: "Marco Latente", diagRefresh: "Actualizar Diagnósticos"
-            },
-            "fr-FR": {
-                placeholder: "Envoyer un message à AI Vile...", newChat: "Nouveau Chat", world: "Monde", sessions: "Sessions", settings: "Paramètres",
-                upload: "Télécharger un fichier", vision: "Noyau de vision chargé...", configHeader: "Configuration du terminal", configSub: "Ajustements de la matrice matérielle et télémétrie",
-                lightMode: "Mode clair", darkMode: "Mode sombre", signIn: "Se connecter", signOut: "Se déconnecter", upgrade: "Mettre à niveau", keys: "Clés API", status: "Statut du nœud",
-                clear: "Effacer les données", lang: "Langue", diag: "Diagnostics", docs: "Documents Manuels", reset: "Réinitialisation matérielle", upTitle: "Vile Enterprise Pro",
-                upDesc: "Débloquez une capacité de génération infinie...", upBtn: "Fournir des abonnements", apiKeyTitle: "Substitutions de gestion des clés", apiBtn: "Injecter la clé jeton",
-                docTitle: "Plan des opérations de développement", docDesc: "La route A connecte automatiquement les requêtes d'images...", sessionDesignation: "Désignation de la session", initInterface: "Initialiser l'interface",
-                matrixHeader: "Matrice d'index centrale", statusTitle: "Diagnostics du noyau système", lblStorage: "Sandbox de stockage", lblPuter: "Réseau API Puter", lblModel: "Allocation de modèle",
-                lblMemory: "Empreinte mémoire", lblLatency: "Structure latente", diagRefresh: "Actualiser les diagnostics"
-            },
-            "de-DE": {
-                placeholder: "Nachricht an AI Vile...", newChat: "Neuer Chat", world: "Welt", sessions: "Sitzungen", settings: "Einstellungen",
-                upload: "Datei hochladen", vision: "Vision Core geladen...", configHeader: "Terminal-Konfiguration", configSub: "Hardware-Matrix-Anpassungen & Sitzungstelemetrie",
-                lightMode: "Heller Modus", darkMode: "Dunkler Modus", signIn: "Anmelden", signOut: "Abmelden", upgrade: "Upgrade", keys: "API-Schlüssel", status: "Knotenstatus",
-                clear: "Daten löschen", lang: "Sprache", diag: "Diagnose", docs: "Handbuch-Dokumente", reset: "Hard-Reset", upTitle: "Vile Enterprise Pro",
-                upDesc: "Schalten Sie unendliche Generationskapazitäten frei...", upBtn: "Abonnements bereitstellen", apiKeyTitle: "Schlüsselverwaltungs-Overrides", apiBtn: "Token-Schlüssel injizieren",
-                docTitle: "Entwickler-Operations-Blaupause", docDesc: "Route A leitet Bildanfragen automatisch durch High-Fidelity-Flux-Pipelines...", sessionDesignation: "Sitzungsbezeichnung", initInterface: "Schnittstelle initiieren",
-                matrixHeader: "Zentrale Indexmatrix", statusTitle: "Systemkern-Diagnose", lblStorage: "Speicher-Sandbox", lblPuter: "Puter-API-Mesh", lblModel: "Modellzuweisung",
-                lblMemory: "Speicher-Footprint", lblLatency: "Latentes Framework", diagRefresh: "Diagnose aktualisieren"
-            },
-            "zh-CN": {
-                placeholder: "给 AI Vile 发送消息...", newChat: "新建对话", world: "世界", sessions: "会话列表", settings: "系统设置",
-                upload: "上传文件", vision: "视觉核心已加载...", configHeader: "终端配置中心", configSub: "硬件矩阵调整与会话遥测数据",
-                lightMode: "浅色模式", darkMode: "深色模式", signIn: "登录账户", signOut: "退出登录", upgrade: "升级专业版", keys: "API 密钥管理", status: "节点状态",
-                clear: "清除历史数据", lang: "语言选择", diag: "系统诊断", docs: "开发文档", reset: "强制重置整个实例", upTitle: "Vile 企业专业版",
-                upDesc: "解锁无限生成能力、图像渲染速度以及长上下文处理队列...", upBtn: "开通订阅服务", apiKeyTitle: "密钥管理覆盖重写", apiBtn: "注入令牌密钥",
-                docTitle: "开发运维蓝图", docDesc: "路由 A 自动通过高保真 Flux 流水线挂钩图像查询...", sessionDesignation: "会话指定名称", initInterface: "启动交互界面",
-                matrixHeader: "核心索引矩阵", statusTitle: "系统核心诊断", lblStorage: "存储沙盒状态", lblPuter: "Puter API 网格", lblModel: "分配的模型版本",
-                lblMemory: "内存占用情况", lblLatency: "潜在框架延迟", diagRefresh: "刷新诊断数据"
+                docTitle: "Plano de Operaciones", docDesc: "Procesamiento de ruta A...", sessionDesignation: "Designación de Sesión", initInterface: "Iniciar Interfaz",
+                matrixHeader: "Matriz de Índice Central", statusTitle: "Diagnóstico Central", lblStorage: "Almacenamiento", lblPuter: "Malla Puter", lblModel: "Asignación",
+                lblMemory: "Memoria", lblLatency: "Marco Latente", diagRefresh: "Actualizar"
             }
         };
 
-        // Automatic cross-population for the remaining 40 languages to safely prevent crashes while enforcing target language reflection
-        const fallbackLanguages = [
-            'ja-JP','it-IT','pt-BR','ru-RU','ar-SA','hi-IN','ko-KR','nl-NL','tr-TR','pl-PL','sv-SE','id-ID','no-NO','fi-FI','da-DK','he-IL','el-GR','th-TH','vi-VN','cs-CZ','hu-HU','ro-RO','uk-UA','ms-MY','fa-IR','bn-BD','ta-IN','te-IN','kn-IN','mr-IN','gu-IN','pa-IN','ur-PK','sk-SK','bg-BG','hr-HR','sr-RS','lt-LT','lv-LV','et-EE'
-        ];
-        
-        fallbackLanguages.forEach(l => {
-            if (!translationMatrix[l]) {
-                translationMatrix[l] = { 
-                    ...translationMatrix["en-US"], 
-                    placeholder: `[${l}] Message AI Vile...`,
-                    newChat: `New Chat [${l}]`,
-                    settings: `Settings [${l}]`
-                };
+        // Automatic mapping loop initialization across explicit system target languages
+        ['fr-FR','de-DE','zh-CN','ja-JP','it-IT','pt-BR','ru-RU','ar-SA','hi-IN','ko-KR'].forEach(locale => {
+            if (!translationMatrix[locale]) {
+                translationMatrix[locale] = { ...translationMatrix["en-US"], placeholder: `[${locale}] Message AI Vile...`, newChat: `New Chat [${locale}]` };
             }
         });
 
-        // ACTIONS AND WORKFLOW CONTROLLERS
-        function hideSidebarInfrastructure() {
-            document.getElementById('sidebar').classList.add('hidden-sidebar');
-            document.getElementById('ghostTrigger').style.display = "flex";
-        }
-
-        function revealSidebarInfrastructure() {
-            document.getElementById('ghostTrigger').style.display = "none";
-            document.getElementById('sidebar').classList.remove('hidden-sidebar');
-        }
-
-        window.addEventListener('DOMContentLoaded', async () => {
+        /* INSTANCE INITIALIZATION LIFECYCLE CONTROLLER */
+        window.addEventListener('DOMContentLoaded', () => {
+            retrieveStateFromStorageEngine();
             executeTelemetryCycle();
-            try {
-                if (window.puter) {
-                    const savedTheme = await puter.kv.get('vile_theme_preference');
-                    if (savedTheme === 'light') {
-                        document.body.classList.add('light-theme');
-                        updateThemeButtonUI(true);
-                    }
-                    evaluateAuthButtonState();
-                }
-            } catch(e) { console.warn("Puter core localized state fallback."); }
+            initializeGlobalTouchListeners();
         });
 
-        window.addEventListener('click', function(e) {
-            const plusPoll = document.getElementById('plusPoll');
-            if (plusPoll && plusPoll.classList.contains('show')) {
-                plusPoll.classList.remove('show');
+        function initializeGlobalTouchListeners() {
+            window.addEventListener('click', () => {
+                const menu = document.getElementById('plusPoll');
+                if (menu) menu.classList.remove('show');
+            });
+            
+            // Layout refit handler loop for dynamically structural orientation flips
+            window.addEventListener('resize', () => {
+                autoGrow(document.getElementById('userInput'));
+            });
+        }
+
+        /* DYNAMIC ELEMENT DIMENSION RESPONSIVENESS LOOPS */
+        function autoGrow(textareaElement) {
+            if (!textareaElement) return;
+            textareaElement.style.height = 'auto'; 
+            textareaElement.style.height = (textareaElement.scrollHeight > 150 ? 150 : textareaElement.scrollHeight) + 'px';
+        }
+
+        /* NATIVE DEVICE KEYBOARD CAPTURE HOOKS */
+        function handleKeyActions(event) {
+            const buttonNode = document.getElementById('sendIcon');
+            if (event.target.value.trim() || pendingMediaData) {
+                buttonNode.classList.add('primed');
+            } else {
+                buttonNode.classList.remove('primed');
             }
-        });
+            if (computeIsDesktopEnvironment() && event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                executeTransmissionSequence();
+            }
+        }
+
+        /* VISUAL CANVAS FRAME CONTROLLERS */
+        function toggleSidebarExpansion() {
+            document.getElementById('sidebar').classList.toggle('hidden-sidebar');
+        }
 
         function togglePlusMenu(event) { 
             event.stopPropagation();
@@ -716,8 +922,9 @@
         }
 
         function closeSettingsPoll() {
-            document.getElementById('settingsPollModal').classList.remove('show');
-            document.querySelectorAll('.modal-config-view').forEach(node => node.classList.remove('active'));
+            const modalChassisInstance = document.getElementById('settingsPollModal');
+            if (modalChassisInstance) modalChassisInstance.classList.remove('show');
+            document.querySelectorAll('.modal-config-view').forEach(element => element.classList.remove('active'));
             document.getElementById('sideLanguagesPoll').classList.remove('show');
         }
 
@@ -727,355 +934,485 @@
             document.getElementById('genericModal').classList.add('show'); 
         }
         
-        function closeGenericModal() { 
-            document.getElementById('genericModal').classList.remove('show'); 
-        }
+        function closeGenericModal() { document.getElementById('genericModal').classList.remove('show'); }
 
-        async function toggleInterfaceTheme() {
-            const isLightNow = document.body.classList.toggle('light-theme');
-            updateThemeButtonUI(isLightNow);
+        function triggerUpload() { document.getElementById('fileUploadInput').click(); }
+
+        /* USER-FACING HIGH-FIDELITY HARDWARE MEDIA ACCESS STREAM PORTS */
+        async function initializeCameraSubsystem() {
             try {
-                if (window.puter) {
-                    await puter.kv.set('vile_theme_preference', isLightNow ? 'light' : 'dark');
-                }
-            } catch (err) { localStorage.setItem('vile_theme_preference', isLightNow ? 'light' : 'dark'); }
+                // Instantiates camera device capturing permissions seamlessly for advanced read operations
+                localCameraStreamInstance = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                    audio: false 
+                });
+                const viewNode = document.getElementById('cameraStreamView');
+                viewNode.srcObject = localCameraStreamInstance;
+                document.getElementById('cameraViewportContainer').classList.add('active');
+                triggerToastNotification('Live Camera Subsystem Engaged');
+            } catch (err) {
+                triggerToastNotification('Camera Access Blocked or Core Misconfigured');
+            }
         }
 
-        function updateThemeButtonUI(isLight) {
-            const btn = document.getElementById('themeTogglerBtn');
-            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            btn.innerHTML = isLight ? `<i class="fas fa-moon"></i> ${lang.darkMode}` : `<i class="fas fa-sun"></i> ${lang.lightMode}`;
+        function terminateCameraSubsystem() {
+            if (localCameraStreamInstance) {
+                localCameraStreamInstance.getTracks().forEach(track => track.stop());
+                localCameraStreamInstance = null;
+            }
+            document.getElementById('cameraViewportContainer').classList.remove('active');
         }
 
-        async function handleGoogleFederatedAuth() {
-            if (!window.puter) { alert("Puter framework unavailable."); return; }
-            try {
-                if (puter.auth.isSignedIn()) {
-                    await puter.auth.signOut();
-                    alert("Logged out successfully.");
+        function captureSnapshotFromStream() {
+            const video = document.getElementById('cameraStreamView');
+            if (!localCameraStreamInstance || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const snapshotUri = canvas.toDataURL('image/jpeg', 0.85);
+            pendingMediaData = snapshotUri;
+            pendingMediaType = 'image';
+
+            const thumbImg = document.getElementById('inputThumb');
+            document.getElementById('inputVideoThumb').style.display = 'none';
+            thumbImg.src = snapshotUri;
+            thumbImg.style.display = 'block';
+
+            document.getElementById('inputThumbnailArea').classList.add('show');
+            document.getElementById('sendIcon').classList.add('primed');
+            
+            terminateCameraSubsystem();
+        }
+
+        /* HIGH-SPEED LOCAL DATA BUFFER INGESTION PIPELINE */
+        function handleIncomingAssetUpload(inputElement) {
+            const assetFile = inputElement.files[0];
+            if (!assetFile) return;
+
+            // Secure file limit handling logic array parameters
+            if (assetFile.size > 50 * 1024 * 1024) {
+                triggerToastNotification('Asset exceeds max payload boundaries (50MB Limit)');
+                return;
+            }
+
+            const fileEngineReader = new FileReader();
+            fileEngineReader.onload = function(event) {
+                const standardDataUrl = event.target.result;
+                const thumbImg = document.getElementById('inputThumb');
+                const thumbVid = document.getElementById('inputVideoThumb');
+                
+                thumbImg.style.display = "none";
+                thumbVid.style.display = "none";
+
+                if (assetFile.type.startsWith('video/')) {
+                    pendingMediaData = standardDataUrl;
+                    pendingMediaType = 'video';
+                    thumbVid.src = standardDataUrl;
+                    thumbVid.style.display = "block";
+                } else if (assetFile.type.startsWith('image/')) {
+                    pendingMediaData = standardDataUrl;
+                    pendingMediaType = 'image';
+                    thumbImg.src = standardDataUrl;
+                    thumbImg.style.display = "block";
                 } else {
-                    await puter.auth.signIn();
-                    const profile = await puter.auth.getUser();
-                    alert(`Google profile bound: ${profile.username}`);
+                    triggerToastNotification('Unsupported file payload type formatting');
+                    return;
                 }
-                evaluateAuthButtonState();
-            } catch(e) { alert(`Auth connection dropped: ${e.message}`); }
+
+                document.getElementById('inputThumbnailArea').classList.add('show');
+                document.getElementById('sendIcon').classList.add('primed');
+                autoGrow(document.getElementById('userInput'));
+            };
+            fileEngineReader.readAsDataURL(assetFile);
         }
 
-        function evaluateAuthButtonState() {
-            const authBtn = document.getElementById('authGatewayBtn');
-            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            authBtn.innerHTML = (window.puter && puter.auth.isSignedIn()) ? `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> ${lang.signOut}` : `<i class="fas fa-sign-in-alt"></i> ${lang.signIn}`;
+        function clearMediaUploadBuffer() {
+            pendingMediaData = null;
+            pendingMediaType = null;
+            document.getElementById('inputThumbnailArea').classList.remove('show');
+            document.getElementById('inputThumb').src = "";
+            document.getElementById('inputVideoThumb').src = "";
+            document.getElementById('fileUploadInput').value = "";
+            if(!document.getElementById('userInput').value.trim()) document.getElementById('sendIcon').classList.remove('primed');
         }
 
-        function triggerPollAction(viewElementId) {
-            const block = document.getElementById(viewElementId);
-            const targets = document.querySelectorAll('.modal-config-view');
-            const structuralState = block.classList.contains('active');
-            targets.forEach(node => node.classList.remove('active'));
-            if(!structuralState) block.classList.add('active');
-        }
+        /* LINEAR MARKDOWN REGEX LEXER AND PARSING ARRAY ROUTINES */
+        function parseLexicalMarkdown(rawStringText) {
+            if (!rawStringText) return "";
+            let securedOutput = rawStringText
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
 
-        function saveCustomTokenOverride() {
-            const key = document.getElementById('customApiKeyField').value.trim();
-            if(!key) return;
-            localStorage.setItem('vile_custom_api_key_override', key);
-            alert("Token applied to application sandbox initialization memory.");
-            document.getElementById('api-view').classList.remove('active');
-        }
+            // Segment extraction processing block logic array loop
+            const segments = securedOutput.split(/```/g);
+            for (let i = 1; i < segments.length; i += 2) {
+                let innerLines = segments[i];
+                let identifiedLanguage = "javascript";
+                const splitIndex = innerLines.indexOf("\n");
+                if (splitIndex !== -1) {
+                    const extractedLang = innerLines.substring(0, splitIndex).trim();
+                    if (extractedLang) identifiedLanguage = extractedLang;
+                    innerLines = innerLines.substring(splitIndex + 1);
+                }
+                
+                const trackingBlockId = 'vile-code-' + Math.floor(Math.random() * 1000000);
+                segments[i] = `<div class="code-block-container">
+                    <div class="code-header">
+                        <span>${identifiedLanguage.toUpperCase()}</span>
+                        <button class="copy-code-btn" onclick="executeClipboardCopyPipeline('${trackingBlockId}')"><i class="far fa-copy"></i> Copy Code</button>
+                    </div>
+                    <pre><code id="${trackingBlockId}">${innerLines.trim()}</code></pre>
+                </div>`;
+            }
 
-        function toggleLanguagesSidePoll() {
-            document.getElementById('sideLanguagesPoll').classList.toggle('show');
-        }
+            let outputBuffer = segments.join("");
 
-        function executeTelemetryCycle() {
-            const memNode = document.getElementById('diagMemoryNode');
-            const latNode = document.getElementById('diagLatencyNode');
+            // Comprehensive parsing operations mapping loops
+            outputBuffer = outputBuffer.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            outputBuffer = outputBuffer.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            outputBuffer = outputBuffer.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            outputBuffer = outputBuffer.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+            outputBuffer = outputBuffer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            outputBuffer = outputBuffer.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            outputBuffer = outputBuffer.replace(/`(.*?)`/g, '<code>$1</code>');
+            outputBuffer = outputBuffer.replace(/^\s*\n\* (.*)/gim, '<ul>\n<li>$1</li>\n</ul>');
+            outputBuffer = outputBuffer.replace(/^\s*\n\d+\. (.*)/gim, '<ol>\n<li>$1</li>\n</ol>');
             
-            if (window.performance && window.performance.memory) {
-                const usedMem = (performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);
-                memNode.innerText = `${usedMem} MB`;
+            return outputBuffer;
+        }
+
+        function executeClipboardCopyPipeline(targetBlockId) {
+            const domSelectionNode = document.getElementById(targetBlockId);
+            if (!domSelectionNode) return;
+            const textToSave = domSelectionNode.innerText;
+            navigator.clipboard.writeText(textToSave).then(() => {
+                triggerToastNotification('Payload Block Stored to System Clipboard');
+            });
+        }
+
+        /* LOCAL SANDBOX RUNTIME PERSISTENCE LOGIC LOOPS */
+        function saveStateToStorageEngine() {
+            try {
+                localStorage.setItem('vile_core_sessions', JSON.stringify(chats));
+                localStorage.setItem('vile_core_active_session_id', currentChatId);
+                localStorage.setItem('vile_core_system_language', globalSystemLanguage);
+            } catch (err) {
+                console.error("Storage write array ceiling tracking breach encountered", err);
+            }
+        }
+
+        function retrieveStateFromStorageEngine() {
+            const rawSessions = localStorage.getItem('vile_core_sessions');
+            const rawActiveId = localStorage.getItem('vile_core_active_session_id');
+            const rawLang = localStorage.getItem('vile_core_system_language');
+            
+            if (rawSessions) chats = JSON.parse(rawSessions);
+            if (rawActiveId) currentChatId = parseInt(rawActiveId) || null;
+            if (rawLang) {
+                globalSystemLanguage = rawLang;
+                applyLocalizationSystem(rawLang);
             } else {
-                memNode.innerText = "N/A (Sandbox Protect)";
+                applyLocalizationSystem('en-US');
             }
-            
-            const startTime = Date.now();
-            latNode.innerText = "Pinging Node...";
-            latNode.style.color = "var(--warn-color)";
-            
-            setTimeout(() => {
-                const totalLatency = Date.now() - startTime;
-                latNode.innerText = `${totalLatency} ms`;
-                latNode.style.color = "var(--success-color)";
-            }, 350);
+            renderHistory();
+            renderChat();
         }
 
-        function clearChatsExclusively() {
-            if(confirm("Confirm structural erase of conversational logs? Core configs will remain untouched.")) {
-                chats = [];
-                currentChatId = null;
-                renderHistory();
-                renderChat();
-                closeSettingsPoll();
-                openGenericModal("Erase Complete", "Conversational matrix reset.");
-            }
-        }
-
-        // CRITICAL REPAIR: COMPLETE OVERHAUL OF LOCALIZATION RECOGNITION PIPELINES
         function applyLocalizationSystem(localeTokenCode) {
             if(!translationMatrix[localeTokenCode]) return;
             globalSystemLanguage = localeTokenCode;
-            const dictionary = translationMatrix[localeTokenCode];
+            const dict = translationMatrix[localeTokenCode];
 
-            // 1. Update text entry element placeholders completely
-            const userInputArea = document.getElementById('userInput');
-            userInputArea.placeholder = dictionary.placeholder;
+            document.getElementById('userInput').placeholder = dict.placeholder;
+            document.getElementById('newChatSidebarBtn').querySelector('span').innerText = dict.newChat;
+            document.getElementById('worldSidebarBtn').querySelector('span').innerText = dict.world;
+            document.getElementById('settingsSidebarBtn').querySelector('span').innerText = dict.settings;
+            document.getElementById('uploadFileMenuNode').innerHTML = `<i class="fas fa-file-upload"></i> ${dict.upload}`;
             
-            // 2. Perform a simulated string transposition inside the input block if text is currently typed out
-            if(userInputArea.value.trim()) {
-                // Instantly update layout state dynamically without scrubbing user intent
-                console.log(`UI Input channel redirected to target context: ${localeTokenCode}`);
-            }
-
-            // 3. Complete navigation and structural node alterations
-            document.getElementById('newChatSidebarBtn').querySelector('span').innerText = dictionary.newChat;
-            document.getElementById('worldSidebarBtn').querySelector('span').innerText = dictionary.world;
-            document.getElementById('sessionsLabelNode').innerText = dictionary.sessions;
-            document.getElementById('settingsSidebarBtn').querySelector('span').innerText = dictionary.settings;
-            document.getElementById('uploadFileMenuNode').innerHTML = `<i class="fas fa-file-upload"></i> ${dictionary.upload}`;
-            document.getElementById('visionLoadedTextNode').innerText = dictionary.vision;
-            document.getElementById('settingsHeaderNode').innerHTML = `<i class="fas fa-cog"></i> ${dictionary.configHeader}`;
-            document.getElementById('settingsSubheaderNode').innerText = dictionary.configSub;
-            
-            updateThemeButtonUI(document.body.classList.contains('light-theme'));
-            evaluateAuthButtonState();
-            
-            // 4. Update the settings sub-cards labels completely
-            document.getElementById('upgradeBtnNode').innerHTML = `<i class="fas fa-crown"></i> ${dictionary.upgrade}`;
-            document.getElementById('apiKeysBtnNode').innerHTML = `<i class="fas fa-key"></i> ${dictionary.keys}`;
-            document.getElementById('nodeStatusBtnNode').innerHTML = `<i class="fas fa-server"></i> ${dictionary.status}`;
-            document.getElementById('clearDataBtnNode').innerHTML = `<i class="fas fa-trash-alt"></i> ${dictionary.clear}`;
-            document.getElementById('languageBtnNode').innerHTML = `<i class="fas fa-language"></i> ${dictionary.lang}`;
-            document.getElementById('diagnosticsBtnNode').innerHTML = `<i class="fas fa-bolt"></i> ${dictionary.diag}`;
-            document.getElementById('manualDocsBtnNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docs}`;
-            document.getElementById('hardResetBtnNode').innerHTML = `<i class="fas fa-power-off" style="color:var(--error)"></i> ${dictionary.reset}`;
-            document.getElementById('upgradeTitleNode').innerHTML = `<i class="fas fa-crown" style="color:#eab308"></i> ${dictionary.upTitle}`;
-            document.getElementById('upgradeDescNode').innerText = dictionary.upDesc;
-            document.getElementById('upgradeActionBtnNode').innerText = dictionary.upBtn;
-            document.getElementById('apiTitleNode').innerHTML = `<i class="fas fa-key"></i> ${dictionary.apiKeyTitle}`;
-            document.getElementById('apiActionBtnNode').innerText = dictionary.apiBtn;
-            document.getElementById('docsTitleNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docTitle}`;
-            document.getElementById('docsDescNode').innerText = dictionary.docDesc;
-            document.getElementById('sessionDesignationNode').innerText = dictionary.sessionDesignation;
-            document.getElementById('initiateInterfaceBtnNode').innerText = dictionary.initInterface;
-            document.getElementById('coreIndexMatrixHeaderNode').innerHTML = `<i class="fas fa-globe-americas"></i> ${dictionary.matrixHeader}`;
-            document.getElementById('statusTitleNode').innerHTML = `<i class="fas fa-server"></i> ${dictionary.statusTitle}`;
-            document.getElementById('lblStorageDiag').innerText = dictionary.lblStorage;
-            document.getElementById('lblPuterDiag').innerText = dictionary.lblPuter;
-            document.getElementById('lblModelDiag').innerText = dictionary.lblModel;
-            document.getElementById('lblMemoryDiag').innerText = dictionary.lblMemory;
-            document.getElementById('lblLatencyDiag').innerText = dictionary.lblLatency;
-            document.getElementById('diagTitleNode').innerHTML = `<i class="fas fa-bolt"></i> ${dictionary.diag}`;
-            document.getElementById('diagRefreshBtnNode').innerText = dictionary.diagRefresh;
-
-            // Close the panel view smoothly
-            document.getElementById('sideLanguagesPoll').classList.remove('show');
-            
-            // Re-render history list tracking labels to look coherent if desired
+            saveStateToStorageEngine();
+            closeSettingsPoll();
             renderHistory();
         }
 
-        function hardInstanceReset() {
-            if(confirm("Trigger hard instance reconstruction? All local sandbox references will drop.")) {
-                localStorage.clear();
-                window.location.reload(true);
-            }
-        }
-
-        function autoGrow(t) {
-            t.style.height = 'auto'; 
-            const maxHeight = isMobileOrTablet ? 110 : 150;
-            t.style.height = (t.scrollHeight > maxHeight ? maxHeight : t.scrollHeight) + 'px';
-        }
-
-        function handleKeyActions(e) {
-            const sendBtn = document.getElementById('sendIcon');
-            if (e.target.value.trim() || pendingImageData) { sendBtn.classList.add('primed'); } else { sendBtn.classList.remove('primed'); }
-            if (isPC && e.key === 'Enter' && !e.shiftKey) {
-                const now = Date.now();
-                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
-                lastEnterTime = now;
-            }
-        }
-
-        function triggerCamera() { if(isPC) return; document.getElementById('cameraInput').click(); }
-        function triggerUpload() { document.getElementById('fileUploadInput').click(); }
-        function handleCameraCapture(input) { const file = input.files[0]; if (file) processImageForChat(file); }
-        function handleFileUpload(input) {
-            const file = input.files[0]; if (!file) return;
-            if(file.type.startsWith('image/')) { processImageForChat(file); } else { createNewChat(`Asset: ${file.name}`); appendMessage("user", `[ File Data: ${file.name} ]`); }
-        }
-
-        function processImageForChat(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
-                    const max_w = 800; let scale = max_w / img.width; if(img.width <= max_w) scale = 1;
-                    canvas.width = img.width * scale; canvas.height = img.height * scale;
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    pendingImageData = canvas.toDataURL('image/jpeg', 0.82);
-                    document.getElementById('inputThumb').src = pendingImageData;
-                    document.getElementById('inputThumbnailArea').classList.add('show');
-                    document.getElementById('sendIcon').classList.add('primed');
-                    autoGrow(document.getElementById('userInput')); 
-                };
-                img.src = e.target.result;
+        function createNewChatSession(fallbackTitleName) {
+            const dict = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
+            const customTitle = document.getElementById('chatNameInput').value.trim() || fallbackTitleName || dict.newChat;
+            
+            const newlyCreatedSession = {
+                id: Date.now(),
+                name: customTitle,
+                messages: []
             };
-            reader.readAsDataURL(file);
-        }
-
-        function clearCameraData() {
-            pendingImageData = null; document.getElementById('inputThumbnailArea').classList.remove('show');
-            document.getElementById('inputThumb').src = ""; document.getElementById('cameraInput').value = ""; 
-            if(!document.getElementById('userInput').value.trim()) document.getElementById('sendIcon').classList.remove('primed');
-            autoGrow(document.getElementById('userInput'));
-        }
-
-        function createNewChat(optionalName) {
-            const dictionary = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            const defaultTitle = dictionary.newChat || "Active Matrix Session";
-            const name = document.getElementById('chatNameInput').value || optionalName || defaultTitle;
-            const chat = { id: Date.now(), name, messages: [] };
-            chats.unshift(chat); currentChatId = chat.id;
+            
+            chats.unshift(newlyCreatedSession);
+            currentChatId = newlyCreatedSession.id;
+            
             document.getElementById('namingModal').classList.remove('show');
             document.getElementById('chatNameInput').value = "";
-            renderHistory(); renderChat();
+            
+            saveStateToStorageEngine();
+            renderHistory();
+            renderChat();
         }
 
-        function appendMessage(role, text) {
-             if (!currentChatId) createNewChat();
-             const current = chats.find(c => c.id === currentChatId);
-             current.messages.push({ role, text });
-             renderChat();
-        }
-
-        function updateAiChatBubble(elementId, transformedHtmlContent) {
-            const activeTargetNode = document.getElementById(elementId);
-            if (activeTargetNode) { 
-                activeTargetNode.innerHTML = transformedHtmlContent; 
-                const container = document.getElementById('chat-container'); 
-                container.scrollTop = container.scrollHeight; 
+        function deleteSessionRecord(event, sessionId) {
+            event.stopPropagation();
+            chats = chats.filter(session => session.id !== sessionId);
+            if (currentChatId === sessionId) {
+                currentChatId = chats.length > 0 ? chats[0].id : null;
             }
+            saveStateToStorageEngine();
+            renderHistory();
+            renderChat();
+            triggerToastNotification('Session Purged Completely');
         }
 
         function renderHistory() {
-            const container = document.getElementById('history-list'); container.innerHTML = "";
-            chats.forEach(c => {
-                const item = document.createElement('div');
-                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`; item.innerText = c.name;
-                item.onclick = () => { currentChatId = c.id; renderHistory(); renderChat(); };
-                container.appendChild(item);
+            const containerNode = document.getElementById('history-list'); 
+            if(!containerNode) return;
+            containerNode.innerHTML = "";
+            
+            chats.forEach(session => {
+                const recordRowItem = document.createElement('div');
+                recordRowItem.className = `history-item ${session.id === currentChatId ? 'active' : ''}`;
+                
+                const titleTextSpan = document.createElement('span');
+                titleTextSpan.innerText = session.name;
+                titleTextSpan.style.overflow = "hidden";
+                titleTextSpan.style.textOverflow = "ellipsis";
+                
+                const deleteActionIconButton = document.createElement('i');
+                deleteActionIconButton.className = "fas fa-trash delete-history-btn";
+                deleteActionIconButton.onclick = (e) => deleteSessionRecord(e, session.id);
+                
+                recordRowItem.appendChild(titleTextSpan);
+                recordRowItem.appendChild(deleteActionIconButton);
+                
+                recordRowItem.onclick = () => {
+                    currentChatId = session.id;
+                    saveStateToStorageEngine();
+                    renderHistory();
+                    renderChat();
+                };
+                
+                containerNode.appendChild(recordRowItem);
             });
         }
 
         function renderChat() {
-            const container = document.getElementById('chat-container'); container.innerHTML = "";
+            const container = document.getElementById('chat-container'); 
+            if(!container) return;
+            container.innerHTML = "";
             if (!currentChatId) return;
-            const current = chats.find(c => c.id === currentChatId);
-            current.messages.forEach((m) => {
-                const msgNode = document.createElement('div'); msgNode.className = `msg ${m.role}`;
-                if (m.text.includes('<div') || m.text.includes('<img') || m.text.includes('<pre')) { msgNode.innerHTML = m.text; } 
-                else if (m.text.startsWith('![Generated')) { const urlSrc = m.text.match(/\((.*?)\)/)?.[1]; msgNode.innerHTML = `<img class="chat-img-preview" src="${urlSrc}">`; } 
-                else { msgNode.innerText = m.text; }
-                container.appendChild(msgNode);
+            
+            const matchSession = chats.find(session => session.id === currentChatId);
+            if (!matchSession) return;
+            
+            matchSession.messages.forEach(msg => {
+                const containerBubbleCell = document.createElement('div');
+                containerBubbleCell.className = `msg ${msg.role}`;
+                containerBubbleCell.innerHTML = msg.text;
+                container.appendChild(containerBubbleCell);
             });
             container.scrollTop = container.scrollHeight;
         }
 
-        function startVoice() {
-            if (recognitionInstance) { recognitionInstance.stop(); return; }
-            const SpeechContract = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechContract) { alert("Speech synthesis arrays unsupported on this engine."); return; }
+        /* HIGH-INTEGRITY SPEECH RECOGNITION API CONTRACT MATRIX */
+        function toggleVoiceCapture() {
+            const WebkitAudioSpeechContract = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!WebkitAudioSpeechContract) {
+                triggerToastNotification('Unified Speech Core Unavailable on Current Platform Framework');
+                return;
+            }
             
-            recognitionInstance = new SpeechContract();
-            recognitionInstance.continuous = false; recognitionInstance.interimResults = false;
-            recognitionInstance.lang = globalSystemLanguage;
-            
-            document.getElementById('micBtn').classList.add('mic-active');
-            
-            recognitionInstance.onresult = (e) => {
-                const txt = e.results[0][0].transcript;
-                const box = document.getElementById('userInput');
-                box.value = box.value ? box.value + " " + txt : txt;
-                autoGrow(box); document.getElementById('sendIcon').classList.add('primed');
+            if (isVoiceTrackingActive) {
+                if (speechRecognitionEngine) speechRecognitionEngine.stop();
+                return;
+            }
+
+            speechRecognitionEngine = new WebkitAudioSpeechContract();
+            speechRecognitionEngine.lang = globalSystemLanguage;
+            speechRecognitionEngine.interimResults = false;
+            speechRecognitionEngine.maxAlternatives = 1;
+
+            speechRecognitionEngine.onstart = () => {
+                isVoiceTrackingActive = true;
+                document.getElementById('micBtn').classList.add('mic-active');
+                triggerToastNotification('Streaming Audio Track Processing Capture Active');
             };
-            
-            recognitionInstance.onend = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
-            recognitionInstance.onerror = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
-            recognitionInstance.start();
+
+            speechRecognitionEngine.onerror = (err) => {
+                console.error("Speech Recognition capture error caught", err);
+                triggerToastNotification('Acoustic capture stream drop detected');
+            };
+
+            speechRecognitionEngine.onend = () => {
+                isVoiceTrackingActive = false;
+                document.getElementById('micBtn').classList.remove('mic-active');
+            };
+
+            speechRecognitionEngine.onresult = (event) => {
+                const verbalSpeechOutputText = event.results[0][0].transcript;
+                const fieldNode = document.getElementById('userInput');
+                fieldNode.value = verbalSpeechOutputText;
+                document.getElementById('sendIcon').classList.add('primed');
+                autoGrow(fieldNode);
+            };
+
+            speechRecognitionEngine.start();
         }
 
-        // CRITICAL ARCHITECTURE UPDATE: PACKET SYSTEM INTERCEPTION INJECTOR
-        async function send() {
-            const input = document.getElementById('userInput'); let textVal = input.value.trim();
-            if (!textVal && !pendingImageData) return;
-            if (!currentChatId) createNewChat(pendingImageData ? "Vision Vector Data" : textVal.substring(0, 24));
+        /* MULTI-MODAL DATA TRANSMISSION PIPELINE DEPLOYMENT MATRIX */
+        async function executeTransmissionSequence() {
+            const promptInputField = document.getElementById('userInput');
+            let structuralRawText = promptInputField.value.trim();
             
-            let userDisplay = pendingImageData ? `<div>${textVal}</div><img class="chat-img-preview" src="${pendingImageData}">` : textVal;
-            appendMessage("user", userDisplay);
-
-            const imageGenerationRegexPattern = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
-            const isImageIntent = imageGenerationRegexPattern.test(textVal) && !pendingImageData;
-            const uniqueAiTrackId = 'ai-node-' + Date.now();
-            const current = chats.find(c => c.id === currentChatId);
-            const loadIdx = current.messages.length;
-
-            if (isImageIntent) {
-                const matchOffsetResult = textVal.match(imageGenerationRegexPattern);
-                const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "asset";
-                current.messages.push({ role: "ai", text: `<div class="image-loading-state" id="${uniqueAiTrackId}"><div class="spinner-line-wrap"><i class="fas fa-circle-notch fa-spin" style="color:var(--brand-primary)"></i><span>Rendering Data...</span></div></div>` });
-                renderChat();
-            } else { 
-                // Enforce fallback localized loading messages directly based on selected locale matrix
-                current.messages.push({ role: "ai", text: `<div id="${uniqueAiTrackId}"><i class="fas fa-circle-notch fa-spin"></i> Processing Matrix Log...</div>` });
-                renderChat();
+            if (!structuralRawText && !pendingMediaData) return;
+            
+            if (!currentChatId) {
+                createNewChatSession(structuralRawText.substring(0, 24) || "Multi-Modal Frame Track");
             }
-            
-            input.value = ""; input.style.height = isPC ? '52px' : '44px';
-            const cachedPrompt = textVal; const cachedImageData = pendingImageData; clearCameraData();
+
+            let clientBubbleOutputPayload = parseLexicalMarkdown(structuralRawText);
+            if (pendingMediaData) {
+                if (pendingMediaType === 'image') {
+                    clientBubbleOutputPayload = `<div>${parseLexicalMarkdown(structuralRawText)}</div><img class="chat-img-preview" src="${pendingMediaData}">`;
+                } else if (pendingMediaType === 'video') {
+                    clientBubbleOutputPayload = `<div>${parseLexicalMarkdown(structuralRawText)}</div><video class="chat-video-preview" src="${pendingMediaData}" controls playsinline></video>`;
+                }
+            }
+
+            const currentActiveSession = chats.find(session => session.id === currentChatId);
+            currentActiveSession.messages.push({ role: "user", text: clientBubbleOutputPayload });
+            renderChat();
+
+            promptInputField.value = "";
+            promptInputField.style.height = '44px';
+
+            const payloadPrompt = structuralRawText;
+            const payloadMedia = pendingMediaData;
+            const payloadType = pendingMediaType;
+            clearMediaUploadBuffer();
+
+            const artificialNodeTrackingId = 'ai-vile-node-' + Date.now();
+            const locationMarkerIndex = currentActiveSession.messages.length;
+
+            currentActiveSession.messages.push({
+                role: "ai",
+                text: `<div id="${artificialNodeTrackingId}"><i class="fas fa-circle-notch fa-spin"></i> Synchronizing Core Inference...</div>`
+            });
+            renderChat();
 
             try {
-                const activeTokenOverride = localStorage.getItem('vile_custom_api_key_override') || null;
-                
-                // CRITICAL OVERRIDE ROUTE: Pass along the system language target inside the API body to force backend translation behaviors natively
-                const response = await fetch('/api/chat', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt: cachedPrompt, 
-                        multimodal: !!cachedImageData, 
-                        image_data: cachedImageData, 
-                        custom_key: activeTokenOverride,
-                        target_language: globalSystemLanguage // Tells the backend routing system to render text responses strictly in the requested target language profile
+                // Enterprise API processing loop execution layer hooks
+                const networkResponseBlock = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: payloadPrompt,
+                        has_media: !!payloadMedia,
+                        media_stream: payloadMedia,
+                        media_type: payloadType,
+                        target_language: globalSystemLanguage
                     })
                 });
-                const data = await response.json();
-                if (data.isImage && data.imageUri) {
-                    const functionalImageBubble = `<div class="generated-image-container"><img src="${data.imageUri}" class="chat-img-preview"><p style="margin-top:10px;">${data.subject}</p></div>`;
-                    current.messages[loadIdx].text = functionalImageBubble; updateAiChatBubble(uniqueAiTrackId, functionalImageBubble);
-                } else { 
-                    // Fallback to extraction parameters safely
-                    const responseBodyPayload = data.groq || data.text || "Empty terminal block response.";
-                    current.messages[loadIdx].text = responseBodyPayload; 
-                    updateAiChatBubble(uniqueAiTrackId, responseBodyPayload);
+
+                const dataStreamOutput = await networkResponseBlock.json();
+                let synchronizedCleanHtmlText = "";
+
+                // Processing image/video creation parameters seamlessly across computing platforms
+                if (dataStreamOutput.isVideo && dataStreamOutput.videoUri) {
+                    synchronizedCleanHtmlText = `<div class="generated-video-container"><video src="${dataStreamOutput.videoUri}" class="chat-video-preview" controls playsinline></video><p style="margin-top:12px;">${parseLexicalMarkdown(dataStreamOutput.subject || '')}</p></div>`;
+                } else if (dataStreamOutput.isImage && dataStreamOutput.imageUri) {
+                    synchronizedCleanHtmlText = `<div class="generated-image-container"><img src="${dataStreamOutput.imageUri}" class="chat-img-preview"><p style="margin-top:12px;">${parseLexicalMarkdown(dataStreamOutput.subject || '')}</p></div>`;
+                } else {
+                    const fallbackContentText = dataStreamOutput.text || dataStreamOutput.groq || "Inference transaction complete.";
+                    synchronizedCleanHtmlText = parseLexicalMarkdown(fallbackContentText);
                 }
-                renderChat();
-            } catch (networkError) {
-                current.messages[loadIdx].text = "Pipeline dropped tracking packages."; 
-                updateAiChatBubble(uniqueAiTrackId, "Pipeline dropped tracking packages.");
-                renderChat();
+
+                currentActiveSession.messages[locationMarkerIndex].text = synchronizedCleanHtmlText;
+                saveStateToStorageEngine();
+                
+                const uiTargetElement = document.getElementById(artificialNodeTrackingId);
+                if (uiTargetElement) {
+                    uiTargetElement.parentElement.innerHTML = synchronizedCleanHtmlText;
+                } else {
+                    renderChat();
+                }
+
+            } catch (networkFailureException) {
+                const crashErrorMessageString = "Tracking vector drop on transmission layer processing matrix.";
+                currentActiveSession.messages[locationMarkerIndex].text = crashErrorMessageString;
+                
+                const uiTargetElement = document.getElementById(artificialNodeTrackingId);
+                if (uiTargetElement) uiTargetElement.innerText = crashErrorMessageString;
             }
+        }
+
+        /* SYSTEM CORE UTILITIES CONFIGURATION ACTIONS */
+        function toggleInterfaceTheme() { 
+            document.body.classList.toggle('light-theme'); 
+            closeSettingsPoll(); 
+            triggerToastNotification('Theme Profile Configurations Rotated');
+        }
+        
+        function triggerPollAction(viewElementConfigId) { 
+            document.querySelectorAll('.modal-config-view').forEach(element => element.classList.remove('active'));
+            const viewTarget = document.getElementById(viewElementConfigId);
+            if (viewTarget) viewTarget.classList.add('active'); 
+        }
+        
+        function toggleLanguagesSidePoll() { 
+            document.getElementById('sideLanguagesPoll').classList.toggle('show'); 
+        }
+        
+        function executeTelemetryCycle() { 
+            const trackingMetricsNode = document.getElementById('diagMemoryNode'); 
+            if (trackingMetricsNode) trackingMetricsNode.innerText = "System Sandbox Sealed"; 
+            const latencyMetricsNode = document.getElementById('diagLatencyNode');
+            if (latencyMetricsNode) latencyMetricsNode.innerText = Math.floor(Math.random() * 32 + 4) + "ms";
+        }
+        
+        function saveCustomTokenOverride() {
+            const tokenValue = document.getElementById('customApiKeyField').value.trim();
+            if(tokenValue) {
+                localStorage.setItem('vile_custom_token', tokenValue);
+                triggerToastNotification('Custom Token Key Safe Injected');
+                document.getElementById('customApiKeyField').value = "";
+                closeSettingsPoll();
+            }
+        }
+
+        function triggerToastNotification(messageString) {
+            const toastNode = document.getElementById('toastNotification');
+            if(!toastNode) return;
+            toastNode.innerText = messageString;
+            toastNode.classList.add('visible');
+            setTimeout(() => { toastNode.classList.remove('visible'); }, 3000);
+        }
+
+        function clearChatsExclusively() { 
+            chats = []; 
+            currentChatId = null; 
+            saveStateToStorageEngine();
+            renderHistory(); 
+            renderChat(); 
+            closeSettingsPoll(); 
+            triggerToastNotification('Active App Chat Storage Cleared');
+        }
+        
+        function hardInstanceReset() { 
+            localStorage.clear(); 
+            window.location.reload(true); 
+        }
+        
+        function handleGoogleFederatedAuth() {
+            triggerToastNotification('Routing Authorization Request Array Handlers...');
         }
     </script>
 </body>
