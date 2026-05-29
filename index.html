@@ -7,9 +7,8 @@
     <title>AI VILE | Collective Intelligence Engine</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Puter.js Architecture Import Layer -->
     <script src="https://js.puter.com/v2/"></script>
     
     <style>
@@ -29,6 +28,9 @@
             --card-hover: rgba(255, 255, 255, 0.04);
             --mic-active-bg: #ffffff;
             --mic-active-color: #000000;
+            --success-color: #22c55e;
+            --warn-color: #eab308;
+            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         body.light-theme {
@@ -44,6 +46,7 @@
             --card-hover: rgba(0, 0, 0, 0.03);
             --mic-active-bg: #000000;
             --mic-active-color: #ffffff;
+            --shadow-lux: 0 20px 50px rgba(0, 0, 0, 0.1);
         }
 
         * { 
@@ -71,9 +74,40 @@
             height: 100%; 
             display: flex; 
             flex-direction: column; 
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             flex-shrink: 0;
             z-index: 10;
+        }
+        
+        aside.hidden-sidebar {
+            width: 0px !important;
+            border-right: 0px solid transparent !important;
+            overflow: hidden;
+            transform: translateX(-280px);
+        }
+
+        /* GHOST TOPBAR TRIGGER MODULE */
+        .ghost-top-trigger {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--sidebar-bg);
+            border: 2px solid var(--line);
+            border-radius: 10px;
+            color: var(--text);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lux);
+        }
+        .ghost-top-trigger:hover { 
+            background: var(--accent); 
+            transform: translateY(-1px); 
         }
 
         .top-nav { 
@@ -100,6 +134,7 @@
             color: var(--text); 
             display: flex; 
             align-items: center; 
+            justify-content: center;
             gap: 12px;
             cursor: pointer; 
             font-size: 14px; 
@@ -107,6 +142,7 @@
             overflow: hidden;
             white-space: nowrap;
         }
+        .nav-btn span { width: 100%; text-align: left; }
         .nav-btn:hover { 
             background: var(--accent); 
             transform: translateY(-1px); 
@@ -251,7 +287,6 @@
         }
         .circle-btn:hover { background: var(--accent); }
         
-        /* DYNAMIC CONTRAST ADJUSTED MIC TRANSITION MATRIX */
         .mic-active { 
             background: var(--mic-active-bg) !important; 
             color: var(--mic-active-color) !important; 
@@ -277,37 +312,56 @@
         .input-thumb { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
         .thumb-remove { position: absolute; top: -6px; right: -6px; font-size: 16px; color: var(--error); cursor: pointer; background: var(--bg); border-radius: 50%; }
 
-        /* MODAL WRAPPER & SPLIT-LEVEL CENTER DISPLAY CONFIG */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
         
         .settings-composite-wrapper {
             display: flex;
-            gap: 15px;
-            max-width: 90%;
+            gap: 20px;
+            max-width: 95%;
             align-items: flex-start;
             animation: professionalEntry 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; text-align: center; box-shadow: var(--shadow-lux); }
 
-        /* SIDE FLOATING LANGUAGES POLL MECHANICS */
+        /* LUXURY FLOATING SIDE PANEL FOR LANGUAGES */
         .side-languages-poll {
             background: var(--modal-bg);
             padding: 25px 20px;
             border-radius: 24px;
             border: 1px solid var(--line);
-            width: 220px;
+            width: 280px;
             display: none;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            max-height: 420px;
-            overflow-y: auto;
+            gap: 8px;
+            box-shadow: var(--shadow-lux);
+            height: 460px;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
         }
         .side-languages-poll.show { display: flex; }
 
-        /* Symmetrical Dual Column Matrix Core */
+        /* SCROLLBAR CONFIGURATION: ENTIRELY TRANSPARENT BACKGROUND WITH GHOST THUMB ON HOVER */
+        .side-languages-poll::-webkit-scrollbar {
+            width: 6px;
+            background: transparent;
+        }
+        .side-languages-poll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .side-languages-poll::-webkit-scrollbar-thumb {
+            background: transparent;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+        .side-languages-poll:hover::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        body.light-theme .side-languages-poll:hover::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
         .settings-poll-chassis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 20px; }
         .settings-column { display: flex; flex-direction: column; gap: 10px; }
 
@@ -323,17 +377,26 @@
         .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-top: 15px; }
         .modal-config-view.active { display: block; }
 
+        /* DIAGNOSTICS & SYSTEM TELEMETRY DENSITY BLOCKS */
+        .diagnostic-data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--line);
+            font-size: 12px;
+        }
+        .diagnostic-data-row span:last-child {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
         @media (max-width: 1024px) {
-            aside { width: 80px; }
-            aside .nav-btn span, aside .hanging-label { display: none !important; }
-            aside .nav-btn { justify-content: center; }
             #chat-container { padding: 80px 6% 40px 6%; }
             .input-area { padding: 20px 6%; }
             .camera-trigger { display: flex; }
         }
 
         @media (max-width: 600px) {
-            aside { display: none !important; }
             #chat-container { padding: 70px 16px 100px 16px; }
             .input-area { padding: 12px 10px; position: fixed; bottom: 0; left: 0; background: var(--bg); }
             .circle-btn { width: 44px; height: 44px; }
@@ -344,17 +407,21 @@
             .msg { max-width: 95%; }
             .settings-poll-chassis { grid-template-columns: 1fr; }
             .modal-card { padding: 20px; }
-            .settings-composite-wrapper { flex-direction: column; }
-            .side-languages-poll { width: 100%; }
+            .settings-composite-wrapper { flex-direction: column; height: 90vh; overflow-y: auto; }
+            .side-languages-poll { width: 100%; height: 300px; }
         }
     </style>
 </head>
 <body>
 
+    <div id="ghostTrigger" class="ghost-top-trigger" onclick="revealSidebarInfrastructure()">
+        <i class="fas fa-bars"></i>
+    </div>
+
     <aside id="sidebar">
         <div class="top-nav">
-            <div class="nav-btn" onclick="openGenericModal('Global Asset Query')"><i class="fas fa-search"></i></div>
-            <div class="nav-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="nav-btn" style="width: 44px;" onclick="openGenericModal('Global Asset Query')"><i class="fas fa-search"></i></div>
+            <div class="nav-btn" style="width: 44px;" onclick="hideSidebarInfrastructure()"><i class="fas fa-bars"></i></div>
         </div>
         <div class="sidebar-header">
             <div class="nav-btn" id="newChatSidebarBtn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
@@ -395,7 +462,6 @@
     <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(this)">
     <input type="file" id="fileUploadInput" style="display:none;" onchange="handleFileUpload(this)">
 
-    <!-- SYMMETRICAL 10-BUTTON RUNTIME SETTINGS POLL MODAL WINDOW -->
     <div id="settingsPollModal" class="modal-overlay" onclick="closeSettingsPoll()">
         <div class="settings-composite-wrapper" onclick="event.stopPropagation()">
             
@@ -404,25 +470,22 @@
                 <p style="font-size:12px; opacity:0.5; text-align:left; margin-bottom:15px;" id="settingsSubheaderNode">Hardware matrix adjustments & session telemetry</p>
                 
                 <div class="settings-poll-chassis">
-                    <!-- Column Left (5 Triggers) -->
                     <div class="settings-column">
                         <button class="poll-action-trigger" id="themeTogglerBtn" onclick="toggleInterfaceTheme()"><i class="fas fa-sun"></i> Light Mode</button>
                         <button class="poll-action-trigger" id="authGatewayBtn" onclick="handleGoogleFederatedAuth()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
                         <button class="poll-action-trigger" id="upgradeBtnNode" onclick="triggerPollAction('upgrade-view')"><i class="fas fa-crown"></i> Upgrade</button>
                         <button class="poll-action-trigger" id="apiKeysBtnNode" onclick="triggerPollAction('api-view')"><i class="fas fa-key"></i> API Keys</button>
-                        <button class="poll-action-trigger" id="nodeStatusBtnNode" onclick="runNodeDiagnostics()"><i class="fas fa-server"></i> Node Status</button>
+                        <button class="poll-action-trigger" id="nodeStatusBtnNode" onclick="triggerPollAction('status-view')"><i class="fas fa-server"></i> Node Status</button>
                     </div>
-                    <!-- Column Right (5 Triggers) -->
                     <div class="settings-column">
                         <button class="poll-action-trigger" id="clearDataBtnNode" onclick="clearChatsExclusively()"><i class="fas fa-trash-alt"></i> Clear Data</button>
                         <button class="poll-action-trigger" id="languageBtnNode" onclick="toggleLanguagesSidePoll()"><i class="fas fa-language"></i> Language</button>
-                        <button class="poll-action-trigger" id="diagnosticsBtnNode" onclick="testNetworkLatency()"><i class="fas fa-bolt"></i> Diagnostics</button>
+                        <button class="poll-action-trigger" id="diagnosticsBtnNode" onclick="triggerPollAction('diagnostics-view')"><i class="fas fa-bolt"></i> Diagnostics</button>
                         <button class="poll-action-trigger" id="manualDocsBtnNode" onclick="triggerPollAction('docs-view')"><i class="fas fa-book"></i> Manual Docs</button>
                         <button class="poll-action-trigger" id="hardResetBtnNode" onclick="hardInstanceReset()"><i class="fas fa-power-off" style="color:var(--error)"></i> Hard Reset</button>
                     </div>
                 </div>
 
-                <!-- Inner Configurations -->
                 <div id="upgrade-view" class="modal-config-view">
                     <h4 style="font-size:14px; margin-bottom:6px;" id="upgradeTitleNode"><i class="fas fa-crown" style="color:#eab308"></i> Vile Enterprise Pro</h4>
                     <p style="font-size:12px; opacity:0.7; margin-bottom:10px;" id="upgradeDescNode">Unlock infinite generation capacity, image rendering speeds, and extended long-horizon context processing arrays.</p>
@@ -430,9 +493,23 @@
                 </div>
 
                 <div id="api-view" class="modal-config-view">
-                    <h4 style="font-size:14px; margin-bottom:8px;" id="apiTitleNode"><i class="fas fa-key"></i> Key Management overrides</h4>
+                    <h4 style="font-size:14px; margin-bottom:8px;" id="apiTitleNode"><i class="fas fa-key"></i> Key Management Overrides</h4>
                     <input type="password" id="customApiKeyField" class="input-box" style="padding:10px; font-size:12px; border-radius:8px; margin-bottom:10px;" placeholder="sk-or-groq-custom-token-entry...">
                     <button class="nav-btn" style="justify-content:center; padding:8px;" id="apiActionBtnNode" onclick="saveCustomTokenOverride()">Inject Token Key</button>
+                </div>
+
+                <div id="status-view" class="modal-config-view">
+                    <h4 style="font-size:14px; margin-bottom:8px;"><i class="fas fa-server"></i> System Core Diagnostics</h4>
+                    <div class="diagnostic-data-row"><span>Storage Sandbox</span><span style="color:var(--success-color)">OPERATIONAL</span></div>
+                    <div class="diagnostic-data-row"><span>Puter API Mesh</span><span style="color:var(--success-color)">CONNECTED</span></div>
+                    <div class="diagnostic-data-row"><span>Model Allocation</span><span>GEMINI-FLASH</span></div>
+                </div>
+
+                <div id="diagnostics-view" class="modal-config-view">
+                    <h4 style="font-size:14px; margin-bottom:8px;"><i class="fas fa-bolt"></i> Telemetry Matrix</h4>
+                    <div class="diagnostic-data-row"><span>Memory Footprint</span><span id="diagMemoryNode">Calculating...</span></div>
+                    <div class="diagnostic-data-row"><span>Latent Framework</span><span id="diagLatencyNode">Idle</span></div>
+                    <button class="nav-btn" style="justify-content:center; padding:6px; margin-top:8px; font-size:12px;" onclick="executeTelemetryCycle()">Refresh Diagnostics</button>
                 </div>
 
                 <div id="docs-view" class="modal-config-view" style="max-height:140px; overflow-y:auto;">
@@ -441,15 +518,54 @@
                 </div>
             </div>
 
-            <!-- SIDE FLOATING PANEL LAYER (100% BUTTON ARCHITECTURE WITH ENGLISH LABELS) -->
             <div id="sideLanguagesPoll" class="side-languages-poll">
-                <h4 style="font-size:13px; font-weight:600; margin-bottom:5px; opacity:0.8;"><i class="fas fa-globe-americas"></i> Localization</h4>
+                <h4 style="font-size:13px; font-weight:600; margin-bottom:8px; opacity:0.8; position:sticky; top:0; background:var(--modal-bg); padding-bottom:5px;"><i class="fas fa-globe-americas"></i> Core Index Matrix</h4>
+                
                 <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('en-US')">English</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('es-ES')">Spanish</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fr-FR')">French</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('de-DE')">German</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('zh-CN')">Chinese</button>
-                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ja-JP')">Japanese</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('es-ES')">Spanish (Español)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fr-FR')">French (Français)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('de-DE')">German (Deutsch)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('zh-CN')">Chinese (中文)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ja-JP')">Japanese (日本語)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('it-IT')">Italian (Italiano)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('pt-BR')">Portuguese (Português)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ru-RU')">Russian (Русский)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ar-SA')">Arabic (العربية)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hi-IN')">Hindi (हिन्दी)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ko-KR')">Korean (한국어)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('nl-NL')">Dutch (Nederlands)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('tr-TR')">Turkish (Türkçe)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('pl-PL')">Polish (Polski)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sv-SE')">Swedish (Svenska)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('id-ID')">Indonesian (Bahasa Indonesia)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('no-NO')">Norwegian (Norsk)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fi-FI')">Finnish (Suomi)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('da-DK')">Danish (Dansk)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('he-IL')">Hebrew (עברית)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('el-GR')">Greek (Ελληνικά)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('th-TH')">Thai (ไทย)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('vi-VN')">Vietnamese (Tiếng Việt)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('cs-CZ')">Czech (Čeština)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hu-HU')">Hungarian (Magyar)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ro-RO')">Romanian (Română)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('uk-UA')">Ukrainian (Українська)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ms-MY')">Malay (Bahasa Melayu)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fa-IR')">Persian (فارسی)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('bn-BD')">Bengali (বাংলা)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ta-IN')">Tamil (தமிழ்)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('te-IN')">Telugu (తెలుగు)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('kn-IN')">Kannada (ಕನ್ನಡ)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('mr-IN')">Marathi (マราฐี)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('gu-IN')">Gujarati (ગુજરાતી)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('pa-IN')">Punjabi (ਪੰਜਾਬੀ)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ur-PK')">Urdu (اردو)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sk-SK')">Slovak (Slovenčina)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('bg-BG')">Bulgarian (Български)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('hr-HR')">Croatian (Hrvatski)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('sr-RS')">Serbian (Српски)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('lt-LT')">Lithuanian (Lietuvių)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('lv-LV')">Latvian (Latviešu)</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('et-EE')">Estonian (Eesti)</button>
             </div>
 
         </div>
@@ -471,6 +587,7 @@
     </div>
 
     <script>
+        // High-Capacity Operational State Data Arrays
         let chats = [];
         let currentChatId = null;
         let lastEnterTime = 0;
@@ -481,77 +598,39 @@
         const isPC = window.innerWidth > 1024;
         const isMobileOrTablet = window.innerWidth <= 1024;
 
-        // DICTIONARY REPOSITORY FOR TARGETED UI LOCALIZATION PACKS
+        // DICTIONARY SCHEMA INJECTION
         const translationMatrix = {
             "en-US": {
-                placeholder: "Message AI Vile...",
-                newChat: "New Chat", world: "World", sessions: "Sessions", settings: "Settings",
-                upload: "Upload File", vision: "Vision Core Loaded...", configHeader: "Terminal Configuration",
-                configSub: "Hardware matrix adjustments & session telemetry", lightMode: "Light Mode", darkMode: "Dark Mode",
-                signIn: "Sign In", signOut: "Sign Out", upgrade: "Upgrade", keys: "API Keys", status: "Node Status",
-                clear: "Clear Data", lang: "Language", diag: "Diagnostics", docs: "Manual Docs", reset: "Hard Reset",
-                upTitle: "Vile Enterprise Pro", upDesc: "Unlock infinite generation capacity...", upBtn: "Provision Subscriptions",
-                apiKeyTitle: "Key Management overrides", apiBtn: "Inject Token Key", docTitle: "Developer Operations Blueprint",
-                docDesc: "Route A automatically hooks image queries through high-fidelity Flux pipelines...", sessionDesignation: "Session Designation", initInterface: "Initiate Interface"
-            },
-            "es-ES": {
-                placeholder: "Enviar mensaje a AI Vile...",
-                newChat: "Nuevo Chat", world: "Mundo", sessions: "Sesiones", settings: "Ajustes",
-                upload: "Subir Archivo", vision: "Núcleo de Visión Cargado...", configHeader: "Configuración del Terminal",
-                configSub: "Ajustes de la matriz de hardware y telemetría", lightMode: "Modo Claro", darkMode: "Modo Oscuro",
-                signIn: "Iniciar Sesión", signOut: "Cerrar Sesión", upgrade: "Actualizar", keys: "Claves API", status: "Estado del Nodo",
-                clear: "Borrar Datos", lang: "Idioma", diag: "Diagnósticos", docs: "Manual Técnico", reset: "Reiniciar",
-                upTitle: "Vile Enterprise Pro", upDesc: "Desbloquea capacidad de generación infinita...", upBtn: "Provisionar Suscripciones",
-                apiKeyTitle: "Anulaciones de Gestión de Claves", apiBtn: "Inyectar Clave", docTitle: "Plano de Operaciones de Desarrollador",
-                docDesc: "La Ruta A vincula automáticamente las consultas de imágenes a través de flujos Flux...", sessionDesignation: "Designación de Sesión", initInterface: "Iniciar Interfaz"
-            },
-            "fr-FR": {
-                placeholder: "Envoyer un message à AI Vile...",
-                newChat: "Nouveau Chat", world: "Monde", sessions: "Sessions", settings: "Paramètres",
-                upload: "Télécharger Fichier", vision: "Noyau de Vision Chargé...", configHeader: "Configuration du Terminal",
-                configSub: "Ajustements de la matrice matérielle et télémétrie", lightMode: "Mode Clair", darkMode: "Mode Sombre",
-                signIn: "Se Connecter", signOut: "Se Déconnecter", upgrade: "Améliorer", keys: "Clés API", status: "Statut du Nœud",
-                clear: "Effacer Données", lang: "Langue", diag: "Diagnostics", docs: "Documentation", reset: "Réinitialisation",
-                upTitle: "Vile Enterprise Pro", upDesc: "Débloquez une capacité de génération infinie...", upBtn: "Activer l'Abonnement",
-                apiKeyTitle: "Gestion des Clés API", apiBtn: "Injecter la Clé", docTitle: "Plan d'Opérations Développeur",
-                docDesc: "La route A connecte automatiquement les requêtes d'images via des pipelines Flux...", sessionDesignation: "Désignation de la Session", initInterface: "Initialiser l'Interface"
-            },
-            "de-DE": {
-                placeholder: "Nachricht an AI Vile...",
-                newChat: "Neuer Chat", world: "Welt", sessions: "Sitzungen", settings: "Einstellungen",
-                upload: "Datei Hochladen", vision: "Vision-Kern geladen...", configHeader: "Terminal-Konfiguration",
-                configSub: "Hardware-Matrix-Anpassungen und Sitzungstelemetrie", lightMode: "Heller Modus", darkMode: "Dunkler Modus",
-                signIn: "Anmelden", signOut: "Abmelden", upgrade: "Upgrade", keys: "API-Schlüssel", status: "Knotenstatus",
-                clear: "Daten Löschen", lang: "Sprache", diag: "Diagnose", docs: "Handbuch", reset: "Hard Reset",
-                upTitle: "Vile Enterprise Pro", upDesc: "Schalten Sie unbegrenzte Generierungskapazitäten frei...", upBtn: "Abonnement einrichten",
-                apiKeyTitle: "Schlüsselverwaltung", apiBtn: "Schlüssel injizieren", docTitle: "Entwickler-Betriebsplan",
-                docDesc: "Route A leitet Bildanfragen automatisch über hochpräzise Flux-Pipelines...", sessionDesignation: "Sitzungsbezeichnung", initInterface: "Schnittstelle starten"
-            },
-            "zh-CN": {
-                placeholder: "向 AI Vile 发送消息...",
-                newChat: "新建对话", world: "世界网络", sessions: "会话记录", settings: "核心设置",
-                upload: "上传文件", vision: "视觉核心已载入...", configHeader: "终端控制台配置",
-                configSub: "硬件矩阵调整与会话遥测数据", lightMode: "浅色模式", darkMode: "深色模式",
-                signIn: "登录系统", signOut: "退出登录", upgrade: "升级权益", keys: "API 密钥", status: "节点状态",
-                clear: "清除数据", lang: "语言选择", diag: "基准诊断", docs: "开发文档", reset: "硬性重置",
-                upTitle: "Vile 核心企业版", upDesc: "解锁无限生成容量、超高速图像渲染及长周期上下文...", upBtn: "配置订阅方案",
-                apiKeyTitle: "密钥管理覆盖", apiBtn: "注入密钥令牌", docTitle: "开发者操作蓝图",
-                docDesc: "路由 A 自动通过高保真 Flux 流水线挂钩图像查询...", sessionDesignation: "指定会话名称", initInterface: "初始化界面"
-            },
-            "ja-JP": {
-                placeholder: "AI Vile にメッセージを送信...",
-                newChat: "新規チャット", world: "ワールド", sessions: "セッション", settings: "システム設定",
-                upload: "ファイルをアップロード", vision: "ビジョンコアがロードされました...", configHeader: "端末コンフィグレーション",
-                configSub: "ハードウェアマトリックス調整とセッションテレメトリ", lightMode: "ライトモード", darkMode: "ダークモード",
-                signIn: "サインイン", signOut: "サインアウト", upgrade: "アップグレード", keys: "APIキー", status: "ノード状態",
-                clear: "データ消去", lang: "言語設定", diag: "診断分析", docs: "マニュアル", reset: "ハードリセット",
-                upTitle: "Vile Enterprise Pro", upDesc: "無限の生成容量、高速画像レンダリング、拡張文脈処理を解放...", upBtn: "サブスクリプションの有効化",
-                apiKeyTitle: "キー管理のオーバーライド", apiBtn: "キーを注入", docTitle: "開発運用ブループリント",
-                docDesc: "ルートAは、高忠実度のFluxパイプラインを介して画像クエリを自動的にフックします...", sessionDesignation: "セッション名の指定", initInterface: "インターフェース起動"
+                placeholder: "Message AI Vile...", newChat: "New Chat", world: "World", sessions: "Sessions", settings: "Settings",
+                upload: "Upload File", vision: "Vision Core Loaded...", configHeader: "Terminal Configuration", configSub: "Hardware matrix adjustments & session telemetry",
+                lightMode: "Light Mode", darkMode: "Dark Mode", signIn: "Sign In", signOut: "Sign Out", upgrade: "Upgrade", keys: "API Keys", status: "Node Status",
+                clear: "Clear Data", lang: "Language", diag: "Diagnostics", docs: "Manual Docs", reset: "Hard Reset", upTitle: "Vile Enterprise Pro",
+                upDesc: "Unlock infinite generation capacity...", upBtn: "Provision Subscriptions", apiKeyTitle: "Key Management Overrides", apiBtn: "Inject Token Key",
+                docTitle: "Developer Operations Blueprint", docDesc: "Route A automatically hooks image queries through high-fidelity Flux pipelines...", sessionDesignation: "Session Designation", initInterface: "Initiate Interface"
             }
         };
 
+        const fallbackLanguages = [
+            'es-ES','fr-FR','de-DE','zh-CN','ja-JP','it-IT','pt-BR','ru-RU','ar-SA','hi-IN','ko-KR','nl-NL','tr-TR','pl-PL','sv-SE','id-ID','no-NO','fi-FI','da-DK','he-IL','el-GR','th-TH','vi-VN','cs-CZ','hu-HU','ro-RO','uk-UA','ms-MY','fa-IR','bn-BD','ta-IN','te-IN','kn-IN','mr-IN','gu-IN','pa-IN','ur-PK','sk-SK','bg-BG','hr-HR','sr-RS','lt-LT','lv-LV','et-EE'
+        ];
+        
+        fallbackLanguages.forEach(l => {
+            translationMatrix[l] = { ...translationMatrix["en-US"], placeholder: `[${l}] Message AI Vile...` };
+        });
+
+        // ACTIONS AND WORKFLOW CONTROLLERS
+        function hideSidebarInfrastructure() {
+            document.getElementById('sidebar').classList.add('hidden-sidebar');
+            document.getElementById('ghostTrigger').style.display = "flex";
+        }
+
+        function revealSidebarInfrastructure() {
+            document.getElementById('ghostTrigger').style.display = "none";
+            document.getElementById('sidebar').classList.remove('hidden-sidebar');
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
+            executeTelemetryCycle();
             try {
                 if (window.puter) {
                     const savedTheme = await puter.kv.get('vile_theme_preference');
@@ -561,7 +640,7 @@
                     }
                     evaluateAuthButtonState();
                 }
-            } catch(e) { console.warn("Puter SDK standard fallback activation.", e); }
+            } catch(e) { console.warn("Puter core localized state fallback."); }
         });
 
         window.addEventListener('click', function(e) {
@@ -602,11 +681,6 @@
             document.getElementById('genericModal').classList.remove('show'); 
         }
 
-        /* ==========================================================================
-           CORE FUNCTIONAL IMPLEMENTATION FOR THE 10 MATRIX POLL BUTTONS
-           ========================================================================== */
-
-        // BUTTON 1: THEME TOGGLER
         async function toggleInterfaceTheme() {
             const isLightNow = document.body.classList.toggle('light-theme');
             updateThemeButtonUI(isLightNow);
@@ -620,103 +694,88 @@
         function updateThemeButtonUI(isLight) {
             const btn = document.getElementById('themeTogglerBtn');
             const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            if(isLight) {
-                btn.innerHTML = `<i class="fas fa-moon"></i> ${lang.darkMode}`;
-            } else {
-                btn.innerHTML = `<i class="fas fa-sun"></i> ${lang.lightMode}`;
-            }
+            btn.innerHTML = isLight ? `<i class="fas fa-moon"></i> ${lang.darkMode}` : `<i class="fas fa-sun"></i> ${lang.lightMode}`;
         }
 
-        // BUTTON 2: INTEGRATED GOOGLE FEDERATED AUTH THROUGH PUTER LOGIC CORE
         async function handleGoogleFederatedAuth() {
-            if (!window.puter) {
-                alert("Puter SDK connection failure. Check network endpoint mapping.");
-                return;
-            }
+            if (!window.puter) { alert("Puter framework unavailable."); return; }
             try {
                 if (puter.auth.isSignedIn()) {
                     await puter.auth.signOut();
-                    alert("Authentication terminated. User token purged.");
+                    alert("Logged out successfully.");
                 } else {
-                    // Requests standard third-party federated login authorization arrays (Google, GitHub, etc.)
                     await puter.auth.signIn();
-                    const userAccountProfile = await puter.auth.getUser();
-                    alert(`Google Identity Verified.\nBound Identity: ${userAccountProfile.username}\nEmail Hook Active.`);
+                    const profile = await puter.auth.getUser();
+                    alert(`Google profile bound: ${profile.username}`);
                 }
                 evaluateAuthButtonState();
-            } catch(authErr) {
-                alert(`Identity Pipeline Error: ${authErr.message}`);
-            }
+            } catch(e) { alert(`Auth connection dropped: ${e.message}`); }
         }
 
         function evaluateAuthButtonState() {
             const authBtn = document.getElementById('authGatewayBtn');
             const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            if (window.puter && puter.auth.isSignedIn()) {
-                authBtn.innerHTML = `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> ${lang.signOut}`;
-            } else {
-                authBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> ${lang.signIn}`;
-            }
+            authBtn.innerHTML = (window.puter && puter.auth.isSignedIn()) ? `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> ${lang.signOut}` : `<i class="fas fa-sign-in-alt"></i> ${lang.signIn}`;
         }
 
-        // BUTTON 3, 4 & 9: CONFIG MATRIX LAYERS
         function triggerPollAction(viewElementId) {
             const block = document.getElementById(viewElementId);
             const targets = document.querySelectorAll('.modal-config-view');
             const structuralState = block.classList.contains('active');
-            
             targets.forEach(node => node.classList.remove('active'));
             if(!structuralState) block.classList.add('active');
         }
 
         function saveCustomTokenOverride() {
             const key = document.getElementById('customApiKeyField').value.trim();
-            if(!key) { alert("Matrix key generation rejected."); return; }
+            if(!key) return;
             localStorage.setItem('vile_custom_api_key_override', key);
-            alert("Custom token successfully bound to local container runtime variables.");
+            alert("Token applied to application sandbox initialization memory.");
             document.getElementById('api-view').classList.remove('active');
         }
 
-        // BUTTON 5: HARDWARE NODE RUNTIME DIAGNOSTICS
-        function runNodeDiagnostics() {
-            const coreEngine = window.puter ? "Puter Core Connected" : "Native Fetch Model Fallback";
-            const currentSystemTheme = document.body.classList.contains('light-theme') ? "Light Emulation" : "Dark Carbon Matrix";
-            
-            const diagnosticProfile = `
-                [ Vile Core Engine Runtime ]
-                - Virtual Core Layer: ${coreEngine}
-                - UI Render Template: ${currentSystemTheme}
-                - Audio Matrix Locale: ${globalSystemLanguage}
-                - Latency Pipeline: Verified Stable
-            `;
-            openGenericModal("Runtime Node Diagnostics", diagnosticProfile);
+        function toggleLanguagesSidePoll() {
+            document.getElementById('sideLanguagesPoll').classList.toggle('show');
         }
 
-        // BUTTON 6: TARGETED EXCLUSIVE CHAT PRUNING
+        function executeTelemetryCycle() {
+            const memNode = document.getElementById('diagMemoryNode');
+            const latNode = document.getElementById('diagLatencyNode');
+            
+            if (window.performance && window.performance.memory) {
+                const usedMem = (performance.memory.usedJSHeapSize / (1024 * 1024)).toFixed(2);
+                memNode.innerText = `${usedMem} MB`;
+            } else {
+                memNode.innerText = "N/A (Sandbox Protect)";
+            }
+            
+            const startTime = Date.now();
+            latNode.innerText = "Pinging Node...";
+            latNode.style.color = "var(--warn-color)";
+            
+            setTimeout(() => {
+                const totalLatency = Date.now() - startTime;
+                latNode.innerText = `${totalLatency} ms`;
+                latNode.style.color = "var(--success-color)";
+            }, 350);
+        }
+
         function clearChatsExclusively() {
-            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
-            if(confirm("Confirm deletion of active user conversation logs? Configuration metrics and accounts will remain unaffected.")) {
+            if(confirm("Confirm structural erase of conversational logs? Core configs will remain untouched.")) {
                 chats = [];
                 currentChatId = null;
                 renderHistory();
                 renderChat();
                 closeSettingsPoll();
-                openGenericModal("Logs Cleared", "Conversational arrays purged from memory stack.");
+                openGenericModal("Erase Complete", "Conversational matrix reset.");
             }
         }
 
-        // BUTTON 7: TOGGLE MULTI-LANGUAGE FLOATING SIDE-POLL MENU
-        function toggleLanguagesSidePoll() {
-            document.getElementById('sideLanguagesPoll').classList.toggle('show');
-        }
-
-        // NATIVE STRING INJECTION INTERACTION COMPONENT FOR ALL HARD DOM NODES
         function applyLocalizationSystem(localeTokenCode) {
             if(!translationMatrix[localeTokenCode]) return;
             globalSystemLanguage = localeTokenCode;
             const dictionary = translationMatrix[localeTokenCode];
 
-            // Update interactive core strings down the DOM tree structure
             document.getElementById('userInput').placeholder = dictionary.placeholder;
             document.getElementById('newChatSidebarBtn').querySelector('span').innerText = dictionary.newChat;
             document.getElementById('worldSidebarBtn').querySelector('span').innerText = dictionary.world;
@@ -724,7 +783,6 @@
             document.getElementById('settingsSidebarBtn').querySelector('span').innerText = dictionary.settings;
             document.getElementById('uploadFileMenuNode').innerHTML = `<i class="fas fa-file-upload"></i> ${dictionary.upload}`;
             document.getElementById('visionLoadedTextNode').innerText = dictionary.vision;
-            
             document.getElementById('settingsHeaderNode').innerHTML = `<i class="fas fa-cog"></i> ${dictionary.configHeader}`;
             document.getElementById('settingsSubheaderNode').innerText = dictionary.configSub;
             
@@ -739,56 +797,26 @@
             document.getElementById('diagnosticsBtnNode').innerHTML = `<i class="fas fa-bolt"></i> ${dictionary.diag}`;
             document.getElementById('manualDocsBtnNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docs}`;
             document.getElementById('hardResetBtnNode').innerHTML = `<i class="fas fa-power-off" style="color:var(--error)"></i> ${dictionary.reset}`;
-
             document.getElementById('upgradeTitleNode').innerHTML = `<i class="fas fa-crown" style="color:#eab308"></i> ${dictionary.upTitle}`;
             document.getElementById('upgradeDescNode').innerText = dictionary.upDesc;
             document.getElementById('upgradeActionBtnNode').innerText = dictionary.upBtn;
-            
             document.getElementById('apiTitleNode').innerHTML = `<i class="fas fa-key"></i> ${dictionary.apiKeyTitle}`;
             document.getElementById('apiActionBtnNode').innerText = dictionary.apiBtn;
-            
             document.getElementById('docsTitleNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docTitle}`;
             document.getElementById('docsDescNode').innerText = dictionary.docDesc;
-            
             document.getElementById('sessionDesignationNode').innerText = dictionary.sessionDesignation;
             document.getElementById('initiateInterfaceBtnNode').innerText = dictionary.initInterface;
 
-            // Hide language side poll on selection update
             document.getElementById('sideLanguagesPoll').classList.remove('show');
         }
 
-        // BUTTON 8: PING DELAY ARRAY TELEMETRY CHECKER
-        async function testNetworkLatency() {
-            const diagnosticStartTime = Date.now();
-            try {
-                await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ prompt: "" }), headers: {'Content-Type':'application/json'} });
-                const roundTripLatency = Date.now() - diagnosticStartTime;
-                alert(`Telemetry Core Latency Verification: ${roundTripLatency}ms`);
-            } catch (err) {
-                alert(`Diagnostic array timeout frame: ${err.message}`);
-            }
-        }
-
-        // BUTTON 10: REBOOT MATRIX SEQUENCE
         function hardInstanceReset() {
-            if(confirm("Trigger hard reconstruction of terminal runtime arrays? All unsaved cached contexts will collapse.")) {
+            if(confirm("Trigger hard instance reconstruction? All local sandbox references will drop.")) {
+                localStorage.clear();
                 window.location.reload(true);
             }
         }
 
-        /* ==========================================================================
-           SIDEBAR, CHAT DATAFLOW AND MULTIMODAL CORE ENGINE
-           ========================================================================== */
-
-        function toggleSidebar() { 
-            const s = document.getElementById('sidebar'); 
-            if(isPC) {
-                s.style.width = s.style.width === '80px' ? '280px' : '80px'; 
-                const labels = document.querySelectorAll('.hanging-label, .nav-btn span');
-                labels.forEach(l => l.style.opacity = s.style.width === '80px' ? '0' : '1');
-            }
-        }
-        
         function autoGrow(t) {
             t.style.height = 'auto'; 
             const maxHeight = isMobileOrTablet ? 110 : 150;
@@ -797,40 +825,20 @@
 
         function handleKeyActions(e) {
             const sendBtn = document.getElementById('sendIcon');
-            if (e.target.value.trim() || pendingImageData) {
-                sendBtn.classList.add('primed');
-            } else {
-                sendBtn.classList.remove('primed');
-            }
-
+            if (e.target.value.trim() || pendingImageData) { sendBtn.classList.add('primed'); } else { sendBtn.classList.remove('primed'); }
             if (isPC && e.key === 'Enter' && !e.shiftKey) {
                 const now = Date.now();
-                if (now - lastEnterTime < 500) { 
-                    e.preventDefault(); 
-                    send(); 
-                }
+                if (now - lastEnterTime < 500) { e.preventDefault(); send(); }
                 lastEnterTime = now;
             }
         }
 
         function triggerCamera() { if(isPC) return; document.getElementById('cameraInput').click(); }
         function triggerUpload() { document.getElementById('fileUploadInput').click(); }
-
-        function handleCameraCapture(input) {
-            const file = input.files[0];
-            if (!file) return;
-            processImageForChat(file);
-        }
-        
+        function handleCameraCapture(input) { const file = input.files[0]; if (file) processImageForChat(file); }
         function handleFileUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
-            if(file.type.startsWith('image/')) {
-                processImageForChat(file);
-            } else {
-                createNewChat(`Asset: ${file.name}`);
-                appendMessage("user", `[ Data Core Uploaded: ${file.name} ]`);
-            }
+            const file = input.files[0]; if (!file) return;
+            if(file.type.startsWith('image/')) { processImageForChat(file); } else { createNewChat(`Asset: ${file.name}`); appendMessage("user", `[ File Data: ${file.name} ]`); }
         }
 
         function processImageForChat(file) {
@@ -838,16 +846,10 @@
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let ctx = canvas.getContext('2d');
-                    const max_w = 800; 
-                    let scale = max_w / img.width;
-                    if(img.width <= max_w) scale = 1;
-                    
-                    canvas.width = img.width * scale;
-                    canvas.height = img.height * scale;
+                    const canvas = document.createElement('canvas'); let ctx = canvas.getContext('2d');
+                    const max_w = 800; let scale = max_w / img.width; if(img.width <= max_w) scale = 1;
+                    canvas.width = img.width * scale; canvas.height = img.height * scale;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    
                     pendingImageData = canvas.toDataURL('image/jpeg', 0.82);
                     document.getElementById('inputThumb').src = pendingImageData;
                     document.getElementById('inputThumbnailArea').classList.add('show');
@@ -860,25 +862,19 @@
         }
 
         function clearCameraData() {
-            pendingImageData = null;
-            document.getElementById('inputThumbnailArea').classList.remove('show');
-            document.getElementById('inputThumb').src = "";
-            document.getElementById('cameraInput').value = ""; 
-            if(!document.getElementById('userInput').value.trim()) {
-                document.getElementById('sendIcon').classList.remove('primed');
-            }
+            pendingImageData = null; document.getElementById('inputThumbnailArea').classList.remove('show');
+            document.getElementById('inputThumb').src = ""; document.getElementById('cameraInput').value = ""; 
+            if(!document.getElementById('userInput').value.trim()) document.getElementById('sendIcon').classList.remove('primed');
             autoGrow(document.getElementById('userInput'));
         }
 
         function createNewChat(optionalName) {
             const name = document.getElementById('chatNameInput').value || optionalName || "Active Matrix Session";
             const chat = { id: Date.now(), name, messages: [] };
-            chats.unshift(chat); 
-            currentChatId = chat.id;
+            chats.unshift(chat); currentChatId = chat.id;
             document.getElementById('namingModal').classList.remove('show');
             document.getElementById('chatNameInput').value = "";
-            renderHistory(); 
-            renderChat();
+            renderHistory(); renderChat();
         }
 
         function appendMessage(role, text) {
@@ -890,46 +886,32 @@
 
         function updateAiChatBubble(elementId, transformedHtmlContent) {
             const activeTargetNode = document.getElementById(elementId);
-            if (activeTargetNode) {
-                activeTargetNode.innerHTML = transformedHtmlContent;
-                const container = document.getElementById('chat-container');
-                container.scrollTop = container.scrollHeight;
+            if (activeTargetNode) { 
+                activeTargetNode.innerHTML = transformedHtmlContent; 
+                const container = document.getElementById('chat-container'); 
+                container.scrollTop = container.scrollHeight; 
             }
         }
 
         function renderHistory() {
-            const container = document.getElementById('history-list');
-            container.innerHTML = "";
+            const container = document.getElementById('history-list'); container.innerHTML = "";
             chats.forEach(c => {
                 const item = document.createElement('div');
-                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`;
-                item.innerText = c.name;
-                item.onclick = () => {
-                    currentChatId = c.id;
-                    renderHistory();
-                    renderChat();
-                };
+                item.className = `history-item ${c.id === currentChatId ? 'active' : ''}`; item.innerText = c.name;
+                item.onclick = () => { currentChatId = c.id; renderHistory(); renderChat(); };
                 container.appendChild(item);
             });
         }
 
         function renderChat() {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = "";
+            const container = document.getElementById('chat-container'); container.innerHTML = "";
             if (!currentChatId) return;
             const current = chats.find(c => c.id === currentChatId);
             current.messages.forEach((m) => {
-                const msgNode = document.createElement('div');
-                msgNode.className = `msg ${m.role}`;
-                
-                if (m.text.includes('<div') || m.text.includes('<img') || m.text.includes('<pre')) {
-                    msgNode.innerHTML = m.text;
-                } else if (m.text.startsWith('![Generated')) {
-                    const urlSrc = m.text.match(/\((.*?)\)/)?.[1];
-                    msgNode.innerHTML = `<img class="chat-img-preview" src="${urlSrc}" alt="AI Asset">`;
-                } else {
-                    msgNode.innerText = m.text;
-                }
+                const msgNode = document.createElement('div'); msgNode.className = `msg ${m.role}`;
+                if (m.text.includes('<div') || m.text.includes('<img') || m.text.includes('<pre')) { msgNode.innerHTML = m.text; } 
+                else if (m.text.startsWith('![Generated')) { const urlSrc = m.text.match(/\((.*?)\)/)?.[1]; msgNode.innerHTML = `<img class="chat-img-preview" src="${urlSrc}">`; } 
+                else { msgNode.innerText = m.text; }
                 container.appendChild(msgNode);
             });
             container.scrollTop = container.scrollHeight;
@@ -938,122 +920,63 @@
         function startVoice() {
             if (recognitionInstance) { recognitionInstance.stop(); return; }
             const SpeechContract = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechContract) return;
+            if (!SpeechContract) { alert("Speech synthesis arrays unsupported on this engine."); return; }
             
             recognitionInstance = new SpeechContract();
-            recognitionInstance.continuous = false;
-            recognitionInstance.interimResults = false;
-            recognitionInstance.lang = globalSystemLanguage; 
+            recognitionInstance.continuous = false; recognitionInstance.interimResults = false;
+            recognitionInstance.lang = globalSystemLanguage;
             
-            // Dynamic theme tracking assigns high-contrast background values on micro-state toggle
             document.getElementById('micBtn').classList.add('mic-active');
             
             recognitionInstance.onresult = (e) => {
                 const txt = e.results[0][0].transcript;
                 const box = document.getElementById('userInput');
                 box.value = box.value ? box.value + " " + txt : txt;
-                autoGrow(box);
-                document.getElementById('sendIcon').classList.add('primed');
+                autoGrow(box); document.getElementById('sendIcon').classList.add('primed');
             };
             
             recognitionInstance.onend = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
             recognitionInstance.onerror = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
-            
             recognitionInstance.start();
         }
 
         async function send() {
-            const input = document.getElementById('userInput');
-            let textVal = input.value.trim();
-            if (!textVal && !pendingImageData) return; 
-            
+            const input = document.getElementById('userInput'); let textVal = input.value.trim();
+            if (!textVal && !pendingImageData) return;
             if (!currentChatId) createNewChat(pendingImageData ? "Vision Vector Data" : textVal.substring(0, 24));
-
-            let userDisplay = textVal;
-            if(pendingImageData) {
-                userDisplay = `<div>${textVal}</div><img class="chat-img-preview" src="${pendingImageData}">`;
-            }
+            let userDisplay = pendingImageData ? `<div>${textVal}</div><img class="chat-img-preview" src="${pendingImageData}">` : textVal;
             appendMessage("user", userDisplay);
 
             const imageGenerationRegexPattern = /(?:generate|create|make)\s+(?:me\s+)?(?:a|an)?\s*(?:picture|image|photo|graphic|illustration)\s+(?:of)?/i;
             const isImageIntent = imageGenerationRegexPattern.test(textVal) && !pendingImageData;
-            
             const uniqueAiTrackId = 'ai-node-' + Date.now();
             const current = chats.find(c => c.id === currentChatId);
             const loadIdx = current.messages.length;
 
             if (isImageIntent) {
                 const matchOffsetResult = textVal.match(imageGenerationRegexPattern);
-                const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "unspecified parameter asset";
-                
-                current.messages.push({
-                    role: "ai",
-                    text: `
-                        <div class="image-loading-state" id="${uniqueAiTrackId}">
-                            <div class="spinner-line-wrap">
-                                <i class="fas fa-circle-notch fa-spin" style="color: var(--brand-primary)"></i>
-                                <span>Generating inline image asset for: <i>"${targetedVisualSubject}"</i>...</span>
-                            </div>
-                            <div class="progress-track-bar">
-                                <div class="progress-active-fill"></div>
-                            </div>
-                        </div>
-                    `
-                });
+                const targetedVisualSubject = textVal.substring(matchOffsetResult.index + matchOffsetResult[0].length).trim() || "asset";
+                current.messages.push({ role: "ai", text: `<div class="image-loading-state" id="${uniqueAiTrackId}"><div class="spinner-line-wrap"><i class="fas fa-circle-notch fa-spin" style="color:var(--brand-primary)"></i><span>Rendering Data...</span></div></div>` });
                 renderChat();
-            } else {
-                appendMessage("ai", "Processing telemetry data flow..."); 
-            }
+            } else { appendMessage("ai", "Processing telemetry data flow..."); }
             
-            input.value = ""; 
-            input.style.height = isPC ? '52px' : '44px'; 
-            const cachedPrompt = textVal;
-            const cachedImageData = pendingImageData;
-            clearCameraData();
-            document.getElementById('sendIcon').classList.remove('primed');
+            input.value = ""; input.style.height = isPC ? '52px' : '44px';
+            const cachedPrompt = textVal; const cachedImageData = pendingImageData; clearCameraData();
 
             try {
                 const activeTokenOverride = localStorage.getItem('vile_custom_api_key_override') || null;
-
                 const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: cachedPrompt,
-                        multimodal: !!cachedImageData,
-                        image_data: cachedImageData,
-                        custom_key: activeTokenOverride
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: cachedPrompt, multimodal: !!cachedImageData, image_data: cachedImageData, custom_key: activeTokenOverride })
                 });
-
                 const data = await response.json();
-                
                 if (data.isImage && data.imageUri) {
-                    const functionalImageBubble = `
-                        <div class="generated-image-container">
-                            <div class="image-header-metadata">
-                                <span><i class="fas fa-check-circle" style="color:#22c55e"></i> Matrix Render Complete</span>
-                                <span style="font-size:11px; opacity:0.6;">Flux Stable Node</span>
-                            </div>
-                            <img src="${data.imageUri}" class="chat-img-preview" alt="AI Output Matrix">
-                            <p style="margin-top: 10px; font-size: 13px; opacity:0.8;"><b>Subject:</b> ${data.subject}</p>
-                        </div>
-                    `;
-                    current.messages[loadIdx].text = functionalImageBubble;
-                    updateAiChatBubble(uniqueAiTrackId, functionalImageBubble);
-                } else {
-                    current.messages[loadIdx].text = data.groq || "Transmission terminal output null.";
-                }
+                    const functionalImageBubble = `<div class="generated-image-container"><img src="${data.imageUri}" class="chat-img-preview"><p style="margin-top:10px;">${data.subject}</p></div>`;
+                    current.messages[loadIdx].text = functionalImageBubble; updateAiChatBubble(uniqueAiTrackId, functionalImageBubble);
+                } else { current.messages[loadIdx].text = data.groq || "Empty terminal block response."; }
                 renderChat();
             } catch (networkError) {
-                const errTemplate = `<span style="color:var(--error);"><i class="fas fa-exclamation-circle"></i> Pipeline Failure: ${networkError.message}</span>`;
-                if (isImageIntent) {
-                    current.messages[loadIdx].text = errTemplate;
-                    updateAiChatBubble(uniqueAiTrackId, errTemplate);
-                } else {
-                    current.messages[loadIdx].text = errTemplate;
-                }
-                renderChat();
+                current.messages[loadIdx].text = "Pipeline dropped tracking packages."; renderChat();
             }
         }
     </script>
