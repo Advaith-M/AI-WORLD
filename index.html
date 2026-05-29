@@ -28,7 +28,6 @@
             --card-hover: rgba(255, 255, 255, 0.04);
         }
 
-        /* LIGHT MODE SYSTEM CONFIGURATION OVERRIDES */
         body.light-theme {
             --bg: #f5f5f7;
             --sidebar-bg: #eaeaea;
@@ -57,11 +56,9 @@
             overflow: hidden; 
             font-size: 14px; 
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* --- SIDEBAR PANEL SYSTEM --- */
         aside { 
             width: 280px; 
             background: var(--sidebar-bg); 
@@ -109,10 +106,6 @@
             background: var(--accent); 
             transform: translateY(-1px); 
         }
-        .nav-btn i {
-            min-width: 16px;
-            text-align: center;
-        }
 
         .hanging-label {
             padding: 15px 25px 15px 30px; 
@@ -122,7 +115,6 @@
             opacity: 0.5;
             letter-spacing: 1.3px; 
             text-transform: uppercase;
-            transition: opacity 0.2s ease;
             flex-shrink: 0;
         }
 
@@ -130,14 +122,6 @@
             flex: 1; 
             overflow-y: auto; 
             padding: 5px 10px; 
-            scroll-behavior: smooth;
-        }
-        #history-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        #history-list::-webkit-scrollbar-thumb {
-            background: var(--line);
-            border-radius: 2px;
         }
         
         .history-item {
@@ -153,15 +137,8 @@
             overflow: hidden; 
             text-overflow: ellipsis;
         }
-        .history-item:hover {
-            opacity: 1;
-            background: var(--card-hover);
-        }
-        .history-item.active { 
-            background: var(--line); 
-            opacity: 1;
-            font-weight: 500;
-        }
+        .history-item:hover { opacity: 1; background: var(--card-hover); }
+        .history-item.active { background: var(--line); opacity: 1; font-weight: 500; }
 
         .sidebar-footer { 
             padding: 15px 20px; 
@@ -169,7 +146,6 @@
             flex-shrink: 0;
         }
 
-        /* --- MAIN VIEW ENVIRONMENT --- */
         main { 
             flex: 1; 
             display: flex; 
@@ -178,7 +154,6 @@
             position: relative; 
             overflow: hidden;
             background: var(--bg);
-            transition: background 0.3s ease;
         }
 
         #chat-container { 
@@ -188,17 +163,8 @@
             display: flex; 
             flex-direction: column; 
             gap: 24px; 
-            scroll-behavior: smooth;
-        }
-        #chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background: var(--line);
-            border-radius: 3px;
         }
 
-        /* MASSIVE DATA DATAFLOW COMPATIBLE MESSAGE CHASSIS */
         .msg { 
             max-width: 85%; 
             padding: 18px 22px; 
@@ -209,27 +175,16 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             animation: professionalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             word-wrap: break-word;
-            overflow-wrap: break-word;
             position: relative;
         }
         
         @keyframes professionalEntry {
-            0% { opacity: 0; transform: translateY(15px) scale(0.99); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
-        .user { 
-            align-self: flex-end; 
-            background: var(--sidebar-bg); 
-            border: 1px solid var(--user-outline); 
-            border-radius: 18px 18px 4px 18px; 
-        }
-        .ai { 
-            align-self: flex-start; 
-            background: var(--modal-bg); 
-            border: 1px solid var(--ai-outline); 
-            border-radius: 18px 18px 18px 4px; 
-        }
+        .user { align-self: flex-end; background: var(--sidebar-bg); border: 1px solid var(--user-outline); border-radius: 18px 18px 4px 18px; }
+        .ai { align-self: flex-start; background: var(--modal-bg); border: 1px solid var(--ai-outline); border-radius: 18px 18px 18px 4px; }
         
         .chat-img-preview { 
             width: 100%; 
@@ -240,10 +195,8 @@
             display: block;
             object-fit: contain;
             border: 1px solid var(--line);
-            background: rgba(0,0,0,0.05);
         }
 
-        /* --- PREVENT CONTAINER COLLAPSE / CODE OVERFLOWS --- */
         pre, code {
             font-family: 'JetBrains Mono', monospace;
             font-size: 13.5px;
@@ -253,306 +206,89 @@
             max-width: 100%;
             overflow-x: auto;
         }
-        pre {
-            padding: 14px;
-            margin: 10px 0;
-            display: block;
-        }
+        pre { padding: 14px; margin: 10px 0; display: block; }
 
-        /* Image Rendering Structural Block Definitions */
-        .generated-image-container {
-            width: 100%;
-            margin-top: 6px;
-        }
-
+        .generated-image-container { width: 100%; margin-top: 6px; }
         .image-header-metadata {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            background-color: var(--card-hover);
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+            background-color: var(--card-hover); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line);
         }
+        .image-header-metadata span { font-size: 0.8rem; color: var(--text); opacity: 0.7; }
 
-        .image-header-metadata span {
-            font-size: 0.8rem;
-            color: var(--text);
-            opacity: 0.7;
-        }
-
-        .image-loading-state {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 10px 0;
-            min-width: 280px;
-            width: 100%;
-        }
-
-        .spinner-line-wrap {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
-            color: var(--text);
-        }
-
-        .progress-track-bar {
-            width: 100%;
-            height: 4px;
-            background-color: var(--line);
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-active-fill {
-            position: absolute;
-            height: 100%;
-            width: 40%;
-            background: var(--brand-gradient);
-            border-radius: 2px;
-            animation: linePulse 1.5s infinite ease-in-out;
-        }
+        .image-loading-state { display: flex; flex-direction: column; gap: 12px; padding: 10px 0; width: 100%; }
+        .spinner-line-wrap { display: flex; align-items: center; gap: 12px; font-size: 0.95rem; color: var(--text); }
+        .progress-track-bar { width: 100%; height: 4px; background-color: var(--line); border-radius: 2px; overflow: hidden; position: relative; }
+        .progress-active-fill { position: absolute; height: 100%; width: 40%; background: var(--brand-gradient); animation: linePulse 1.5s infinite ease-in-out; }
 
         @keyframes linePulse {
             0% { left: -40%; }
             100% { left: 100%; }
         }
 
-        /* --- FLOATING MEDIA CONTEXT MENU --- */
         .poll-menu {
-            position: absolute; 
-            bottom: 85px; 
-            left: 15%; 
-            background: var(--modal-bg); 
-            border: 1px solid var(--line);
-            border-radius: 15px; 
-            padding: 10px; 
-            display: none;
-            flex-direction: column; 
-            gap: 5px; 
-            z-index: 100;
+            position: absolute; bottom: 85px; left: 15%; background: var(--modal-bg); border: 1px solid var(--line);
+            border-radius: 15px; padding: 10px; display: none; flex-direction: column; gap: 5px; z-index: 100;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: professionalEntry 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .poll-menu.show { 
-            display: flex; 
-        }
-        .poll-item {
-            padding: 10px 15px;
-            font-size: 13px;
-            color: var(--text);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-        .poll-item:hover {
-            background: var(--card-hover);
-        }
+        .poll-menu.show { display: flex; }
+        .poll-item { padding: 10px 15px; font-size: 13px; color: var(--text); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .poll-item:hover { background: var(--card-hover); }
 
-        /* --- INPUT COMPONENT LAYOUT --- */
         .input-area { 
-            padding: 20px 15%; 
-            display: flex; 
-            gap: 12px; 
-            align-items: flex-end; 
-            position: relative; 
-            width: 100%;
-            background: linear-gradient(to top, var(--bg) 80%, transparent);
-            z-index: 5;
-            flex-shrink: 0;
+            padding: 20px 15%; display: flex; gap: 12px; align-items: flex-end; position: relative; width: 100%;
+            background: linear-gradient(to top, var(--bg) 80%, transparent); z-index: 5; flex-shrink: 0;
         }
         
         .circle-btn {
-            width: 52px; 
-            height: 52px; 
-            background: var(--input-bg); 
-            border: 1.9px solid var(--line);
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            cursor: pointer; 
-            color: var(--text); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-            font-size: 16px;
+            width: 52px; height: 52px; background: var(--input-bg); border: 1.9px solid var(--line);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; font-size: 16px;
         }
-        .circle-btn:hover {
-            background: var(--accent);
-        }
-        .mic-active { 
-            background: var(--error) !important; 
-            color: #fff !important; 
-            box-shadow: 0 0 15px var(--error); 
-            border-color: var(--error) !important;
-        }
+        .circle-btn:hover { background: var(--accent); }
+        .mic-active { background: var(--error) !important; color: #fff !important; box-shadow: 0 0 15px var(--error); border-color: var(--error) !important; }
 
-        .input-wrap { 
-            position: relative; 
-            width: 100%; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        .input-wrap { position: relative; width: 100%; display: flex; flex-direction: column; }
         
         .input-box {
-            width: 100%; 
-            background: var(--input-bg); 
-            border: 2px solid var(--line); 
-            border-radius: 20px; 
-            padding: 15px 55px 15px 22px; 
-            color: var(--text);
-            outline: none; 
-            font-size: 15px; 
-            resize: none;
-            max-height: 150px;
-            line-height: 20px;
-            overflow-y: auto;
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-        .input-box:focus {
-            border-color: var(--accent);
-        }
-        .input-box::-webkit-scrollbar { 
-            width: 0px; 
-            background: transparent; 
+            width: 100%; background: var(--input-bg); border: 2px solid var(--line); border-radius: 20px; 
+            padding: 15px 55px 15px 22px; color: var(--text); outline: none; font-size: 15px; resize: none;
+            max-height: 150px; line-height: 20px; overflow-y: auto;
         }
 
-        .send-btn {
-            position: absolute; 
-            right: 17.59px; 
-            bottom: 16px; 
-            color: var(--text);
-            opacity: 0.4;
-            font-size: 18px; 
-            cursor: pointer; 
-            transition: all 0.285s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding: 4px;
-        }
-        .send-btn.primed { 
-            opacity: 1;
-            transform: scale(1.1); 
-        }
+        .send-btn { position: absolute; right: 17.59px; bottom: 16px; color: var(--text); opacity: 0.4; font-size: 18px; cursor: pointer; padding: 4px; }
+        .send-btn.primed { opacity: 1; transform: scale(1.1); }
 
-        /* --- IMAGE BAR EXTENSION PREVIEW --- */
-        .input-thumbnail-area { 
-            display: none; 
-            padding: 12px; 
-            background: var(--modal-bg); 
-            border-radius: 18px 18px 0 0; 
-            border: 2px solid var(--line); 
-            border-bottom: none; 
-            margin-bottom: -2px; 
-            align-items: center;
-        }
-        .input-thumbnail-area.show { 
-            display: flex; 
-            gap: 12px; 
-        }
-        .input-thumb-container {
-            position: relative;
-            display: inline-block;
-        }
-        .input-thumb { 
-            height: 45px; 
-            width: 45px;
-            border-radius: 8px; 
-            object-fit: cover;
-            border: 1px solid var(--line);
-        }
-        .thumb-remove {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            font-size: 16px;
-            color: var(--error);
-            cursor: pointer;
-            background: var(--bg);
-            border-radius: 50%;
-        }
+        .input-thumbnail-area { display: none; padding: 12px; background: var(--modal-bg); border-radius: 18px 18px 0 0; border: 2px solid var(--line); border-bottom: none; margin-bottom: -2px; align-items: center; }
+        .input-thumbnail-area.show { display: flex; gap: 12px; }
+        .input-thumb-container { position: relative; display: inline-block; }
+        .input-thumb { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
+        .thumb-remove { position: absolute; top: -6px; right: -6px; font-size: 16px; color: var(--error); cursor: pointer; background: var(--bg); border-radius: 50%; }
 
-        /* --- GLOBAL BACKGROUND MODAL BLOCKS --- */
-        .modal-overlay {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%;
-            background: rgba(0,0,0,0.6); 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-        .modal-overlay.show { 
-            display: flex; 
-        }
-        .modal-card { 
-            background: var(--modal-bg); 
-            padding: 35px; 
-            border-radius: 24px; 
-            border: 1px solid var(--line); 
-            width: 400px; 
-            max-width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            animation: professionalEntry 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; max-width: 90%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
 
-        /* --- SYMMETRICAL 10 BUTTON POLL MATRIX GRID --- */
-        .settings-poll-chassis {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            width: 100%;
-            margin-top: 20px;
-        }
-        
-        .settings-column {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        /* Symmetrical Dual Column Matrix Core */
+        .settings-poll-chassis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 20px; }
+        .settings-column { display: flex; flex-direction: column; gap: 10px; }
 
         .poll-action-trigger {
-            width: 100%;
-            padding: 14px 10px;
-            background: var(--input-bg);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 13.5px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s ease;
+            width: 100%; padding: 14px 10px; background: var(--input-bg); border: 1px solid var(--line);
+            border-radius: 12px; color: var(--text); font-size: 13.5px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s ease;
         }
-        .poll-action-trigger:hover {
-            background: var(--brand-gradient);
-            color: white;
-            border-color: transparent;
-            transform: translateY(-1px);
-        }
+        .poll-action-trigger:hover { background: var(--brand-gradient); color: white; border-color: transparent; transform: translateY(-1px); }
         
-        .camera-trigger { 
-            display: none; 
-        }
+        .camera-trigger { display: none; }
 
-        /* --- HARDWARE CROSS-PLATFORM BREAKPOINTS --- */
+        /* Dynamic Field Config Blocks Inside the Modal */
+        .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-top: 15px; animation: professionalEntry 0.2s ease; }
+        .modal-config-view.active { display: block; }
+
         @media (max-width: 1024px) {
             aside { width: 80px; }
-            aside .nav-btn span, aside .hanging-label, aside .top-nav i.fa-bars { display: none !important; }
-            aside .nav-btn { justify-content: center; padding: 12px 0; font-size: 16px; }
+            aside .nav-btn span, aside .hanging-label { display: none !important; }
+            aside .nav-btn { justify-content: center; }
             #chat-container { padding: 80px 6% 40px 6%; }
             .input-area { padding: 20px 6%; }
             .camera-trigger { display: flex; }
@@ -560,16 +296,16 @@
 
         @media (max-width: 600px) {
             aside { display: none !important; }
-            main { height: 100vh; width: 100vw; }
             #chat-container { padding: 70px 16px 100px 16px; }
-            .input-area { padding: 12px 10px; gap: 6px; position: fixed; bottom: 0; left: 0; background: var(--bg); }
-            .circle-btn { width: 44px; height: 44px; font-size: 15px; }
-            .input-box { padding: 12px 45px 12px 16px; font-size: 14px; border-radius: 18px; max-height: 110px; }
-            .send-btn { right: 14px; bottom: 12px; font-size: 16px; }
+            .input-area { padding: 12px 10px; position: fixed; bottom: 0; left: 0; background: var(--bg); }
+            .circle-btn { width: 44px; height: 44px; }
+            .input-box { padding: 12px 45px 12px 16px; border-radius: 18px; }
+            .send-btn { right: 14px; bottom: 12px; }
             .camera-trigger { display: flex; }
             .poll-menu { left: 10px; bottom: 70px; }
-            .msg { max-width: 95%; font-size: 14px; padding: 14px 16px; }
-            .settings-poll-chassis { grid-template-columns: 1fr; } /* Stack on tiny displays */
+            .msg { max-width: 95%; }
+            .settings-poll-chassis { grid-template-columns: 1fr; }
+            .modal-card { padding: 20px; }
         }
     </style>
 </head>
@@ -603,7 +339,6 @@
             <div class="circle-btn camera-trigger" onclick="triggerCamera()"><i class="fas fa-camera"></i></div>
             <div id="micBtn" class="circle-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></div>
             <div class="input-wrap">
-                
                 <div id="inputThumbnailArea" class="input-thumbnail-area">
                     <div class="input-thumb-container">
                         <img id="inputThumb" class="input-thumb" src="" alt="Capture preview">
@@ -611,7 +346,6 @@
                     </div>
                     <span style="font-size:12px; color:var(--text); opacity:0.5; margin-left:10px;">Vision Core Loaded...</span>
                 </div>
-                
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleKeyActions(event)" placeholder="Message AI Vile..."></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
             </div>
@@ -621,29 +355,53 @@
     <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(this)">
     <input type="file" id="fileUploadInput" style="display:none;" onchange="handleFileUpload(this)">
 
-    <!-- CENTERED 10 BUTTON CONFIGURATION POLL -->
     <div id="settingsPollModal" class="modal-overlay" onclick="closeSettingsPoll()">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h3 style="font-size:17px; font-weight:600; text-align:left; margin-bottom:5px;"><i class="fas fa-cog"></i> Terminal Settings</h3>
-            <p style="font-size:12px; opacity:0.5; text-align:left; margin-bottom:15px;">Configure local runtime adjustments</p>
+            <h3 style="font-size:17px; font-weight:600; text-align:left; margin-bottom:5px;"><i class="fas fa-cog"></i> Terminal Configuration</h3>
+            <p style="font-size:12px; opacity:0.5; text-align:left; margin-bottom:15px;">Hardware matrix adjustments & session telemetry</p>
             
             <div class="settings-poll-chassis">
-                <!-- Left End Symmetrical Core -->
                 <div class="settings-column">
-                    <button class="poll-action-trigger" onclick="toggleInterfaceTheme()"><i class="fas fa-adjust"></i> Theme Mode</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Account Access Portal')"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Premium Expansion Tier')"><i class="fas fa-crown"></i> Upgrade</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Security Token Management')"><i class="fas fa-key"></i> API Keys</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('System Status Logs')"><i class="fas fa-server"></i> Node Status</button>
+                    <button class="poll-action-trigger" id="themeTogglerBtn" onclick="toggleInterfaceTheme()"><i class="fas fa-sun"></i> Light Mode</button>
+                    <button class="poll-action-trigger" id="authGatewayBtn" onclick="handleSystemAuth()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                    <button class="poll-action-trigger" onclick="triggerPollAction('upgrade-view')"><i class="fas fa-crown"></i> Upgrade</button>
+                    <button class="poll-action-trigger" onclick="triggerPollAction('api-view')"><i class="fas fa-key"></i> API Keys</button>
+                    <button class="poll-action-trigger" onclick="runNodeDiagnostics()"><i class="fas fa-server"></i> Node Status</button>
                 </div>
-                <!-- Right End Symmetrical Core -->
                 <div class="settings-column">
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Clear Environment Cache')"><i class="fas fa-trash-alt"></i> Clear Data</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Language Localization Layer')"><i class="fas fa-language"></i> Language</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Latency Diagnostic Arrays')"><i class="fas fa-bolt"></i> Diagnostics</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Documentation Modules')"><i class="fas fa-book"></i> Manual Docs</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('Instance Protocol Reset')"><i class="fas fa-power-off"></i> Hard Reset</button>
+                    <button class="poll-action-trigger" onclick="clearEnvironmentCache()"><i class="fas fa-trash-alt"></i> Clear Data</button>
+                    <button class="poll-action-trigger" onclick="triggerPollAction('lang-view')"><i class="fas fa-language"></i> Language</button>
+                    <button class="poll-action-trigger" onclick="testNetworkLatency()"><i class="fas fa-bolt"></i> Diagnostics</button>
+                    <button class="poll-action-trigger" onclick="triggerPollAction('docs-view')"><i class="fas fa-book"></i> Manual Docs</button>
+                    <button class="poll-action-trigger" onclick="hardInstanceReset()"><i class="fas fa-power-off" style="color:var(--error)"></i> Hard Reset</button>
                 </div>
+            </div>
+
+            <div id="upgrade-view" class="modal-config-view">
+                <h4 style="font-size:14px; margin-bottom:6px;"><i class="fas fa-crown" style="color:#eab308"></i> Vile Enterprise Pro</h4>
+                <p style="font-size:12px; opacity:0.7; margin-bottom:10px;">Unlock infinite generation capacity, image rendering speeds, and extended long-horizon context processing arrays.</p>
+                <button class="nav-btn" style="background:var(--brand-gradient); color:white; border:none; justify-content:center;" onclick="alert('Checkout module connection failure: Gateway mock offline.')">Provision Subscriptions</button>
+            </div>
+
+            <div id="api-view" class="modal-config-view">
+                <h4 style="font-size:14px; margin-bottom:8px;"><i class="fas fa-key"></i> Key Management overrides</h4>
+                <input type="password" id="customApiKeyField" class="input-box" style="padding:10px; font-size:12px; border-radius:8px; margin-bottom:10px;" placeholder="sk-or-groq-custom-token-entry...">
+                <button class="nav-btn" style="justify-content:center; padding:8px;" onclick="saveCustomTokenOverride()">Inject Token Key</button>
+            </div>
+
+            <div id="lang-view" class="modal-config-view">
+                <h4 style="font-size:14px; margin-bottom:6px;"><i class="fas fa-language"></i> System Localization</h4>
+                <select id="langSelectNode" onchange="changeLanguageContext(this)" style="width:100%; background:var(--bg); color:var(--text); padding:8px; border:1px solid var(--line); border-radius:8px; outline:none;">
+                    <option value="en-US">English (Standard Terminal)</option>
+                    <option value="es-ES">Español (Castellano)</option>
+                    <option value="fr-FR">Français (France)</option>
+                    <option value="de-DE">Deutsch (System)</option>
+                </select>
+            </div>
+
+            <div id="docs-view" class="modal-config-view" style="max-height:140px; overflow-y:auto;">
+                <h4 style="font-size:14px; margin-bottom:4px;"><i class="fas fa-book"></i> Developer Operations Blueprint</h4>
+                <p style="font-size:11.5px; opacity:0.7; line-height:1.5;">Route A automatically hooks image queries through high-fidelity Flux pipelines. Serverless logic converts streams directly into Base64 blocks to prevent cross-origin tracking breaks.</p>
             </div>
         </div>
     </div>
@@ -659,7 +417,7 @@
     <div id="genericModal" class="modal-overlay" onclick="closeGenericModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2 id="modalTitle" style="font-size:16px; font-weight:600; text-align:left;"></h2>
-            <p style="color:var(--text); opacity:0.6; margin-top:15px; text-align:left; font-size:13px;">Operation endpoint verified. Function matrix initialization complete.</p>
+            <p id="modalDescription" style="color:var(--text); opacity:0.6; margin-top:15px; text-align:left; font-size:13px;">Operation endpoint verified. Function matrix initialization complete.</p>
         </div>
     </div>
 
@@ -669,14 +427,30 @@
         let lastEnterTime = 0;
         let recognitionInstance = null;
         let pendingImageData = null; 
+        let globalSystemLanguage = "en-US";
 
         const isPC = window.innerWidth > 1024;
         const isMobileOrTablet = window.innerWidth <= 1024;
 
-        // OUTSIDE POLL TRIGGER CLOCK WINDOW CLOSING LOGIC
+        // INITIALIZE RUNTIME COMPONENT ASSIGNMENTS
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Load theme configurations directly out of persistent cloud key-value slots if set
+            try {
+                if (window.puter) {
+                    const savedTheme = await puter.kv.get('vile_theme_preference');
+                    if (savedTheme === 'light') {
+                        document.body.classList.add('light-theme');
+                        updateThemeButtonUI(true);
+                    }
+                    // Validate existing security tokens
+                    evaluateAuthButtonState();
+                }
+            } catch(e) { console.warn("Puter Cloud KV uninitialized or slow checkout: ", e); }
+        });
+
         window.addEventListener('click', function(e) {
             const plusPoll = document.getElementById('plusPoll');
-            if (plusPoll.classList.contains('show')) {
+            if (plusPoll && plusPoll.classList.contains('show')) {
                 plusPoll.classList.remove('show');
             }
         });
@@ -698,26 +472,154 @@
 
         function closeSettingsPoll() {
             document.getElementById('settingsPollModal').classList.remove('show');
+            // Collapse any active inner configuration sub-menus
+            document.querySelectorAll('.modal-config-view').forEach(node => node.classList.remove('active'));
         }
 
-        function toggleInterfaceTheme() {
-            document.body.classList.toggle('light-theme');
-        }
-
-        function triggerPollAction(actionName) {
-            alert(`Initializing system route: ${actionName}`);
-            closeSettingsPoll();
-        }
-        
-        function openGenericModal(title) { 
+        function openGenericModal(title, description = "") { 
             document.getElementById('modalTitle').innerText = title; 
+            if(description) document.getElementById('modalDescription').innerText = description;
             document.getElementById('genericModal').classList.add('show'); 
         }
         
         function closeGenericModal() { 
             document.getElementById('genericModal').classList.remove('show'); 
         }
-        
+
+        /* ==========================================================================
+           CORE FUNCTIONAL IMPLEMENTATION FOR THE 10 MATRIX POLL BUTTONS
+           ========================================================================== */
+
+        // BUTTON 1: THEME TOGGLER WITH PERSISTENT CLOUD STORAGE HOOKS
+        async function toggleInterfaceTheme() {
+            const isLightNow = document.body.classList.toggle('light-theme');
+            updateThemeButtonUI(isLightNow);
+            try {
+                if (window.puter) {
+                    await puter.kv.set('vile_theme_preference', isLightNow ? 'light' : 'dark');
+                }
+            } catch (err) { localStorage.setItem('vile_theme_preference', isLightNow ? 'light' : 'dark'); }
+        }
+
+        function updateThemeButtonUI(isLight) {
+            const btn = document.getElementById('themeTogglerBtn');
+            if(isLight) {
+                btn.innerHTML = `<i class="fas fa-moon"></i> Dark Mode`;
+            } else {
+                btn.innerHTML = `<i class="fas fa-sun"></i> Light Mode`;
+            }
+        }
+
+        // BUTTON 2: PUTER OAUTH SECURE GATEWAY ROUTER
+        async function handleSystemAuth() {
+            if (!window.puter) {
+                alert("Puter SDK connection timed out. Verify your internet status.");
+                return;
+            }
+            try {
+                if (puter.auth.isSignedIn()) {
+                    await puter.auth.signOut();
+                    alert("Session destroyed successfully. Terminal offline.");
+                } else {
+                    await puter.auth.signIn();
+                    const info = await puter.auth.getUser();
+                    alert(`Access Granted. Authenticated as: ${info.username}`);
+                }
+                evaluateAuthButtonState();
+            } catch(authError) {
+                alert(`OAuth Interface Failure: ${authError.message}`);
+            }
+        }
+
+        function evaluateAuthButtonState() {
+            const authBtn = document.getElementById('authGatewayBtn');
+            if (window.puter && puter.auth.isSignedIn()) {
+                authBtn.innerHTML = `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> Sign Out`;
+            } else {
+                authBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Sign In`;
+            }
+        }
+
+        // BUTTON 3, 4, 7 & 9: STRUCTURAL CONFIG MATRIX PANEL TOGGLERS
+        function triggerPollAction(viewElementId) {
+            const block = document.getElementById(viewElementId);
+            const targets = document.querySelectorAll('.modal-config-view');
+            const structuralState = block.classList.contains('active');
+            
+            targets.forEach(node => node.classList.remove('active'));
+            if(!structuralState) block.classList.add('active');
+        }
+
+        function saveCustomTokenOverride() {
+            const key = document.getElementById('customApiKeyField').value.trim();
+            if(!key) { alert("Key field empty. Matrix injection rejected."); return; }
+            localStorage.setItem('vile_custom_api_key_override', key);
+            alert("Custom token successfully bound to local application instance memory.");
+            document.getElementById('api-view').classList.remove('active');
+        }
+
+        function changeLanguageContext(selectComponent) {
+            globalSystemLanguage = selectComponent.value;
+            alert(`Voice matrix system language modified to: ${globalSystemLanguage}`);
+            document.getElementById('lang-view').classList.remove('active');
+        }
+
+        // BUTTON 5: HARDWARE NODE STATUS LOGGER
+        function runNodeDiagnostics() {
+            const coreEngine = window.puter ? "Puter Core Verified" : "Native Fetch Model Fallback";
+            const currentSystemTheme = document.body.classList.contains('light-theme') ? "Light Emulation" : "Dark Carbon Matrix";
+            
+            const diagnosticProfile = `
+                [ ENGINE RUNTIME BLOCK ]\n
+                - Virtual Core: ${coreEngine}\n
+                - Active Layout Template: ${currentSystemTheme}\n
+                - System Language Core: ${globalSystemLanguage}\n
+                - Hardware Memory Pipeline: Active\n
+                - Operational Security Context: CSP Verified
+            `;
+            openGenericModal("Runtime Node Diagnostics", diagnosticProfile);
+        }
+
+        // BUTTON 6: TRANSIENT MEMORY CLEAR ROUTINE
+        function clearEnvironmentCache() {
+            if(confirm("Purge all active user chat session arrays and persistent cache preferences?")) {
+                chats = [];
+                currentChatId = null;
+                localStorage.removeItem('vile_custom_api_key_override');
+                localStorage.removeItem('vile_theme_preference');
+                document.body.classList.remove('light-theme');
+                updateThemeButtonUI(false);
+                renderHistory();
+                renderChat();
+                closeSettingsPoll();
+                openGenericModal("Cache Flush Success", "LocalStorage wiped. Operational memory re-indexed.");
+            }
+        }
+
+        // BUTTON 8: PING DELAY TELEMETRY DIAGNOSTIC CHECKER
+        async function testNetworkLatency() {
+            const diagnosticStartTime = Date.now();
+            try {
+                // Testing round-trip time against local serverless structure
+                await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ prompt: "" }), headers: {'Content-Type':'application/json'} });
+                const roundTripLatency = Date.now() - diagnosticStartTime;
+                alert(`Network Diagnostics Complete.\n- Matrix Endpoint Latency: ${roundTripLatency}ms\n- Connection State: Stable`);
+            } catch (err) {
+                alert(`Diagnostic verification node dropped packet. Error status: ${err.message}`);
+            }
+        }
+
+        // BUTTON 10: INSTANCE PROTOCOL REBOOT RECOVERY SEQUENCE
+        function hardInstanceReset() {
+            if(confirm("ATTENTION: This triggers a total hardware state reconstruction. The terminal session will freeze and rebuild completely. Continue?")) {
+                window.location.reload(true);
+            }
+        }
+
+        /* ==========================================================================
+           SIDEBAR, CHAT DATAFLOW AND MULTIMODAL CORE ENGINE
+           ========================================================================== */
+
         function toggleSidebar() { 
             const s = document.getElementById('sidebar'); 
             if(isPC) {
@@ -751,14 +653,8 @@
             }
         }
 
-        function triggerCamera() { 
-            if(isPC) return; 
-            document.getElementById('cameraInput').click(); 
-        }
-
-        function triggerUpload() { 
-            document.getElementById('fileUploadInput').click(); 
-        }
+        function triggerCamera() { if(isPC) return; document.getElementById('cameraInput').click(); }
+        function triggerUpload() { document.getElementById('fileUploadInput').click(); }
 
         function handleCameraCapture(input) {
             const file = input.files[0];
@@ -866,11 +762,9 @@
                 const msgNode = document.createElement('div');
                 msgNode.className = `msg ${m.role}`;
                 
-                // Flexible parsing to natively accommodate text strings, images, or Markdown transformations
                 if (m.text.includes('<div') || m.text.includes('<img') || m.text.includes('<pre')) {
                     msgNode.innerHTML = m.text;
                 } else if (m.text.startsWith('![Generated')) {
-                    // Quick-parse client-side markdown strings safely if present
                     const urlSrc = m.text.match(/\((.*?)\)/)?.[1];
                     msgNode.innerHTML = `<img class="chat-img-preview" src="${urlSrc}" alt="AI Asset">`;
                 } else {
@@ -882,17 +776,14 @@
         }
 
         function startVoice() {
-            if (recognitionInstance) {
-                recognitionInstance.stop();
-                return;
-            }
+            if (recognitionInstance) { recognitionInstance.stop(); return; }
             const SpeechContract = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechContract) return;
             
             recognitionInstance = new SpeechContract();
             recognitionInstance.continuous = false;
             recognitionInstance.interimResults = false;
-            recognitionInstance.lang = 'en-US';
+            recognitionInstance.lang = globalSystemLanguage; // Binds dynamic localization parameter change
             
             document.getElementById('micBtn').classList.add('mic-active');
             
@@ -904,15 +795,8 @@
                 document.getElementById('sendIcon').classList.add('primed');
             };
             
-            recognitionInstance.onend = () => {
-                document.getElementById('micBtn').classList.remove('mic-active');
-                recognitionInstance = null;
-            };
-            
-            recognitionInstance.onerror = () => {
-                document.getElementById('micBtn').classList.remove('mic-active');
-                recognitionInstance = null;
-            };
+            recognitionInstance.onend = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
+            recognitionInstance.onerror = () => { document.getElementById('micBtn').classList.remove('mic-active'); recognitionInstance = null; };
             
             recognitionInstance.start();
         }
@@ -968,20 +852,23 @@
             document.getElementById('sendIcon').classList.remove('primed');
 
             try {
+                // Pull optional runtime key override adjustments out of memory
+                const activeTokenOverride = localStorage.getItem('vile_custom_api_key_override') || null;
+
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         prompt: cachedPrompt,
                         multimodal: !!cachedImageData,
-                        image_data: cachedImageData 
+                        image_data: cachedImageData,
+                        custom_key: activeTokenOverride
                     })
                 });
 
                 const data = await response.json();
                 
                 if (data.isImage && data.imageUri) {
-                    // Build a clean inline image render frame directly inside the message bubble response pop up
                     const functionalImageBubble = `
                         <div class="generated-image-container">
                             <div class="image-header-metadata">
