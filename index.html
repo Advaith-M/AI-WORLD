@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
+    <!-- Puter.js Architecture Import Layer -->
     <script src="https://js.puter.com/v2/"></script>
     
     <style>
@@ -26,6 +27,8 @@
             --brand-primary: #4f46e5;
             --error: #ef4444;
             --card-hover: rgba(255, 255, 255, 0.04);
+            --mic-active-bg: #ffffff;
+            --mic-active-color: #000000;
         }
 
         body.light-theme {
@@ -39,6 +42,8 @@
             --user-outline: rgba(0, 0, 0, 0.2);
             --ai-outline: rgba(0, 0, 0, 0.08);
             --card-hover: rgba(0, 0, 0, 0.03);
+            --mic-active-bg: #000000;
+            --mic-active-color: #ffffff;
         }
 
         * { 
@@ -245,7 +250,15 @@
             cursor: pointer; color: var(--text); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; font-size: 16px;
         }
         .circle-btn:hover { background: var(--accent); }
-        .mic-active { background: var(--error) !important; color: #fff !important; box-shadow: 0 0 15px var(--error); border-color: var(--error) !important; }
+        
+        /* DYNAMIC CONTRAST ADJUSTED MIC TRANSITION MATRIX */
+        .mic-active { 
+            background: var(--mic-active-bg) !important; 
+            color: var(--mic-active-color) !important; 
+            box-shadow: 0 0 20px rgba(255,255,255,0.4); 
+            border-color: var(--mic-active-bg) !important;
+            transform: scale(1.05);
+        }
 
         .input-wrap { position: relative; width: 100%; display: flex; flex-direction: column; }
         
@@ -264,9 +277,35 @@
         .input-thumb { height: 45px; width: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); }
         .thumb-remove { position: absolute; top: -6px; right: -6px; font-size: 16px; color: var(--error); cursor: pointer; background: var(--bg); border-radius: 50%; }
 
+        /* MODAL WRAPPER & SPLIT-LEVEL CENTER DISPLAY CONFIG */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
-        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; max-width: 90%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        
+        .settings-composite-wrapper {
+            display: flex;
+            gap: 15px;
+            max-width: 90%;
+            align-items: flex-start;
+            animation: professionalEntry 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-card { background: var(--modal-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--line); width: 460px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+
+        /* SIDE FLOATING LANGUAGES POLL MECHANICS */
+        .side-languages-poll {
+            background: var(--modal-bg);
+            padding: 25px 20px;
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            width: 220px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .side-languages-poll.show { display: flex; }
 
         /* Symmetrical Dual Column Matrix Core */
         .settings-poll-chassis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; margin-top: 20px; }
@@ -281,8 +320,7 @@
         
         .camera-trigger { display: none; }
 
-        /* Dynamic Field Config Blocks Inside the Modal */
-        .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-top: 15px; animation: professionalEntry 0.2s ease; }
+        .modal-config-view { display: none; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid var(--line); margin-top: 15px; }
         .modal-config-view.active { display: block; }
 
         @media (max-width: 1024px) {
@@ -306,6 +344,8 @@
             .msg { max-width: 95%; }
             .settings-poll-chassis { grid-template-columns: 1fr; }
             .modal-card { padding: 20px; }
+            .settings-composite-wrapper { flex-direction: column; }
+            .side-languages-poll { width: 100%; }
         }
     </style>
 </head>
@@ -317,13 +357,13 @@
             <div class="nav-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
         </div>
         <div class="sidebar-header">
-            <div class="nav-btn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
-            <div class="nav-btn" onclick="openGenericModal('World Feed Logs')"><i class="fas fa-globe"></i><span>World</span></div>
+            <div class="nav-btn" id="newChatSidebarBtn" onclick="showNamingModal()"><i class="fas fa-plus-circle"></i><span>New Chat</span></div>
+            <div class="nav-btn" id="worldSidebarBtn" onclick="openGenericModal('World Feed Logs')"><i class="fas fa-globe"></i><span>World</span></div>
         </div>
-        <div class="hanging-label">Sessions</div>
+        <div class="hanging-label" id="sessionsLabelNode">Sessions</div>
         <div id="history-list"></div>
         <div class="sidebar-footer">
-            <div class="nav-btn" onclick="openSettingsPoll(event)"><i class="fas fa-sliders-h"></i><span>Settings</span></div>
+            <div class="nav-btn" id="settingsSidebarBtn" onclick="openSettingsPoll(event)"><i class="fas fa-sliders-h"></i><span>Settings</span></div>
         </div>
     </aside>
 
@@ -331,7 +371,7 @@
         <div id="chat-container"></div>
         
         <div id="plusPoll" class="poll-menu">
-            <div class="poll-item" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
+            <div class="poll-item" id="uploadFileMenuNode" onclick="triggerUpload()"><i class="fas fa-file-upload"></i> Upload File</div>
         </div>
 
         <div class="input-area">
@@ -344,7 +384,7 @@
                         <img id="inputThumb" class="input-thumb" src="" alt="Capture preview">
                         <i class="fas fa-times-circle thumb-remove" onclick="clearCameraData()"></i>
                     </div>
-                    <span style="font-size:12px; color:var(--text); opacity:0.5; margin-left:10px;">Vision Core Loaded...</span>
+                    <span style="font-size:12px; color:var(--text); opacity:0.5; margin-left:10px;" id="visionLoadedTextNode">Vision Core Loaded...</span>
                 </div>
                 <textarea id="userInput" class="input-box" rows="1" oninput="autoGrow(this)" onkeydown="handleKeyActions(event)" placeholder="Message AI Vile..."></textarea>
                 <i id="sendIcon" class="fas fa-paper-plane send-btn" onclick="send()"></i>
@@ -355,69 +395,78 @@
     <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleCameraCapture(this)">
     <input type="file" id="fileUploadInput" style="display:none;" onchange="handleFileUpload(this)">
 
+    <!-- SYMMETRICAL 10-BUTTON RUNTIME SETTINGS POLL MODAL WINDOW -->
     <div id="settingsPollModal" class="modal-overlay" onclick="closeSettingsPoll()">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <h3 style="font-size:17px; font-weight:600; text-align:left; margin-bottom:5px;"><i class="fas fa-cog"></i> Terminal Configuration</h3>
-            <p style="font-size:12px; opacity:0.5; text-align:left; margin-bottom:15px;">Hardware matrix adjustments & session telemetry</p>
+        <div class="settings-composite-wrapper" onclick="event.stopPropagation()">
             
-            <div class="settings-poll-chassis">
-                <div class="settings-column">
-                    <button class="poll-action-trigger" id="themeTogglerBtn" onclick="toggleInterfaceTheme()"><i class="fas fa-sun"></i> Light Mode</button>
-                    <button class="poll-action-trigger" id="authGatewayBtn" onclick="handleSystemAuth()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('upgrade-view')"><i class="fas fa-crown"></i> Upgrade</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('api-view')"><i class="fas fa-key"></i> API Keys</button>
-                    <button class="poll-action-trigger" onclick="runNodeDiagnostics()"><i class="fas fa-server"></i> Node Status</button>
+            <div class="modal-card">
+                <h3 style="font-size:17px; font-weight:600; text-align:left; margin-bottom:5px;" id="settingsHeaderNode"><i class="fas fa-cog"></i> Terminal Configuration</h3>
+                <p style="font-size:12px; opacity:0.5; text-align:left; margin-bottom:15px;" id="settingsSubheaderNode">Hardware matrix adjustments & session telemetry</p>
+                
+                <div class="settings-poll-chassis">
+                    <!-- Column Left (5 Triggers) -->
+                    <div class="settings-column">
+                        <button class="poll-action-trigger" id="themeTogglerBtn" onclick="toggleInterfaceTheme()"><i class="fas fa-sun"></i> Light Mode</button>
+                        <button class="poll-action-trigger" id="authGatewayBtn" onclick="handleGoogleFederatedAuth()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                        <button class="poll-action-trigger" id="upgradeBtnNode" onclick="triggerPollAction('upgrade-view')"><i class="fas fa-crown"></i> Upgrade</button>
+                        <button class="poll-action-trigger" id="apiKeysBtnNode" onclick="triggerPollAction('api-view')"><i class="fas fa-key"></i> API Keys</button>
+                        <button class="poll-action-trigger" id="nodeStatusBtnNode" onclick="runNodeDiagnostics()"><i class="fas fa-server"></i> Node Status</button>
+                    </div>
+                    <!-- Column Right (5 Triggers) -->
+                    <div class="settings-column">
+                        <button class="poll-action-trigger" id="clearDataBtnNode" onclick="clearChatsExclusively()"><i class="fas fa-trash-alt"></i> Clear Data</button>
+                        <button class="poll-action-trigger" id="languageBtnNode" onclick="toggleLanguagesSidePoll()"><i class="fas fa-language"></i> Language</button>
+                        <button class="poll-action-trigger" id="diagnosticsBtnNode" onclick="testNetworkLatency()"><i class="fas fa-bolt"></i> Diagnostics</button>
+                        <button class="poll-action-trigger" id="manualDocsBtnNode" onclick="triggerPollAction('docs-view')"><i class="fas fa-book"></i> Manual Docs</button>
+                        <button class="poll-action-trigger" id="hardResetBtnNode" onclick="hardInstanceReset()"><i class="fas fa-power-off" style="color:var(--error)"></i> Hard Reset</button>
+                    </div>
                 </div>
-                <div class="settings-column">
-                    <button class="poll-action-trigger" onclick="clearEnvironmentCache()"><i class="fas fa-trash-alt"></i> Clear Data</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('lang-view')"><i class="fas fa-language"></i> Language</button>
-                    <button class="poll-action-trigger" onclick="testNetworkLatency()"><i class="fas fa-bolt"></i> Diagnostics</button>
-                    <button class="poll-action-trigger" onclick="triggerPollAction('docs-view')"><i class="fas fa-book"></i> Manual Docs</button>
-                    <button class="poll-action-trigger" onclick="hardInstanceReset()"><i class="fas fa-power-off" style="color:var(--error)"></i> Hard Reset</button>
+
+                <!-- Inner Configurations -->
+                <div id="upgrade-view" class="modal-config-view">
+                    <h4 style="font-size:14px; margin-bottom:6px;" id="upgradeTitleNode"><i class="fas fa-crown" style="color:#eab308"></i> Vile Enterprise Pro</h4>
+                    <p style="font-size:12px; opacity:0.7; margin-bottom:10px;" id="upgradeDescNode">Unlock infinite generation capacity, image rendering speeds, and extended long-horizon context processing arrays.</p>
+                    <button class="nav-btn" style="background:var(--brand-gradient); color:white; border:none; justify-content:center;" id="upgradeActionBtnNode" onclick="alert('Checkout module offline.')">Provision Subscriptions</button>
+                </div>
+
+                <div id="api-view" class="modal-config-view">
+                    <h4 style="font-size:14px; margin-bottom:8px;" id="apiTitleNode"><i class="fas fa-key"></i> Key Management overrides</h4>
+                    <input type="password" id="customApiKeyField" class="input-box" style="padding:10px; font-size:12px; border-radius:8px; margin-bottom:10px;" placeholder="sk-or-groq-custom-token-entry...">
+                    <button class="nav-btn" style="justify-content:center; padding:8px;" id="apiActionBtnNode" onclick="saveCustomTokenOverride()">Inject Token Key</button>
+                </div>
+
+                <div id="docs-view" class="modal-config-view" style="max-height:140px; overflow-y:auto;">
+                    <h4 style="font-size:14px; margin-bottom:4px;" id="docsTitleNode"><i class="fas fa-book"></i> Developer Operations Blueprint</h4>
+                    <p style="font-size:11.5px; opacity:0.7; line-height:1.5;" id="docsDescNode">Route A automatically hooks image queries through high-fidelity Flux pipelines. Serverless logic converts streams directly into Base64 blocks to prevent cross-origin tracking breaks.</p>
                 </div>
             </div>
 
-            <div id="upgrade-view" class="modal-config-view">
-                <h4 style="font-size:14px; margin-bottom:6px;"><i class="fas fa-crown" style="color:#eab308"></i> Vile Enterprise Pro</h4>
-                <p style="font-size:12px; opacity:0.7; margin-bottom:10px;">Unlock infinite generation capacity, image rendering speeds, and extended long-horizon context processing arrays.</p>
-                <button class="nav-btn" style="background:var(--brand-gradient); color:white; border:none; justify-content:center;" onclick="alert('Checkout module connection failure: Gateway mock offline.')">Provision Subscriptions</button>
+            <!-- SIDE FLOATING PANEL LAYER (100% BUTTON ARCHITECTURE WITH ENGLISH LABELS) -->
+            <div id="sideLanguagesPoll" class="side-languages-poll">
+                <h4 style="font-size:13px; font-weight:600; margin-bottom:5px; opacity:0.8;"><i class="fas fa-globe-americas"></i> Localization</h4>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('en-US')">English</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('es-ES')">Spanish</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('fr-FR')">French</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('de-DE')">German</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('zh-CN')">Chinese</button>
+                <button class="poll-action-trigger" style="justify-content:flex-start;" onclick="applyLocalizationSystem('ja-JP')">Japanese</button>
             </div>
 
-            <div id="api-view" class="modal-config-view">
-                <h4 style="font-size:14px; margin-bottom:8px;"><i class="fas fa-key"></i> Key Management overrides</h4>
-                <input type="password" id="customApiKeyField" class="input-box" style="padding:10px; font-size:12px; border-radius:8px; margin-bottom:10px;" placeholder="sk-or-groq-custom-token-entry...">
-                <button class="nav-btn" style="justify-content:center; padding:8px;" onclick="saveCustomTokenOverride()">Inject Token Key</button>
-            </div>
-
-            <div id="lang-view" class="modal-config-view">
-                <h4 style="font-size:14px; margin-bottom:6px;"><i class="fas fa-language"></i> System Localization</h4>
-                <select id="langSelectNode" onchange="changeLanguageContext(this)" style="width:100%; background:var(--bg); color:var(--text); padding:8px; border:1px solid var(--line); border-radius:8px; outline:none;">
-                    <option value="en-US">English (Standard Terminal)</option>
-                    <option value="es-ES">Español (Castellano)</option>
-                    <option value="fr-FR">Français (France)</option>
-                    <option value="de-DE">Deutsch (System)</option>
-                </select>
-            </div>
-
-            <div id="docs-view" class="modal-config-view" style="max-height:140px; overflow-y:auto;">
-                <h4 style="font-size:14px; margin-bottom:4px;"><i class="fas fa-book"></i> Developer Operations Blueprint</h4>
-                <p style="font-size:11.5px; opacity:0.7; line-height:1.5;">Route A automatically hooks image queries through high-fidelity Flux pipelines. Serverless logic converts streams directly into Base64 blocks to prevent cross-origin tracking breaks.</p>
-            </div>
         </div>
     </div>
 
     <div id="namingModal" class="modal-overlay" onclick="document.getElementById('namingModal').classList.remove('show')">
         <div class="modal-card" onclick="event.stopPropagation()">
-            <h2 style="margin-bottom:15px; font-size:16px; font-weight:600; text-align:left;">Session Designation</h2>
+            <h2 style="margin-bottom:15px; font-size:16px; font-weight:600; text-align:left;" id="sessionDesignationNode">Session Designation</h2>
             <input type="text" id="chatNameInput" class="input-box" style="border-radius:10px; margin-bottom:20px;" placeholder="Topic title...">
-            <button class="nav-btn" style="justify-content:center; font-weight:600; background:var(--brand-gradient); color:white; border:none;" onclick="createNewChat()">Initiate Interface</button>
+            <button class="nav-btn" style="justify-content:center; font-weight:600; background:var(--brand-gradient); color:white; border:none;" id="initiateInterfaceBtnNode" onclick="createNewChat()">Initiate Interface</button>
         </div>
     </div>
 
     <div id="genericModal" class="modal-overlay" onclick="closeGenericModal()">
         <div class="modal-card" onclick="event.stopPropagation()">
             <h2 id="modalTitle" style="font-size:16px; font-weight:600; text-align:left;"></h2>
-            <p id="modalDescription" style="color:var(--text); opacity:0.6; margin-top:15px; text-align:left; font-size:13px;">Operation endpoint verified. Function matrix initialization complete.</p>
+            <p id="modalDescription" style="color:var(--text); opacity:0.6; margin-top:15px; text-align:left; font-size:13px;">Operation endpoint verified.</p>
         </div>
     </div>
 
@@ -432,9 +481,77 @@
         const isPC = window.innerWidth > 1024;
         const isMobileOrTablet = window.innerWidth <= 1024;
 
-        // INITIALIZE RUNTIME COMPONENT ASSIGNMENTS
+        // DICTIONARY REPOSITORY FOR TARGETED UI LOCALIZATION PACKS
+        const translationMatrix = {
+            "en-US": {
+                placeholder: "Message AI Vile...",
+                newChat: "New Chat", world: "World", sessions: "Sessions", settings: "Settings",
+                upload: "Upload File", vision: "Vision Core Loaded...", configHeader: "Terminal Configuration",
+                configSub: "Hardware matrix adjustments & session telemetry", lightMode: "Light Mode", darkMode: "Dark Mode",
+                signIn: "Sign In", signOut: "Sign Out", upgrade: "Upgrade", keys: "API Keys", status: "Node Status",
+                clear: "Clear Data", lang: "Language", diag: "Diagnostics", docs: "Manual Docs", reset: "Hard Reset",
+                upTitle: "Vile Enterprise Pro", upDesc: "Unlock infinite generation capacity...", upBtn: "Provision Subscriptions",
+                apiKeyTitle: "Key Management overrides", apiBtn: "Inject Token Key", docTitle: "Developer Operations Blueprint",
+                docDesc: "Route A automatically hooks image queries through high-fidelity Flux pipelines...", sessionDesignation: "Session Designation", initInterface: "Initiate Interface"
+            },
+            "es-ES": {
+                placeholder: "Enviar mensaje a AI Vile...",
+                newChat: "Nuevo Chat", world: "Mundo", sessions: "Sesiones", settings: "Ajustes",
+                upload: "Subir Archivo", vision: "Núcleo de Visión Cargado...", configHeader: "Configuración del Terminal",
+                configSub: "Ajustes de la matriz de hardware y telemetría", lightMode: "Modo Claro", darkMode: "Modo Oscuro",
+                signIn: "Iniciar Sesión", signOut: "Cerrar Sesión", upgrade: "Actualizar", keys: "Claves API", status: "Estado del Nodo",
+                clear: "Borrar Datos", lang: "Idioma", diag: "Diagnósticos", docs: "Manual Técnico", reset: "Reiniciar",
+                upTitle: "Vile Enterprise Pro", upDesc: "Desbloquea capacidad de generación infinita...", upBtn: "Provisionar Suscripciones",
+                apiKeyTitle: "Anulaciones de Gestión de Claves", apiBtn: "Inyectar Clave", docTitle: "Plano de Operaciones de Desarrollador",
+                docDesc: "La Ruta A vincula automáticamente las consultas de imágenes a través de flujos Flux...", sessionDesignation: "Designación de Sesión", initInterface: "Iniciar Interfaz"
+            },
+            "fr-FR": {
+                placeholder: "Envoyer un message à AI Vile...",
+                newChat: "Nouveau Chat", world: "Monde", sessions: "Sessions", settings: "Paramètres",
+                upload: "Télécharger Fichier", vision: "Noyau de Vision Chargé...", configHeader: "Configuration du Terminal",
+                configSub: "Ajustements de la matrice matérielle et télémétrie", lightMode: "Mode Clair", darkMode: "Mode Sombre",
+                signIn: "Se Connecter", signOut: "Se Déconnecter", upgrade: "Améliorer", keys: "Clés API", status: "Statut du Nœud",
+                clear: "Effacer Données", lang: "Langue", diag: "Diagnostics", docs: "Documentation", reset: "Réinitialisation",
+                upTitle: "Vile Enterprise Pro", upDesc: "Débloquez une capacité de génération infinie...", upBtn: "Activer l'Abonnement",
+                apiKeyTitle: "Gestion des Clés API", apiBtn: "Injecter la Clé", docTitle: "Plan d'Opérations Développeur",
+                docDesc: "La route A connecte automatiquement les requêtes d'images via des pipelines Flux...", sessionDesignation: "Désignation de la Session", initInterface: "Initialiser l'Interface"
+            },
+            "de-DE": {
+                placeholder: "Nachricht an AI Vile...",
+                newChat: "Neuer Chat", world: "Welt", sessions: "Sitzungen", settings: "Einstellungen",
+                upload: "Datei Hochladen", vision: "Vision-Kern geladen...", configHeader: "Terminal-Konfiguration",
+                configSub: "Hardware-Matrix-Anpassungen und Sitzungstelemetrie", lightMode: "Heller Modus", darkMode: "Dunkler Modus",
+                signIn: "Anmelden", signOut: "Abmelden", upgrade: "Upgrade", keys: "API-Schlüssel", status: "Knotenstatus",
+                clear: "Daten Löschen", lang: "Sprache", diag: "Diagnose", docs: "Handbuch", reset: "Hard Reset",
+                upTitle: "Vile Enterprise Pro", upDesc: "Schalten Sie unbegrenzte Generierungskapazitäten frei...", upBtn: "Abonnement einrichten",
+                apiKeyTitle: "Schlüsselverwaltung", apiBtn: "Schlüssel injizieren", docTitle: "Entwickler-Betriebsplan",
+                docDesc: "Route A leitet Bildanfragen automatisch über hochpräzise Flux-Pipelines...", sessionDesignation: "Sitzungsbezeichnung", initInterface: "Schnittstelle starten"
+            },
+            "zh-CN": {
+                placeholder: "向 AI Vile 发送消息...",
+                newChat: "新建对话", world: "世界网络", sessions: "会话记录", settings: "核心设置",
+                upload: "上传文件", vision: "视觉核心已载入...", configHeader: "终端控制台配置",
+                configSub: "硬件矩阵调整与会话遥测数据", lightMode: "浅色模式", darkMode: "深色模式",
+                signIn: "登录系统", signOut: "退出登录", upgrade: "升级权益", keys: "API 密钥", status: "节点状态",
+                clear: "清除数据", lang: "语言选择", diag: "基准诊断", docs: "开发文档", reset: "硬性重置",
+                upTitle: "Vile 核心企业版", upDesc: "解锁无限生成容量、超高速图像渲染及长周期上下文...", upBtn: "配置订阅方案",
+                apiKeyTitle: "密钥管理覆盖", apiBtn: "注入密钥令牌", docTitle: "开发者操作蓝图",
+                docDesc: "路由 A 自动通过高保真 Flux 流水线挂钩图像查询...", sessionDesignation: "指定会话名称", initInterface: "初始化界面"
+            },
+            "ja-JP": {
+                placeholder: "AI Vile にメッセージを送信...",
+                newChat: "新規チャット", world: "ワールド", sessions: "セッション", settings: "システム設定",
+                upload: "ファイルをアップロード", vision: "ビジョンコアがロードされました...", configHeader: "端末コンフィグレーション",
+                configSub: "ハードウェアマトリックス調整とセッションテレメトリ", lightMode: "ライトモード", darkMode: "ダークモード",
+                signIn: "サインイン", signOut: "サインアウト", upgrade: "アップグレード", keys: "APIキー", status: "ノード状態",
+                clear: "データ消去", lang: "言語設定", diag: "診断分析", docs: "マニュアル", reset: "ハードリセット",
+                upTitle: "Vile Enterprise Pro", upDesc: "無限の生成容量、高速画像レンダリング、拡張文脈処理を解放...", upBtn: "サブスクリプションの有効化",
+                apiKeyTitle: "キー管理のオーバーライド", apiBtn: "キーを注入", docTitle: "開発運用ブループリント",
+                docDesc: "ルートAは、高忠実度のFluxパイプラインを介して画像クエリを自動的にフックします...", sessionDesignation: "セッション名の指定", initInterface: "インターフェース起動"
+            }
+        };
+
         window.addEventListener('DOMContentLoaded', async () => {
-            // Load theme configurations directly out of persistent cloud key-value slots if set
             try {
                 if (window.puter) {
                     const savedTheme = await puter.kv.get('vile_theme_preference');
@@ -442,10 +559,9 @@
                         document.body.classList.add('light-theme');
                         updateThemeButtonUI(true);
                     }
-                    // Validate existing security tokens
                     evaluateAuthButtonState();
                 }
-            } catch(e) { console.warn("Puter Cloud KV uninitialized or slow checkout: ", e); }
+            } catch(e) { console.warn("Puter SDK standard fallback activation.", e); }
         });
 
         window.addEventListener('click', function(e) {
@@ -472,8 +588,8 @@
 
         function closeSettingsPoll() {
             document.getElementById('settingsPollModal').classList.remove('show');
-            // Collapse any active inner configuration sub-menus
             document.querySelectorAll('.modal-config-view').forEach(node => node.classList.remove('active'));
+            document.getElementById('sideLanguagesPoll').classList.remove('show');
         }
 
         function openGenericModal(title, description = "") { 
@@ -490,7 +606,7 @@
            CORE FUNCTIONAL IMPLEMENTATION FOR THE 10 MATRIX POLL BUTTONS
            ========================================================================== */
 
-        // BUTTON 1: THEME TOGGLER WITH PERSISTENT CLOUD STORAGE HOOKS
+        // BUTTON 1: THEME TOGGLER
         async function toggleInterfaceTheme() {
             const isLightNow = document.body.classList.toggle('light-theme');
             updateThemeButtonUI(isLightNow);
@@ -503,44 +619,47 @@
 
         function updateThemeButtonUI(isLight) {
             const btn = document.getElementById('themeTogglerBtn');
+            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
             if(isLight) {
-                btn.innerHTML = `<i class="fas fa-moon"></i> Dark Mode`;
+                btn.innerHTML = `<i class="fas fa-moon"></i> ${lang.darkMode}`;
             } else {
-                btn.innerHTML = `<i class="fas fa-sun"></i> Light Mode`;
+                btn.innerHTML = `<i class="fas fa-sun"></i> ${lang.lightMode}`;
             }
         }
 
-        // BUTTON 2: PUTER OAUTH SECURE GATEWAY ROUTER
-        async function handleSystemAuth() {
+        // BUTTON 2: INTEGRATED GOOGLE FEDERATED AUTH THROUGH PUTER LOGIC CORE
+        async function handleGoogleFederatedAuth() {
             if (!window.puter) {
-                alert("Puter SDK connection timed out. Verify your internet status.");
+                alert("Puter SDK connection failure. Check network endpoint mapping.");
                 return;
             }
             try {
                 if (puter.auth.isSignedIn()) {
                     await puter.auth.signOut();
-                    alert("Session destroyed successfully. Terminal offline.");
+                    alert("Authentication terminated. User token purged.");
                 } else {
+                    // Requests standard third-party federated login authorization arrays (Google, GitHub, etc.)
                     await puter.auth.signIn();
-                    const info = await puter.auth.getUser();
-                    alert(`Access Granted. Authenticated as: ${info.username}`);
+                    const userAccountProfile = await puter.auth.getUser();
+                    alert(`Google Identity Verified.\nBound Identity: ${userAccountProfile.username}\nEmail Hook Active.`);
                 }
                 evaluateAuthButtonState();
-            } catch(authError) {
-                alert(`OAuth Interface Failure: ${authError.message}`);
+            } catch(authErr) {
+                alert(`Identity Pipeline Error: ${authErr.message}`);
             }
         }
 
         function evaluateAuthButtonState() {
             const authBtn = document.getElementById('authGatewayBtn');
+            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
             if (window.puter && puter.auth.isSignedIn()) {
-                authBtn.innerHTML = `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> Sign Out`;
+                authBtn.innerHTML = `<i class="fas fa-sign-out-alt" style="color:var(--error)"></i> ${lang.signOut}`;
             } else {
-                authBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> Sign In`;
+                authBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> ${lang.signIn}`;
             }
         }
 
-        // BUTTON 3, 4, 7 & 9: STRUCTURAL CONFIG MATRIX PANEL TOGGLERS
+        // BUTTON 3, 4 & 9: CONFIG MATRIX LAYERS
         function triggerPollAction(viewElementId) {
             const block = document.getElementById(viewElementId);
             const targets = document.querySelectorAll('.modal-config-view');
@@ -552,66 +671,107 @@
 
         function saveCustomTokenOverride() {
             const key = document.getElementById('customApiKeyField').value.trim();
-            if(!key) { alert("Key field empty. Matrix injection rejected."); return; }
+            if(!key) { alert("Matrix key generation rejected."); return; }
             localStorage.setItem('vile_custom_api_key_override', key);
-            alert("Custom token successfully bound to local application instance memory.");
+            alert("Custom token successfully bound to local container runtime variables.");
             document.getElementById('api-view').classList.remove('active');
         }
 
-        function changeLanguageContext(selectComponent) {
-            globalSystemLanguage = selectComponent.value;
-            alert(`Voice matrix system language modified to: ${globalSystemLanguage}`);
-            document.getElementById('lang-view').classList.remove('active');
-        }
-
-        // BUTTON 5: HARDWARE NODE STATUS LOGGER
+        // BUTTON 5: HARDWARE NODE RUNTIME DIAGNOSTICS
         function runNodeDiagnostics() {
-            const coreEngine = window.puter ? "Puter Core Verified" : "Native Fetch Model Fallback";
+            const coreEngine = window.puter ? "Puter Core Connected" : "Native Fetch Model Fallback";
             const currentSystemTheme = document.body.classList.contains('light-theme') ? "Light Emulation" : "Dark Carbon Matrix";
             
             const diagnosticProfile = `
-                [ ENGINE RUNTIME BLOCK ]\n
-                - Virtual Core: ${coreEngine}\n
-                - Active Layout Template: ${currentSystemTheme}\n
-                - System Language Core: ${globalSystemLanguage}\n
-                - Hardware Memory Pipeline: Active\n
-                - Operational Security Context: CSP Verified
+                [ Vile Core Engine Runtime ]
+                - Virtual Core Layer: ${coreEngine}
+                - UI Render Template: ${currentSystemTheme}
+                - Audio Matrix Locale: ${globalSystemLanguage}
+                - Latency Pipeline: Verified Stable
             `;
             openGenericModal("Runtime Node Diagnostics", diagnosticProfile);
         }
 
-        // BUTTON 6: TRANSIENT MEMORY CLEAR ROUTINE
-        function clearEnvironmentCache() {
-            if(confirm("Purge all active user chat session arrays and persistent cache preferences?")) {
+        // BUTTON 6: TARGETED EXCLUSIVE CHAT PRUNING
+        function clearChatsExclusively() {
+            const lang = translationMatrix[globalSystemLanguage] || translationMatrix["en-US"];
+            if(confirm("Confirm deletion of active user conversation logs? Configuration metrics and accounts will remain unaffected.")) {
                 chats = [];
                 currentChatId = null;
-                localStorage.removeItem('vile_custom_api_key_override');
-                localStorage.removeItem('vile_theme_preference');
-                document.body.classList.remove('light-theme');
-                updateThemeButtonUI(false);
                 renderHistory();
                 renderChat();
                 closeSettingsPoll();
-                openGenericModal("Cache Flush Success", "LocalStorage wiped. Operational memory re-indexed.");
+                openGenericModal("Logs Cleared", "Conversational arrays purged from memory stack.");
             }
         }
 
-        // BUTTON 8: PING DELAY TELEMETRY DIAGNOSTIC CHECKER
+        // BUTTON 7: TOGGLE MULTI-LANGUAGE FLOATING SIDE-POLL MENU
+        function toggleLanguagesSidePoll() {
+            document.getElementById('sideLanguagesPoll').classList.toggle('show');
+        }
+
+        // NATIVE STRING INJECTION INTERACTION COMPONENT FOR ALL HARD DOM NODES
+        function applyLocalizationSystem(localeTokenCode) {
+            if(!translationMatrix[localeTokenCode]) return;
+            globalSystemLanguage = localeTokenCode;
+            const dictionary = translationMatrix[localeTokenCode];
+
+            // Update interactive core strings down the DOM tree structure
+            document.getElementById('userInput').placeholder = dictionary.placeholder;
+            document.getElementById('newChatSidebarBtn').querySelector('span').innerText = dictionary.newChat;
+            document.getElementById('worldSidebarBtn').querySelector('span').innerText = dictionary.world;
+            document.getElementById('sessionsLabelNode').innerText = dictionary.sessions;
+            document.getElementById('settingsSidebarBtn').querySelector('span').innerText = dictionary.settings;
+            document.getElementById('uploadFileMenuNode').innerHTML = `<i class="fas fa-file-upload"></i> ${dictionary.upload}`;
+            document.getElementById('visionLoadedTextNode').innerText = dictionary.vision;
+            
+            document.getElementById('settingsHeaderNode').innerHTML = `<i class="fas fa-cog"></i> ${dictionary.configHeader}`;
+            document.getElementById('settingsSubheaderNode').innerText = dictionary.configSub;
+            
+            updateThemeButtonUI(document.body.classList.contains('light-theme'));
+            evaluateAuthButtonState();
+            
+            document.getElementById('upgradeBtnNode').innerHTML = `<i class="fas fa-crown"></i> ${dictionary.upgrade}`;
+            document.getElementById('apiKeysBtnNode').innerHTML = `<i class="fas fa-key"></i> ${dictionary.keys}`;
+            document.getElementById('nodeStatusBtnNode').innerHTML = `<i class="fas fa-server"></i> ${dictionary.status}`;
+            document.getElementById('clearDataBtnNode').innerHTML = `<i class="fas fa-trash-alt"></i> ${dictionary.clear}`;
+            document.getElementById('languageBtnNode').innerHTML = `<i class="fas fa-language"></i> ${dictionary.lang}`;
+            document.getElementById('diagnosticsBtnNode').innerHTML = `<i class="fas fa-bolt"></i> ${dictionary.diag}`;
+            document.getElementById('manualDocsBtnNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docs}`;
+            document.getElementById('hardResetBtnNode').innerHTML = `<i class="fas fa-power-off" style="color:var(--error)"></i> ${dictionary.reset}`;
+
+            document.getElementById('upgradeTitleNode').innerHTML = `<i class="fas fa-crown" style="color:#eab308"></i> ${dictionary.upTitle}`;
+            document.getElementById('upgradeDescNode').innerText = dictionary.upDesc;
+            document.getElementById('upgradeActionBtnNode').innerText = dictionary.upBtn;
+            
+            document.getElementById('apiTitleNode').innerHTML = `<i class="fas fa-key"></i> ${dictionary.apiKeyTitle}`;
+            document.getElementById('apiActionBtnNode').innerText = dictionary.apiBtn;
+            
+            document.getElementById('docsTitleNode').innerHTML = `<i class="fas fa-book"></i> ${dictionary.docTitle}`;
+            document.getElementById('docsDescNode').innerText = dictionary.docDesc;
+            
+            document.getElementById('sessionDesignationNode').innerText = dictionary.sessionDesignation;
+            document.getElementById('initiateInterfaceBtnNode').innerText = dictionary.initInterface;
+
+            // Hide language side poll on selection update
+            document.getElementById('sideLanguagesPoll').classList.remove('show');
+        }
+
+        // BUTTON 8: PING DELAY ARRAY TELEMETRY CHECKER
         async function testNetworkLatency() {
             const diagnosticStartTime = Date.now();
             try {
-                // Testing round-trip time against local serverless structure
                 await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ prompt: "" }), headers: {'Content-Type':'application/json'} });
                 const roundTripLatency = Date.now() - diagnosticStartTime;
-                alert(`Network Diagnostics Complete.\n- Matrix Endpoint Latency: ${roundTripLatency}ms\n- Connection State: Stable`);
+                alert(`Telemetry Core Latency Verification: ${roundTripLatency}ms`);
             } catch (err) {
-                alert(`Diagnostic verification node dropped packet. Error status: ${err.message}`);
+                alert(`Diagnostic array timeout frame: ${err.message}`);
             }
         }
 
-        // BUTTON 10: INSTANCE PROTOCOL REBOOT RECOVERY SEQUENCE
+        // BUTTON 10: REBOOT MATRIX SEQUENCE
         function hardInstanceReset() {
-            if(confirm("ATTENTION: This triggers a total hardware state reconstruction. The terminal session will freeze and rebuild completely. Continue?")) {
+            if(confirm("Trigger hard reconstruction of terminal runtime arrays? All unsaved cached contexts will collapse.")) {
                 window.location.reload(true);
             }
         }
@@ -783,8 +943,9 @@
             recognitionInstance = new SpeechContract();
             recognitionInstance.continuous = false;
             recognitionInstance.interimResults = false;
-            recognitionInstance.lang = globalSystemLanguage; // Binds dynamic localization parameter change
+            recognitionInstance.lang = globalSystemLanguage; 
             
+            // Dynamic theme tracking assigns high-contrast background values on micro-state toggle
             document.getElementById('micBtn').classList.add('mic-active');
             
             recognitionInstance.onresult = (e) => {
@@ -852,7 +1013,6 @@
             document.getElementById('sendIcon').classList.remove('primed');
 
             try {
-                // Pull optional runtime key override adjustments out of memory
                 const activeTokenOverride = localStorage.getItem('vile_custom_api_key_override') || null;
 
                 const response = await fetch('/api/chat', {
